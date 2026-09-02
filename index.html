@@ -60,7 +60,7 @@
         </div>
         
         <div class="controls-center">
-            <div id="status-message">Ожидание...</div>
+            <div id="status-message">Загрузка...</div>
             <button id="action-btn" class="disabled">Выберите героя</button>
         </div>
         
@@ -189,8 +189,7 @@ executeDraftStep(selectedHero);
 selectedHero = null;
 } else {
 if (availableHeroes.length === 0) return;
-// Компьютер выбирает первого доступного героя (100% стабильно и просто)
-const aiHeroChoice = availableHeroes[0];
+const aiHeroChoice = availableHeroes[0]; // Исправлено: берется первый элемент
 executeDraftStep(aiHeroChoice);
 }
 });
@@ -242,7 +241,5 @@ actionBtn.innerText = "Ход Компьютера";
 actionBtn.className = "";
 }
 }
-setTimeout(() => {
-    initHeroesGrid();
-    updateUI();
-}, 100);
+initHeroesGrid();
+updateUI();
