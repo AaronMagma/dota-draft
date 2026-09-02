@@ -31,7 +31,7 @@
         .hero-card.disabled { filter: grayscale(100%); opacity: 0.25; cursor: not-allowed; border-color: #27272a; }
         .hero-name-label { font-size: 10px; text-align: center; font-weight: bold; margin-top: 5px; }
         
-        /* Золотая пульсация для активного слота драфта */
+        /* Эффект золотого свечения для активного слота */
         @keyframes pulse-gold {
             0% { border-color: #52525b; box-shadow: 0 0 0px rgba(251, 191, 36, 0); }
             50% { border-color: #fbbf24; box-shadow: 0 0 12px rgba(251, 191, 36, 1); background-color: #27272a; }
@@ -204,7 +204,7 @@ executeDraftStep(selectedHero);
 selectedHero = null;
 } else {
 if (availableHeroes.length === 0) return;
-let bestHero = availableHeroes[0]; // Исправлено: теперь это корректная строка
+let bestHero = availableHeroes[0];
 let maxScore = -999;
 availableHeroes.forEach(heroName => {
 const heroData = heroesPool.find(h => h.name === heroName);
@@ -239,6 +239,11 @@ const currentSlotElement = document.getElementById(currentSlotId);
 if (currentSlotElement) {
 currentSlotElement.classList.remove('active-slot-highlight');
 }
+// Фиксируем выбор в массивы сторон ДО увеличения шага
+const sidePrefix = currentTurn.side ? 'd' : 'r';
+const draftRef = currentTurn.side ? direDraft : radiantDraft;
+const arrayToPush = currentTurn.type === 'ban' ? draftRef.bans : draftRef.picks;
+arrayToPush.push(heroName);
 availableHeroes = availableHeroes.filter(name => name !== heroName);
 const cardId = 'card-' + heroName.replace(/\s+/g, '');
 const card = document.getElementById(cardId);
@@ -246,11 +251,6 @@ if (card) {
 card.classList.remove('selected');
 card.classList.add('disabled');
 }
-const sidePrefix = currentTurn.side ? 'd' : 'r';
-const draftRef = currentTurn.side ? direDraft : radiantDraft;
-const arrayToPush = currentTurn.type === 'ban' ? draftRef.bans : draftRef.picks;
-const slotIndex = arrayToPush.length;
-arrayToPush.push(heroName);
 if (currentSlotElement) {
 currentSlotElement.innerText = heroData.icon;
 if (currentTurn.type === 'ban') {
@@ -296,5 +296,7 @@ actionBtn.className = "";
 }
 startTimer();
 }
+// Правильный порядок инициализации: сначала сетка, потом UI
 initHeroesGrid();
 updateUI();
+
