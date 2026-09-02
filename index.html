@@ -1,108 +1,197 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Dota 2 Draft Simulator</title>
-    <style>
-        body { background-color: #1c1c1f; color: #e5e5e5; font-family: 'Arial', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        h1 { margin-bottom: 5px; color: #a3a3a3; text-transform: uppercase; font-size: 20px; letter-spacing: 2px;}
-        .draft-header { display: flex; width: 100%; max-width: 1100px; justify-content: space-between; align-items: flex-start; background: #2a2a2e; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-bottom: 3px solid #3f3f46; box-sizing: border-box; }
-        .team-box { width: 38%; }
-        .team-box.radiant h3 { color: #4ade80; margin: 0 0 10px 0; }
-        .team-box.dire h3 { color: #f87171; margin: 0 0 10px 0; text-align: right; }
-        .row-label { font-size: 11px; color: #a1a1aa; margin: 5px 0 2px 0; text-transform: uppercase; }
-        .team-box.dire .row-label { text-align: right; }
-        .slots { display: flex; gap: 6px; margin-bottom: 10px; }
-        .team-box.dire .slots { justify-content: flex-end; }
-        
-        .slot { 
-            width: 65px; 
-            height: 38px; 
-            background-color: #141416; 
-            border: 1px solid #52525b; 
-            border-radius: 4px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 20px; 
-            overflow: hidden; 
-            color: #71717a; /* Цвет для подписей */
-            font-weight: bold;
-        }
-        .slot.ban-slot { 
-            width: 45px; 
-            height: 26px; 
-            border-color: #3f3f46; 
-            font-size: 10px; 
-        }
-        .controls-center { width: 24%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding-top: 20px; }
-        #status-message { font-size: 13px; font-weight: bold; color: #fbbf24; text-align: center; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; }
-        #action-btn { background-color: #ef4444; color: white; border: none; padding: 12px 20px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: background 0.2s; letter-spacing: 1px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        #action-btn:hover { background-color: #dc2626; }
-        #action-btn.player-turn { background-color: #22c55e; }
-        #action-btn.player-turn:hover { background-color: #16a34a; }
-        #action-btn.disabled { background-color: #4b5563; cursor: not-allowed; opacity: 0.6; }
-        .heroes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 10px; width: 100%; max-width: 1100px; background: #2a2a2e; padding: 20px; border-radius: 8px; box-sizing: border-box; }
-        .hero-card { cursor: pointer; border: 2px solid #52525b; border-radius: 4px; padding: 10px 5px; text-align: center; transition: all 0.2s ease; position: relative; background-color: #141416; }
-        .hero-card:hover:not(.disabled) { border-color: #fbbf24; transform: scale(1.04); }
-        .hero-card.selected { border-color: #22c55e; box-shadow: 0 0 10px #22c55e; }
-        .hero-icon { font-size: 28px; margin-bottom: 5px; }
-        .hero-card.disabled { filter: grayscale(100%); opacity: 0.25; cursor: not-allowed; border-color: #27272a; }
-        .hero-name-label { font-size: 10px; text-align: center; font-weight: bold; margin-top: 5px; }
-    </style>
-</head>
-<body>
-    <h1>Dota 2 Draft Simulator</h1>
-    <div class="draft-header">
-        <div class="team-box radiant">
-            <h3>Свет (Radiant)</h3>
-            <div class="row-label">Пики (Picks)</div>
-            <div class="slots">
-                <div id="r-pick-0" class="slot">1-й</div>
-                <div id="r-pick-1" class="slot">2-й</div>
-                <div id="r-pick-2" class="slot">3-й</div>
-                <div id="r-pick-3" class="slot">4-й</div>
-                <div id="r-pick-4" class="slot">5-й</div>
-            </div>
-            <div class="row-label">Баны (Bans)</div>
-            <div class="slots">
-                <div id="r-ban-0" class="slot ban-slot">1-й</div>
-                <div id="r-ban-1" class="slot ban-slot">2-й</div>
-                <div id="r-ban-2" class="slot ban-slot">3-й</div>
-                <div id="r-ban-3" class="slot ban-slot">4-й</div>
-                <div id="r-ban-4" class="slot ban-slot">5-й</div>
-                <div id="r-ban-5" class="slot ban-slot">6-й</div>
-                <div id="r-ban-6" class="slot ban-slot">7-й</div>
-            </div>
-        </div>
-        <div class="controls-center">
-            <div id="status-message">Загрузка скрипта...</div>
-            <button id="action-btn" class="disabled">Выберите героя</button>
-        </div>
-        <div class="team-box dire">
-            <h3>Тьма (Dire)</h3>
-            <div class="row-label">Пики (Picks)</div>
-            <div class="slots">
-                <div id="d-pick-0" class="slot">1-й</div>
-                <div id="d-pick-1" class="slot">2-й</div>
-                <div id="d-pick-2" class="slot">3-й</div>
-                <div id="d-pick-3" class="slot">4-й</div>
-                <div id="d-pick-4" class="slot">5-й</div>
-            </div>
-            <div class="row-label">Баны (Bans)</div>
-            <div class="slots">
-                <div id="d-ban-0" class="slot ban-slot">1-й</div>
-                <div id="d-ban-1" class="slot ban-slot">2-й</div>
-                <div id="d-ban-2" class="slot ban-slot">3-й</div>
-                <div id="d-ban-3" class="slot ban-slot">4-й</div>
-                <div id="d-ban-4" class="slot ban-slot">5-й</div>
-                <div id="d-ban-5" class="slot ban-slot">6-й</div>
-                <div id="d-ban-6" class="slot ban-slot">7-й</div>
-            </div>
-        </div>
-    </div>
-    <div id="heroes-container" class="heroes-grid"></div>
+const heroesPool = [
+    { name: "Doom", icon: "😈", counters: ["Viper", "Slark"], synergy: ["Grimstroke"] },
+    { name: "Lina", icon: "🔥", counters: ["Viper"], synergy: [] },
+    { name: "Slark", icon: "🦈", counters: ["Sven"], synergy: [] },
+    { name: "Viper", icon: "🐍", counters: ["Lina"], synergy: [] },
+    { name: "Sven", icon: "⚔️", counters: ["Winter Wyvern"], synergy: ["Undying"] },
+    { name: "Winter Wyvern", icon: "❄️", counters: [], synergy: [] },
+    { name: "Grimstroke", icon: "🖌️", counters: [], synergy: ["Doom"] },
+    { name: "Undying", icon: "🧟", counters: ["Sven"], synergy: [] },
+    { name: "Pudge", icon: "🥩", counters: [], synergy: [] },
+    { name: "Juggernaut", icon: "🎭", counters: [], synergy: [] },
+    { name: "Crystal Maiden", icon: "👑", counters: [], synergy: [] },
+    { name: "Axe", icon: "🪓", counters: [], synergy: [] },
+    { name: "Invoker", icon: "🔮", counters: [], synergy: [] },
+    { name: "Phantom Assassin", icon: "🗡️", counters: [], synergy: [] },
+    { name: "Anti-Mage", icon: "🧙", counters: [], synergy: [] },
+    { name: "Shadow Fiend", icon: "💀", counters: [], synergy: [] },
+    { name: "Wraith King", icon: "👑", counters: [], synergy: [] },
+    { name: "Tidehunter", icon: "🍉", counters: [], synergy: [] },
+    { name: "Lion", icon: "🦁", counters: [], synergy: [] },
+    { name: "Zeus", icon: "⚡", counters: [], synergy: [] }
+];
 
-    <script src="script.js"></script>
-</body>
-</html>
+let availableHeroes = heroesPool.map(h => h.name);
+let currentStep = 0;
+let selectedHero = null;
+
+const radiantDraft = { bans: [], picks: [] };
+const direDraft = { bans: [], picks: [] };
+
+const draftSchedule = [
+    { type: "ban", side: false }, { type: "ban", side: false },
+    { type: "ban", side: true }, { type: "ban", side: true },
+    { type: "ban", side: false }, { type: "ban", side: true },
+    { type: "ban", side: true }, { type: "pick", side: false },
+    { type: "pick", side: true }, { type: "ban", side: false },
+    { type: "ban", side: false }, { type: "ban", side: true },
+    { type: "pick", side: true }, { type: "pick", side: false },
+    { type: "pick", side: false }, { type: "pick", side: true },
+    { type: "pick", side: true }, { type: "pick", side: false },
+    { type: "ban", side: false }, { type: "ban", side: true },
+    { type: "ban", side: false }, { type: "ban", side: true },
+    { type: "pick", side: false }, { type: "pick", side: true }
+];
+
+const statusMessage = document.getElementById('status-message');
+const actionBtn = document.getElementById('action-btn');
+const container = document.getElementById('heroes-container');
+
+function initHeroesGrid() {
+    container.innerHTML = "";
+    heroesPool.forEach(hero => {
+        const card = document.createElement('div');
+        card.className = 'hero-card';
+        card.id = 'card-' + hero.name.replace(/\s+/g, '');
+        
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'hero-icon';
+        iconDiv.innerText = hero.icon;
+        
+        const nameLabel = document.createElement('div');
+        nameLabel.className = 'hero-name-label';
+        nameLabel.innerText = hero.name;
+
+        card.appendChild(iconDiv);
+        card.appendChild(nameLabel);
+        
+        card.addEventListener('click', () => selectHero(hero.name));
+        container.appendChild(card);
+    });
+}
+
+window.selectHero = function(heroName) {
+    if (currentStep >= draftSchedule.length) return;
+    const currentTurn = draftSchedule[currentStep];
+    if (currentTurn.side === true) {
+        alert("Сейчас ход Компьютера! Нажмите на кнопку.");
+        return;
+    }
+    if (!availableHeroes.includes(heroName)) return;
+
+    if (selectedHero) {
+        const oldId = 'card-' + selectedHero.replace(/\s+/g, '');
+        const oldCard = document.getElementById(oldId);
+        if (oldCard) oldCard.classList.remove('selected');
+    }
+
+    selectedHero = heroName;
+    const newId = 'card-' + heroName.replace(/\s+/g, '');
+    document.getElementById(newId).classList.add('selected');
+    
+    actionBtn.classList.remove('disabled');
+    actionBtn.innerText = currentTurn.type === 'ban' ? 'Забанить героя' : 'Пикнуть героя';
+    actionBtn.classList.add('player-turn');
+};
+
+actionBtn.addEventListener('click', () => {
+    if (currentStep >= draftSchedule.length) return;
+    const currentTurn = draftSchedule[currentStep];
+
+    if (currentTurn.side === false) {
+        if (!selectedHero) {
+            alert("Сначала выберите героя!");
+            return;
+        }
+        executeDraftStep(selectedHero);
+        selectedHero = null;
+    } else {
+        if (availableHeroes.length === 0) return;
+        
+        let bestHero = availableHeroes[0];
+        let maxScore = -999;
+
+        availableHeroes.forEach(heroName => {
+            const heroData = heroesPool.find(h => h.name === heroName);
+            let score = 0;
+
+            if (currentTurn.type === "pick") {
+                radiantDraft.picks.forEach(enemyHero => {
+                    if (heroData.counters.includes(enemyHero)) score += 2;
+                });
+                direDraft.picks.forEach(allyHero => {
+                    if (heroData.synergy.includes(allyHero)) score += 1;
+                });
+            } else if (currentTurn.type === "ban") {
+                direDraft.picks.forEach(allyHero => {
+                    const allyData = heroesPool.find(h => h.name === allyHero);
+                    if (allyData && allyData.counters.includes(heroName)) score += 2;
+                });
+            }
+
+            score += Math.random() * 0.5;
+
+            if (score > maxScore) {
+                maxScore = score;
+                bestHero = heroName;
+            }
+        });
+
+        executeDraftStep(bestHero);
+    }
+});
+
+function executeDraftStep(heroName) {
+    const currentTurn = draftSchedule[currentStep];
+    const heroData = heroesPool.find(h => h.name === heroName);
+
+    availableHeroes = availableHeroes.filter(name => name !== heroName);
+    const cardId = 'card-' + heroName.replace(/\s+/g, '');
+    const card = document.getElementById(cardId);
+    if (card) {
+        card.classList.remove('selected');
+        card.classList.add('disabled');
+    }
+
+    const sidePrefix = currentTurn.side ? 'd' : 'r';
+    const draftRef = currentTurn.side ? direDraft : radiantDraft;
+    const arrayToPush = currentTurn.type === 'ban' ? draftRef.bans : draftRef.picks;
+    const slotIndex = arrayToPush.length;
+    arrayToPush.push(heroName);
+
+    const slotId = sidePrefix + '-' + currentTurn.type + '-' + slotIndex;
+    const slotElement = document.getElementById(slotId);
+    
+    if (slotElement) {
+        slotElement.innerText = heroData.icon;
+        if (currentTurn.type === 'ban') {
+            slotElement.style.filter = 'grayscale(100%) brightness(40%)';
+        }
+    }
+
+    currentStep++;
+    updateUI();
+}
+
+function updateUI() {
+    if (currentStep >= draftSchedule.length) {
+        statusMessage.innerText = "Драфт окончен!";
+        actionBtn.innerText = "Конец";
+        actionBtn.className = "disabled";
+        return;
+    }
+
+    const nextTurn = draftSchedule[currentStep];
+    if (nextTurn.side === false) {
+        statusMessage.innerText = nextTurn.type === 'ban' ? "Ваш ход: Банька героя" : "Ваш ход: Выберите Пик";
+        actionBtn.innerText = "Выберите героя";
+        actionBtn.className = "disabled";
+    } else {
+        statusMessage.innerText = nextTurn.type === 'ban' ? "Ход Тьмы (ИИ): Бан" : "Ход Тьмы (ИИ): Пик";
+        actionBtn.innerText = "Ход Компьютера";
+        actionBtn.className = "";
+    }
+}
+
+initHeroesGrid();
+updateUI();
