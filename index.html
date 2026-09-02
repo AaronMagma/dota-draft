@@ -50,12 +50,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 20px;
             overflow: hidden;
         }
         .slot.ban-slot {
             width: 45px;
             height: 26px;
             border-color: #3f3f46;
+            font-size: 14px;
         }
 
         .controls-center {
@@ -113,14 +115,11 @@
             cursor: pointer;
             border: 2px solid #52525b;
             border-radius: 4px;
-            padding: 5px;
+            padding: 10px 5px;
             text-align: center;
             transition: all 0.2s ease;
             position: relative;
             background-color: #141416;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
         .hero-card:hover:not(.disabled) {
             border-color: #fbbf24;
@@ -130,11 +129,9 @@
             border-color: #22c55e;
             box-shadow: 0 0 10px #22c55e;
         }
-        .hero-card img {
-            width: 100%;
-            height: auto;
-            border-radius: 2px;
-            display: block;
+        .hero-icon {
+            font-size: 28px;
+            margin-bottom: 5px;
         }
         
         .hero-card.disabled {
@@ -148,7 +145,6 @@
             text-align: center;
             font-weight: bold;
             margin-top: 5px;
-            word-break: break-word;
         }
     </style>
 </head>
@@ -211,62 +207,68 @@
 
     <script>
         const heroesPool = [
-            { name: "Doom", img: "https://steamstatic.com", counters: ["Viper", "Slark"], synergy: ["Grimstroke"] },
-            { name: "Lina", img: "https://steamstatic.com", counters: ["Viper"], synergy: [] },
-            { name: "Slark", img: "https://steamstatic.com", counters: ["Sven"], synergy: [] },
-            { name: "Viper", img: "https://steamstatic.com", counters: ["Lina"], synergy: [] },
-            { name: "Sven", img: "https://steamstatic.com", counters: ["Winter Wyvern"], synergy: ["Undying"] },
-            { name: "Winter Wyvern", img: "https://steamstatic.com", counters: [], synergy: [] },
-            { name: "Grimstroke", img: "https://steamstatic.com", counters: [], synergy: ["Doom"] },
-            { name: "Undying", img: "https://steamstatic.com", counters: ["Sven"], synergy: [] },
-            { name: "Pudge", img: "https://steamstatic.com", counters: [], synergy: [] },
-            { name: "Juggernaut", img: "https://steamstatic.com", counters: [], synergy: [] },
-            { name: "Crystal Maiden", img: "https://steamstatic.com", counters: [], synergy: [] },
-            { name: "Axe", img: "https://steamstatic.com", counters: [], synergy: [] },
-            { name: "Invoker", img: "https://steamstatic.com", counters: [], synergy: [] },
-            { name: "Phantom Assassin", img: "https://steamstatic.com", counters: [], synergy: [] },
-            { name: "Anti-Mage", img: "https://steamstatic.com", counters: [], synergy: [] },
-            { name: "Shadow Fiend", img: "https://steamstatic.com", counters: [], synergy: [] },
-            { name: "Wraith King", img: "https://steamstatic.com", counters: [], synergy: [] },
-            { name: "Tidehunter", img: "https://steamstatic.com", counters: [], synergy: [] },
+            { name: "Doom", icon: "😈", counters: ["Viper", "Slark"], synergy: ["Grimstroke"] },
+            { name: "Lina", icon: "🔥", counters: ["Viper"], synergy: [] },
+            { name: "Slark", icon: "🦈", counters: ["Sven"], synergy: [] },
+            { name: "Viper", icon: "🐍", counters: ["Lina"], synergy: [] },
+            { name: "Sven", icon: "⚔️", counters: ["Winter Wyvern"], synergy: ["Undying"] },
+            { name: "Winter Wyvern", icon: "❄️", counters: [], synergy: [] },
+            { name: "Grimstroke", icon: "🖌️", counters: [], synergy: ["Doom"] },
+            { name: "Undying", icon: "🧟", counters: ["Sven"], synergy: [] },
+            { name: "Pudge", icon: "🥩", counters: [], synergy: [] },
+            { name: "Juggernaut", icon: "🎭", counters: [], synergy: [] },
+            { name: "Crystal Maiden", icon: "👑", counters: [], synergy: [] },
+            { name: "Axe", icon: "🪓", counters: [], synergy: [] },
+            { name: "Invoker", icon: "🔮", counters: [], synergy: [] },
+            { name: "Phantom Assassin", icon: "🗡️", counters: [], synergy: [] },
+            { name: "Anti-Mage", icon: "🧙", counters: [], synergy: [] },
+            { name: "Shadow Fiend", icon: "💀", counters: [], synergy: [] },
+            { name: "Wraith King", icon: "👑", counters: [], synergy: [] },
+            { name: "Tidehunter", icon: "🍉", counters: [], synergy: [] },
+            { name: "Lion", icon: "🦁", counters: [], synergy: [] },
+            { name: "Zeus", icon: "⚡", counters: [], synergy: [] }
+        ];
 
-{ name: "Lion", img: "steamstatic.com", counters: [], synergy: [] },
-{ name: "Zeus", img: "steamstatic.com", counters: [], synergy: [] }
-];
-let availableHeroes = heroesPool.map(h => h.name);
-let currentStep = 0;
-let selectedHero = null;
-const radiantDraft = { bans: [], picks: [] };
-const direDraft = { bans: [], picks: [] };
-const draftSchedule = [
-{ type: "ban", side: false }, { type: "ban", side: false },
-{ type: "ban", side: true }, { type: "ban", side: true },
-{ type: "ban", side: false }, { type: "ban", side: true },
-{ type: "ban", side: true }, { type: "pick", side: false },
-{ type: "pick", side: true }, { type: "ban", side: false },
-{ type: "ban", side: false }, { type: "ban", side: true },
-{ type: "pick", side: true }, { type: "pick", side: false },
-{ type: "pick", side: false }, { type: "pick", side: true },
-{ type: "pick", side: true }, { type: "pick", side: false },
-{ type: "ban", side: false }, { type: "ban", side: true },
-{ type: "ban", side: false }, { type: "ban", side: true },
-{ type: "pick", side: false }, { type: "pick", side: true }
-];
-const statusMessage = document.getElementById('status-message');
-const actionBtn = document.getElementById('action-btn');
-const container = document.getElementById('heroes-container');
-function initHeroesGrid() {
-container.innerHTML = "";
-heroesPool.forEach(hero => {
-const card = document.createElement('div');
+        let availableHeroes = heroesPool.map(h => h.name);
+        let currentStep = 0;
+        let selectedHero = null;
+
+        const radiantDraft = { bans: [], picks: [] };
+        const direDraft = { bans: [], picks: [] };
+
+        const draftSchedule = [
+            { type: "ban", side: false }, { type: "ban", side: false },
+            { type: "ban", side: true }, { type: "ban", side: true },
+            { type: "ban", side: false }, { type: "ban", side: true },
+            { type: "ban", side: true }, { type: "pick", side: false },
+            { type: "pick", side: true }, { type: "ban", side: false },
+            { type: "ban", side: false }, { type: "ban", side: true },
+            { type: "pick", side: true }, { type: "pick", side: false },
+            { type: "pick", side: false }, { type: "pick", side: true },
+            { type: "pick", side: true }, { type: "pick", side: false },
+            { type: "ban", side: false }, { type: "ban", side: true },
+            { type: "ban", side: false }, { type: "ban", side: true },
+            { type: "pick", side: false }, { type: "pick", side: true }
+        ];
+
+        const statusMessage = document.getElementById('status-message');
+        const actionBtn = document.getElementById('action-btn');
+        const container = document.getElementById('heroes-container');
+
+        function initHeroesGrid() {
+            container.innerHTML = "";
+            heroesPool.forEach(hero => {
+                const card = document.createElement('div');
+
 card.className = 'hero-card';
 card.id = 'card-' + hero.name.replace(/\s+/g, '');
-const img = document.createElement('img');
-img.src = hero.img;
+const iconDiv = document.createElement('div');
+iconDiv.className = 'hero-icon';
+iconDiv.innerText = hero.icon;
 const nameLabel = document.createElement('div');
 nameLabel.className = 'hero-name-label';
 nameLabel.innerText = hero.name;
-card.appendChild(img);
+card.appendChild(iconDiv);
 card.appendChild(nameLabel);
 card.addEventListener('click', () => selectHero(hero.name));
 container.appendChild(card);
@@ -349,7 +351,7 @@ arrayToPush.push(heroName);
 const slotId = sidePrefix + '-' + currentTurn.type + '-' + slotIndex;
 const slotElement = document.getElementById(slotId);
 if (slotElement) {
-slotElement.innerHTML = '';
+slotElement.innerText = heroData.icon;
 if (currentTurn.type === 'ban') {
 slotElement.style.filter = 'grayscale(100%) brightness(40%)';
 }
@@ -380,6 +382,6 @@ updateUI();
 
 
 
-Копируйте, полностью заменяйте старый код на GitHub и нажимайте **Commit changes**. Напишите, когда **зелёная галочка** деплоя подтвердит, что новые файлы собраны!
+Жду новостей! Какой **статус сейчас горит во вкладке Deployments** [🌐], и отвис ли сайт после сохранения этого кода?
 
 
