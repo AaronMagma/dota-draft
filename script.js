@@ -183,7 +183,7 @@ function updateUI() {
 
     const nextTurn = draftSchedule[currentStep];
     if (nextTurn.side === false) {
-        statusMessage.innerText = nextTurn.type === 'ban' ? "Ваш ход: Банька героя" : "Ваш ход: Выберите Пик";
+        statusMessage.innerText = nextTurn.type === 'ban' ? "Ваш ход: Бан героя" : "Ваш ход: Выберите Пик";
         actionBtn.innerText = "Выберите героя";
         actionBtn.className = "disabled";
     } else {
