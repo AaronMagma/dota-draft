@@ -288,13 +288,51 @@
                 executeDraftStep(selectedHero);
                 selectedHero = null;
             } else {
-                // ХОД КОМПЬЮТЕРА (ИИ)
+                // ХОД КОМПЬЮТЕРА (УМНЫЙ ИИ)
                 if (availableHeroes.length === 0) return;
                 
-                // Простая логика ИИ: берет случайного доступного героя
-                const randomIndex = Math.floor(Math.random() * availableHeroes.length);
-                const aiHeroChoice = availableHeroes[randomIndex];
-                executeDraftStep(aiHeroChoice);
+                let bestHero = availableHeroes[0];
+                let maxScore = -999;
+
+                // Оцениваем каждого доступного героя
+                availableHeroes.forEach(heroName => {
+                    const heroData = heroesPool.find(h => h.name === heroName);
+                    let score = 0;
+
+                    if (currentTurn.type === "pick") {
+                        // 1. Проверяем контрпики против пиков Игрока (Radiant)
+                        radiantDraft.picks.forEach(enemyHero => {
+                            if (heroData.counters.includes(enemyHero)) {
+                                score += 2; // Отличный выбор против героя врага
+                            }
+                        });
+
+                        // 2. Проверяем синергию со своими пиками (Dire)
+                        direDraft.picks.forEach(allyHero => {
+                            if (heroData.synergy.includes(allyHero)) {
+                                score += 1; // Хорошая связка со своим тиммейтом
+                            }
+                        });
+                    } else if (currentTurn.type === "ban") {
+                        // Логика для бана: ИИ банит того, кто контрит его текущие пики
+                        direDraft.picks.forEach(allyHero => {
+                            const allyData = heroesPool.find(h => h.name === allyHero);
+                            if (allyData && allyData.counters.includes(heroName)) {
+                                score += 2; // Баним опасного врага для нашего героя
+                            }
+                        });
+                    }
+
+                    // Если баллы равны, добавляем немного случайности, чтобы игры были разными
+                    score += Math.random() * 0.5;
+
+                    if (score > maxScore) {
+                        maxScore = score;
+                        bestHero = heroName;
+                    }
+                });
+
+                executeDraftStep(bestHero);
             }
         });
 
