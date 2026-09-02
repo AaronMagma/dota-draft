@@ -91,15 +91,18 @@
         ];
         let availableHeroes = heroesPool.map(h => h.name), currentStep = 0, selectedHero = null, timerInterval = null, timeLeft = 30;
         const radiantDraft = { bans: [], picks: [] }, direDraft = { bans: [], picks: [] };
+        
         const draftSchedule = [
-            { type: "ban", side: false }, { type: "ban", side: false }, { type: "ban", side: true }, { type: "ban", side: true },
-            { type: "ban", side: false }, { type: "ban", side: true }, { type: "ban", side: true }, { type: "pick", side: false },
-            { type: "pick", side: true }, { type: "ban", side: false }, { type: "ban", side: false }, { type: "ban", side: true },
-            { type: "pick", side: true }, { type: "pick", side: false }, { type: "pick", side: false }, { type: "pick", side: true },
-            { type: "pick", side: true }, { type: "pick", side: false }, { type: "ban", side: false }, { type: "ban", side: true },
-            { type: "ban", side: false }, { type: "ban", side: true }, { type: "pick", side: false }, { type: "pick", side: true }
+            { type: "ban", side: "radiant" }, { type: "ban", side: "radiant" }, { type: "ban", side: "dire" }, { type: "ban", side: "dire" },
+            { type: "ban", side: "radiant" }, { type: "ban", side: "dire" }, { type: "ban", side: "dire" }, { type: "pick", side: "radiant" },
+            { type: "pick", side: "dire" }, { type: "ban", side: "radiant" }, { type: "ban", side: "radiant" }, { type: "ban", side: "dire" },
+            { type: "pick", side: "dire" }, { type: "pick", side: "radiant" }, { type: "pick", side: "radiant" }, { type: "pick", side: "dire" },
+            { type: "pick", side: "dire" }, { type: "pick", side: "radiant" }, { type: "ban", side: "radiant" }, { type: "ban", side: "dire" },
+            { type: "ban", side: "radiant" }, { type: "ban", side: "dire" }, { type: "pick", side: "radiant" }, { type: "pick", side: "dire" }
         ];
+        
         const statusMessage = document.getElementById('status-message'), actionBtn = document.getElementById('action-btn'), container = document.getElementById('heroes-container'), timerDisplay = document.getElementById('timer-display');
+        
         function initHeroesGrid() {
             container.innerHTML = "";
             heroesPool.forEach(hero => {
@@ -109,12 +112,13 @@
                 card.appendChild(iconDiv); card.appendChild(nameLabel); card.addEventListener('click', () => selectHero(hero.name)); container.appendChild(card);
             });
         }
+        
         window.selectHero = function(heroName) {
             if (currentStep >= draftSchedule.length) return;
             const currentTurn = draftSchedule[currentStep];
-            if (currentTurn.side === true || !availableHeroes.includes(heroName)) return;
-            if (selectedHero) { document.getElementById('card-' + selectedHero.replace(/\s+/g, '')).classList.remove('selected'); }
+            if (currentTurn.side === "dire" || !availableHeroes.includes(heroName)) return;
 
+if (selectedHero) { document.getElementById('card-' + selectedHero.replace(/\s+/g, '')).classList.remove('selected'); }
 selectedHero = heroName; document.getElementById('card-' + heroName.replace(/\s+/g, '')).classList.add('selected');
 actionBtn.classList.remove('disabled'); actionBtn.innerText = currentTurn.type === 'ban' ? 'Забанить героя' : 'Пикнуть героя'; actionBtn.classList.add('player-turn');
 };
@@ -124,14 +128,14 @@ timerInterval = setInterval(() => { timeLeft--; timerDisplay.innerText = "ВРЕ
 }
 function handleTimeout() {
 if (currentStep >= draftSchedule.length) return;
-if (draftSchedule[currentStep].side === false && availableHeroes.length > 0) { executeDraftStep(availableHeroes[Math.floor(Math.random() * availableHeroes.length)]); selectedHero = null; } else { actionBtn.click(); }
+if (draftSchedule[currentStep].side === "radiant" && availableHeroes.length > 0) { executeDraftStep(availableHeroes[Math.floor(Math.random() * availableHeroes.length)]); selectedHero = null; } else { actionBtn.click(); }
 }
 actionBtn.addEventListener('click', () => {
 if (currentStep >= draftSchedule.length) return;
 const currentTurn = draftSchedule[currentStep];
-if (currentTurn.side === false) { if (!selectedHero) return; executeDraftStep(selectedHero); selectedHero = null; } else {
+if (currentTurn.side === "radiant") { if (!selectedHero) return; executeDraftStep(selectedHero); selectedHero = null; } else {
 if (availableHeroes.length === 0) return;
-let bestHero = availableHeroes[0], maxScore = -999; // Исправлено: теперь по умолчанию берется строка
+let bestHero = availableHeroes[0], maxScore = -999;
 availableHeroes.forEach(heroName => {
 const heroData = heroesPool.find(h => h.name === heroName); let score = 0;
 if (currentTurn.type === "pick") {
@@ -146,20 +150,21 @@ function executeDraftStep(heroName) {
 const currentTurn = draftSchedule[currentStep], heroData = heroesPool.find(h => h.name === heroName);
 const currentSlotId = getSlotIdByTurn(currentTurn, currentStep), currentSlotElement = document.getElementById(currentSlotId);
 if (currentSlotElement) { currentSlotElement.classList.remove('active-slot-highlight'); currentSlotElement.innerText = heroData.icon; if (currentTurn.type === 'ban') currentSlotElement.style.filter = 'grayscale(100%) brightness(40%)'; }
-(currentTurn.side ? direDraft : radiantDraft)[currentTurn.type === 'ban' ? 'bans' : 'picks'].push(heroName);
+(currentTurn.side === "dire" ? direDraft : radiantDraft)[currentTurn.type === 'ban' ? 'bans' : 'picks'].push(heroName);
 availableHeroes = availableHeroes.filter(name => name !== heroName);
 document.getElementById('card-' + heroName.replace(/\s+/g, '')).className = 'hero-card disabled';
 currentStep++; updateUI();
 }
 function getSlotIdByTurn(turn, step) {
+const sidePrefix = turn.side === "dire" ? 'd-' : 'r-';
 let count = 0; for (let i = 0; i < step; i++) { if (draftSchedule[i].side === turn.side && draftSchedule[i].type === turn.type) count++; }
-return (turn.side ? 'd-' : 'r-') + turn.type + '-' + count;
+return sidePrefix + turn.type + '-' + count;
 }
 function updateUI() {
 if (currentStep >= draftSchedule.length) { clearInterval(timerInterval); statusMessage.innerText = "Драфт окончен!"; timerDisplay.innerText = ""; actionBtn.innerText = "Конец"; actionBtn.className = "disabled"; return; }
 const nextTurn = draftSchedule[currentStep], nextSlotElement = document.getElementById(getSlotIdByTurn(nextTurn, currentStep));
 if (nextSlotElement) nextSlotElement.classList.add('active-slot-highlight');
-if (nextTurn.side === false) { statusMessage.innerText = nextTurn.type === 'ban' ? "Ваш ход: Банька героя" : "Ваш ход: Выберите Пик"; actionBtn.innerText = "Выберите героя"; actionBtn.className = "disabled"; }
+if (nextTurn.side === "radiant") { statusMessage.innerText = nextTurn.type === 'ban' ? "Ваш ход: Банька героя" : "Ваш ход: Выберите Пик"; actionBtn.innerText = "Выберите героя"; actionBtn.className = "disabled"; }
 else { statusMessage.innerText = nextTurn.type === 'ban' ? "Ход Тьмы (ИИ): Бан" : "Ход Тьмы (ИИ): Пик"; actionBtn.innerText = "Ход Компьютера"; actionBtn.className = ""; }
 startTimer();
 }
