@@ -117,9 +117,14 @@
             if (currentStep >= draftSchedule.length) return;
             const currentTurn = draftSchedule[currentStep];
             if (currentTurn.side === "dire" || !availableHeroes.includes(heroName)) return;
+            if (selectedHero) { 
 
-if (selectedHero) { document.getElementById('card-' + selectedHero.replace(/\s+/g, '')).classList.remove('selected'); }
-selectedHero = heroName; document.getElementById('card-' + heroName.replace(/\s+/g, '')).classList.add('selected');
+const oldCard = document.getElementById('card-' + selectedHero.replace(/\s+/g, ''));
+if (oldCard) oldCard.classList.remove('selected');
+}
+selectedHero = heroName;
+const newCard = document.getElementById('card-' + heroName.replace(/\s+/g, ''));
+if (newCard) newCard.classList.add('selected');
 actionBtn.classList.remove('disabled'); actionBtn.innerText = currentTurn.type === 'ban' ? 'Забанить героя' : 'Пикнуть героя'; actionBtn.classList.add('player-turn');
 };
 function startTimer() {
@@ -152,7 +157,8 @@ const currentSlotId = getSlotIdByTurn(currentTurn, currentStep), currentSlotElem
 if (currentSlotElement) { currentSlotElement.classList.remove('active-slot-highlight'); currentSlotElement.innerText = heroData.icon; if (currentTurn.type === 'ban') currentSlotElement.style.filter = 'grayscale(100%) brightness(40%)'; }
 (currentTurn.side === "dire" ? direDraft : radiantDraft)[currentTurn.type === 'ban' ? 'bans' : 'picks'].push(heroName);
 availableHeroes = availableHeroes.filter(name => name !== heroName);
-document.getElementById('card-' + heroName.replace(/\s+/g, '')).className = 'hero-card disabled';
+const card = document.getElementById('card-' + heroName.replace(/\s+/g, ''));
+if (card) card.className = 'hero-card disabled';
 currentStep++; updateUI();
 }
 function getSlotIdByTurn(turn, step) {
@@ -162,7 +168,7 @@ return sidePrefix + turn.type + '-' + count;
 }
 function updateUI() {
 if (currentStep >= draftSchedule.length) { clearInterval(timerInterval); statusMessage.innerText = "Драфт окончен!"; timerDisplay.innerText = ""; actionBtn.innerText = "Конец"; actionBtn.className = "disabled"; return; }
-const nextTurn = draftSchedule[currentStep], nextSlotElement = document.getElementById(getSlotIdByTurn(nextTurn, currentStep));
+const nextTurn = draftSchedule[currentStep], nextSlotId = getSlotIdByTurn(nextTurn, currentStep), nextSlotElement = document.getElementById(nextSlotId);
 if (nextSlotElement) nextSlotElement.classList.add('active-slot-highlight');
 if (nextTurn.side === "radiant") { statusMessage.innerText = nextTurn.type === 'ban' ? "Ваш ход: Банька героя" : "Ваш ход: Выберите Пик"; actionBtn.innerText = "Выберите героя"; actionBtn.className = "disabled"; }
 else { statusMessage.innerText = nextTurn.type === 'ban' ? "Ход Тьмы (ИИ): Бан" : "Ход Тьмы (ИИ): Пик"; actionBtn.innerText = "Ход Компьютера"; actionBtn.className = ""; }
