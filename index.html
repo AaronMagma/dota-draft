@@ -228,25 +228,140 @@
         const radiantDraft = { bans: [], picks: [] };
         const direDraft = { bans: [], picks: [] };
 
+        // Расписание драфта: side false = Свет (Игрок), side true = Тьма (Компьютер)
         const draftSchedule = [
-            { type: "ban", side: false },
-            { type: "ban", side: false },
-            { type: "ban", side: true },
-            { type: "ban", side: true },
-            { type: "ban", side: false },
-            { type: "ban", side: true },
-            { type: "ban", side: true },
-            { type: "pick", side: false },
-            { type: "pick", side: true },
-            { type: "ban", side: false },
-            { type: "ban", side: false },
-            { type: "ban", side: true },
-            { type: "pick", side: true },
-            { type: "pick", side: false },
-            { type: "pick", side: false },
-            { type: "pick", side: true },
-            { type: "pick", side: true },
-            { type: "pick", side: false },
+            { type: "ban", side: false }, { type: "ban", side: false },
+            { type: "ban", side: true }, { type: "ban", side: true },
+            { type: "ban", side: false }, { type: "ban", side: true },
+            { type: "ban", side: true }, { type: "pick", side: false },
+            { type: "pick", side: true }, { type: "ban", side: false },
+            { type: "ban", side: false }, { type: "ban", side: true },
+            { type: "pick", side: true }, { type: "pick", side: false },
+            { type: "pick", side: false }, { type: "pick", side: true },
+            { type: "pick", side: true }, { type: "pick", side: false },
+            { type: "ban", side: false }, { type: "ban", side: true },
+            { type: "ban", side: false }, { type: "ban", side: true },
+            { type: "pick", side: false }, { type: "pick", side: true }
+        ];
+
+        const statusMessage = document.getElementById('status-message');
+        const actionBtn = document.getElementById('action-btn');
+
+        // Функция выбора героя игроком (клик по карточке)
+        window.selectHero = function(heroName) {
+            if (currentStep >= draftSchedule.length) return;
+            
+            const currentTurn = draftSchedule[currentStep];
+            // Игрок может выбирать только в свой ход (side === false)
+            if (currentTurn.side === true) {
+                alert("Сейчас ход Компьютера! Нажмите на кнопку.");
+                return;
+            }
+
+            if (!availableHeroes.includes(heroName)) return;
+
+            // Снимаем выделение со старого героя, если он был выбран
+            if (selectedHero) {
+                document.getElementById(`card-${selectedHero}`).classList.remove('selected');
+            }
+
+            selectedHero = heroName;
+            document.getElementById(`card-${heroName}`).classList.add('selected');
+            
+            actionBtn.classList.remove('disabled');
+            actionBtn.innerText = currentTurn.type === 'ban' ? 'Забанить героя' : 'Пикнуть героя';
+            actionBtn.classList.add('player-turn');
+        };
+
+        // Логика нажатия на главную кнопку действия
+        actionBtn.addEventListener('click', () => {
+            if (currentStep >= draftSchedule.length) return;
+
+            const currentTurn = draftSchedule[currentStep];
+
+            if (currentTurn.side === false) {
+                // ХОД ИГРОКА
+                if (!selectedHero) {
+                    alert("Сначала выберите героя из списка ниже!");
+                    return;
+                }
+                executeDraftStep(selectedHero);
+                selectedHero = null;
+            } else {
+                // ХОД КОМПЬЮТЕРА (ИИ)
+                if (availableHeroes.length === 0) return;
+                
+                // Простая логика ИИ: берет случайного доступного героя
+                const randomIndex = Math.floor(Math.random() * availableHeroes.length);
+                const aiHeroChoice = availableHeroes[randomIndex];
+                executeDraftStep(aiHeroChoice);
+            }
+        });
+
+        // Применение выбора к слотам интерфейса
+        function executeDraftStep(heroName) {
+            const currentTurn = draftSchedule[currentStep];
+            const heroData = heroesPool.find(h => h.name === heroName);
+
+            // Удаляем героя из доступных и гасим карточку
+            availableHeroes = availableHeroes.filter(name => name !== heroName);
+            const card = document.getElementById(`card-${heroName}`);
+            card.classList.remove('selected');
+            card.classList.add('disabled');
+
+            // Определяем префикс стороны и тип
+            const sidePrefix = currentTurn.side ? 'd' : 'r';
+            const draftRef = currentTurn.side ? direDraft : radiantDraft;
+            
+            const arrayToPush = currentTurn.type === 'ban' ? draftRef.bans : draftRef.picks;
+            const slotIndex = arrayToPush.length;
+            arrayToPush.push(heroName);
+
+            // Находим нужный ID слота (например, r-pick-0 или d-ban-1)
+            const slotId = `${sidePrefix}-${currentTurn.type}-${slotIndex}`;
+            const slotElement = document.getElementById(slotId);
+            
+            if (slotElement) {
+                slotElement.innerText = heroData.icon;
+                if (currentTurn.type === 'ban') {
+                    slotElement.style.opacity = '0.5'; // Забаненных делаем полупрозрачными
+                }
+            }
+
+            // Переходим к следующему шагу
+            currentStep++;
+            updateUI();
+        }
+
+        // Обновление состояния кнопок и текстов после каждого хода
+        function updateUI() {
+            if (currentStep >= draftSchedule.length) {
+                statusMessage.innerText = "Драфт окончен!";
+                actionBtn.innerText = "Конец";
+                actionBtn.className = "disabled";
+                return;
+            }
+
+            const nextTurn = draftSchedule[currentStep];
+            
+            if (nextTurn.side === false) {
+                // Наступает ход игрока
+                statusMessage.innerText = nextTurn.type === 'ban' ? "Ваш ход: Банька героя" : "Ваш ход: Выберите Пик";
+                actionBtn.innerText = "Выберите героя";
+                actionBtn.className = "disabled"; // Кнопка выключена, пока игрок не кликнет на карточку
+            } else {
+                // Наступает ход компьютера
+                statusMessage.innerText = nextTurn.type === 'ban' ? "Ход Тьмы (ИИ): Бан" : "Ход Тьмы (ИИ): Пик";
+                actionBtn.innerText = "Ход Компьютера";
+                actionBtn.className = ""; // Кнопка активна для нажатия
+            }
+        }
+
+        // Инициализация стартового состояния
+        updateUI();
+    </script>
+</body>
+</html>
             { type: "ban", side: false },
             { type: "ban", side: true },
             { type: "ban", side: false },
