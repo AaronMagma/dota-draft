@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Dota 2 Draft Simulator</title>
+    <style>
+        body {
+            background-color: #1c1c1f;
+            color: #e5e5e5;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 { margin-bottom: 5px; color: #a3a3a3; text-transform: uppercase; font-size: 20px; letter-spacing: 2px;}
+
+        .draft-header {
+            display: flex;
+            width: 100%;
+            max-width: 1100px;
+            justify-content: space-between;
+            align-items: flex-start;
+            background: #2a2a2e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #3f3f46;
+            box-sizing: border-box;
+        }
+
+        .team-box { width: 38%; }
+        .team-box.radiant h3 { color: #4ade80; margin: 0 0 10px 0; }
+        .team-box.dire h3 { color: #f87171; margin: 0 0 10px 0; text-align: right; }
+        
+        .row-label { font-size: 11px; color: #a1a1aa; margin: 5px 0 2px 0; text-transform: uppercase; }
+        .team-box.dire .row-label { text-align: right; }
+        
+        .slots { display: flex; gap: 6px; margin-bottom: 10px; }
+        .team-box.dire .slots { justify-content: flex-end; }
+
+        .slot {
+            width: 65px;
+            height: 38px;
+            background-color: #141416;
+            border: 1px solid #52525b;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .slot.ban-slot {
+            width: 45px;
+            height: 26px;
+            border-color: #3f3f46;
+            font-size: 14px;
+        }
+
+        .controls-center {
+            width: 24%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding-top: 20px;
+        }
+
+        #status-message {
+            font-size: 13px;
+            font-weight: bold;
+            color: #fbbf24;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.4;
+        }
+
+        #action-btn {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background 0.2s;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        #action-btn:hover { background-color: #dc2626; }
+        #action-btn.player-turn { background-color: #22c55e; }
+        #action-btn.player-turn:hover { background-color: #16a34a; }
+        #action-btn.disabled { background-color: #4b5563; cursor: not-allowed; opacity: 0.6; }
+
+        .heroes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+            gap: 10px;
+            width: 100%;
+            max-width: 1100px;
+            background: #2a2a2e;
+            padding: 20px;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        .hero-card {
+            cursor: pointer;
+            border: 2px solid #52525b;
+            border-radius: 4px;
+            padding: 10px 5px;
+            text-align: center;
+            transition: all 0.2s ease;
+            position: relative;
+            background-color: #141416;
+        }
+        .hero-card:hover:not(.disabled) {
+            border-color: #fbbf24;
+            transform: scale(1.04);
+        }
+        .hero-card.selected {
+            border-color: #22c55e;
+            box-shadow: 0 0 10px #22c55e;
+        }
+        .hero-icon { font-size: 24px; margin-bottom: 5px; }
+        
+        .hero-card.disabled {
+            filter: grayscale(100%);
+            opacity: 0.25;
+            cursor: not-allowed;
+            border-color: #27272a;
+        }
+        .hero-name-label {
+            font-size: 10px; text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Dota 2 Draft Simulator</h1>
+
+    <div class="draft-header">
+        <div class="team-box radiant">
+            <h3>Свет (Radiant)</h3>
+            <div class="row-label">Пики (Picks)</div>
+            <div class="slots">
+                <div class="slot" id="r-pick-0"></div>
+                <div class="slot" id="r-pick-1"></div>
+                <div class="slot" id="r-pick-2"></div>
+                <div class="slot" id="r-pick-3"></div>
+                <div class="slot" id="r-pick-4"></div>
+            </div>
+            <div class="row-label">Баны (Bans)</div>
+            <div class="slots">
+                <div class="slot ban-slot" id="r-ban-0"></div>
+                <div class="slot ban-slot" id="r-ban-1"></div>
+                <div class="slot ban-slot" id="r-ban-2"></div>
+                <div class="slot ban-slot" id="r-ban-3"></div>
+                <div class="slot ban-slot" id="r-ban-4"></div>
+                <div class="slot ban-slot" id="r-ban-5"></div>
+                <div class="slot ban-slot" id="r-ban-6"></div>
+            </div>
+        </div>
+        
+        <div class="controls-center">
+            <div id="status-message">Ход Тьмы (ИИ)</div>
+            <button id="action-btn">Ход Компьютера</button>
+        </div>
+        
+        <div class="team-box dire">
+            <h3>Тьма (Dire)</h3>
+            <div class="row-label">Пики (Picks)</div>
+            <div class="slots">
+                <div class="slot" id="d-pick-0"></div>
+                <div class="slot" id="d-pick-1"></div>
+                <div class="slot" id="d-pick-2"></div>
+                <div class="slot" id="d-pick-3"></div>
+                <div class="slot" id="d-pick-4"></div>
+            </div>
+            <div class="row-label">Баны (Bans)</div>
+            <div class="slots">
+                <div class="slot ban-slot" id="d-ban-0"></div>
+                <div class="slot ban-slot" id="d-ban-1"></div>
+                <div class="slot ban-slot" id="d-ban-2"></div>
+                <div class="slot ban-slot" id="d-ban-3"></div>
+                <div class="slot ban-slot" id="d-ban-4"></div>
+                <div class="slot ban-slot" id="d-ban-5"></div>
+                <div class="slot ban-slot" id="d-ban-6"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Вместо тяжелых картинок используем текст и эмодзи -->
+    <div class="heroes-grid">
+        <div class="hero-card" id="card-Doom" onclick="selectHero('Doom')"><div class="hero-icon">😈</div><div class="hero-name-label">Doom</div></div>
+        <div class="hero-card" id="card-Lina" onclick="selectHero('Lina')"><div class="hero-icon">🔥</div><div class="hero-name-label">Lina</div></div>
+        <div class="hero-card" id="card-Slark" onclick="selectHero('Slark')"><div class="hero-icon">🦈</div><div class="hero-name-label">Slark</div></div>
+        <div class="hero-card" id="card-Viper" onclick="selectHero('Viper')"><div class="hero-icon">🐍</div><div class="hero-name-label">Viper</div></div>
+        <div class="hero-card" id="card-Sven" onclick="selectHero('Sven')"><div class="hero-icon">⚔️</div><div class="hero-name-label">Sven</div></div>
+        <div class="hero-card" id="card-Winter" onclick="selectHero('Winter')"><div class="hero-icon">❄️</div><div class="hero-name-label">Winter</div></div>
+        <div class="hero-card" id="card-Grim" onclick="selectHero('Grim')"><div class="hero-icon">🖌️</div><div class="hero-name-label">Grim</div></div>
+        <div class="hero-card" id="card-Undying" onclick="selectHero('Undying')"><div class="hero-icon">🧟</div><div class="hero-name-label">Undying</div></div>
+    </div>
+
+    <script>
+        const heroesPool = [
+            { name: "Doom", icon: "😈", counters: ["Viper", "Slark"], synergy: ["Grim"] },
+            { name: "Lina", icon: "🔥", counters: ["Viper"], synergy: [] },
+            { name: "Slark", icon: "🦈", counters: ["Sven"], synergy: [] },
+            { name: "Viper", icon: "🐍", counters: ["Lina"], synergy: [] },
+            { name: "Sven", icon: "⚔️", counters: ["Winter"], synergy: ["Undying"] },
+            { name: "Winter", icon: "❄️", counters: [], synergy: [] },
+            { name: "Grim", icon: "🖌️", counters: [], synergy: ["Doom"] },
+            { name: "Undying", icon: "🧟", counters: ["Sven"], synergy: [] }
+        ];
+
+        let availableHeroes = ["Doom", "Lina", "Slark", "Viper", "Sven", "Winter", "Grim", "Undying"];
+        let currentStep = 0;
+        let selectedHero = null;
+
+        const radiantDraft = { bans: [], picks: [] };
+        const direDraft = { bans: [], picks: [] };
+
+        const draftSchedule = [
+            { type: "ban", side: false },
+            { type: "ban", side: false },
+            { type: "ban", side: true },
+            { type: "ban", side: true },
+            { type: "ban", side: false },
+            { type: "ban", side: true },
+            { type: "ban", side: true },
+            { type: "pick", side: false },
+            { type: "pick", side: true },
+            { type: "ban", side: false },
+            { type: "ban", side: false },
+            { type: "ban", side: true },
+            { type: "pick", side: true },
+            { type: "pick", side: false },
+            { type: "pick", side: false },
+            { type: "pick", side: true },
+            { type: "pick", side: true },
+            { type: "pick", side: false },
+            { type: "ban", side: false },
+            { type: "ban", side: true },
+            { type: "ban", side: false },
+            { type: "ban", side: true },
+            { type: "pick", side: false },
