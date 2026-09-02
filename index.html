@@ -140,7 +140,7 @@ if (currentStep >= draftSchedule.length) return;
 const currentTurn = draftSchedule[currentStep];
 if (currentTurn.side === "radiant") { if (!selectedHero) return; executeDraftStep(selectedHero); selectedHero = null; } else {
 if (availableHeroes.length === 0) return;
-let bestHero = availableHeroes[0], maxScore = -999;
+let bestHero = availableHeroes, maxScore = -999;
 availableHeroes.forEach(heroName => {
 const heroData = heroesPool.find(h => h.name === heroName); let score = 0;
 if (currentTurn.type === "pick") {
