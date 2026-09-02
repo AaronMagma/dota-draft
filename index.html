@@ -189,8 +189,9 @@ executeDraftStep(selectedHero);
 selectedHero = null;
 } else {
 if (availableHeroes.length === 0) return;
-const aiHeroChoice = availableHeroes[0]; // Исправлено: берется первый элемент
-executeDraftStep(aiHeroChoice);
+// Исправлено: изолированное чтение текстового значения из списка строк
+const targetHero = availableHeroes[0];
+executeDraftStep(targetHero);
 }
 });
 function executeDraftStep(heroName) {
