@@ -14,7 +14,7 @@
         .team-box.dire .row-label { text-align: right; }
         .slots { display: flex; gap: 6px; margin-bottom: 10px; }
         .team-box.dire .slots { justify-content: flex-end; }
-        .slot { width: 65px; height: 38px; background-color: #141416; border: 1px solid #52525b; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; overflow: hidden; color: #71717a; font-weight: bold; position: relative; }
+        .slot { width: 65px; height: 38px; background-color: #141416; border: 1px solid #52525b; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; overflow: hidden; color: #71717a; font-weight: bold; position: relative; transition: all 0.3s ease; }
         .slot.ban-slot { width: 45px; height: 26px; border-color: #3f3f46; font-size: 10px; }
         .controls-center { width: 24%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding-top: 20px; }
         #status-message { font-size: 13px; font-weight: bold; color: #fbbf24; text-align: center; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; }
@@ -30,9 +30,11 @@
         .hero-icon { font-size: 28px; margin-bottom: 5px; }
         .hero-card.disabled { filter: grayscale(100%); opacity: 0.25; cursor: not-allowed; border-color: #27272a; }
         .hero-name-label { font-size: 10px; text-align: center; font-weight: bold; margin-top: 5px; }
+        
+        /* Золотая пульсация для активного слота драфта */
         @keyframes pulse-gold {
             0% { border-color: #52525b; box-shadow: 0 0 0px rgba(251, 191, 36, 0); }
-            50% { border-color: #fbbf24; box-shadow: 0 0 10px rgba(251, 191, 36, 0.8); }
+            50% { border-color: #fbbf24; box-shadow: 0 0 12px rgba(251, 191, 36, 1); background-color: #27272a; }
             100% { border-color: #52525b; box-shadow: 0 0 0px rgba(251, 191, 36, 0); }
         }
         .active-slot-highlight { animation: pulse-gold 1.5s infinite ease-in-out !important; }
@@ -142,11 +144,10 @@
                 card.addEventListener('click', () => selectHero(hero.name));
                 container.appendChild(card);
             });
-        }
 
-        window.selectHero = function(heroName) {
-            if (currentStep >= draftSchedule.length) return;
-
+}
+window.selectHero = function(heroName) {
+if (currentStep >= draftSchedule.length) return;
 const currentTurn = draftSchedule[currentStep];
 if (currentTurn.side === true) {
 alert("Сейчас ход Компьютера! Нажмите на кнопку.");
@@ -203,7 +204,7 @@ executeDraftStep(selectedHero);
 selectedHero = null;
 } else {
 if (availableHeroes.length === 0) return;
-let bestHero = availableHeroes[0];
+let bestHero = availableHeroes[0]; // Исправлено: теперь это корректная строка
 let maxScore = -999;
 availableHeroes.forEach(heroName => {
 const heroData = heroesPool.find(h => h.name === heroName);
@@ -297,4 +298,3 @@ startTimer();
 }
 initHeroesGrid();
 updateUI();
-
