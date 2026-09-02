@@ -183,8 +183,8 @@ if (currentStep >= draftSchedule.length) return;
 const currentTurn = draftSchedule[currentStep];
 if (currentTurn.side === false) {
 if (availableHeroes.length > 0) {
-const randomIndex = Math.floor(Math.random() * availableHeroes.length);
-executeDraftStep(availableHeroes[randomIndex]);
+const randomHero = availableHeroes[Math.floor(Math.random() * availableHeroes.length)];
+executeDraftStep(randomHero);
 selectedHero = null;
 }
 } else {
@@ -297,3 +297,4 @@ startTimer();
 }
 initHeroesGrid();
 updateUI();
+
