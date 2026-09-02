@@ -72,7 +72,6 @@
         </div>
     </div>
     <div id="heroes-container" class="heroes-grid"></div>
-
     <script>
         const heroesPool = [
             { name: "Doom", icon: "😈", counters: ["Viper", "Slark"], synergy: ["Grimstroke"] },
@@ -83,215 +82,85 @@
             { name: "Winter Wyvern", icon: "❄️", counters: [], synergy: [] },
             { name: "Grimstroke", icon: "🖌️", counters: [], synergy: ["Doom"] },
             { name: "Undying", icon: "🧟", counters: ["Sven"], synergy: [] },
-            { name: "Pudge", icon: "🥩", counters: [], synergy: [] },
-            { name: "Juggernaut", icon: "🎭", counters: [], synergy: [] },
-            { name: "Crystal Maiden", icon: "👑", counters: [], synergy: [] },
-            { name: "Axe", icon: "🪓", counters: [], synergy: [] },
-            { name: "Invoker", icon: "🔮", counters: [], synergy: [] },
-            { name: "Phantom Assassin", icon: "🗡️", counters: [], synergy: [] },
-            { name: "Anti-Mage", icon: "🧙", counters: [], synergy: [] },
-            { name: "Shadow Fiend", icon: "💀", counters: [], synergy: [] },
-            { name: "Wraith King", icon: "👑", counters: [], synergy: [] },
-            { name: "Tidehunter", icon: "🍉", counters: [], synergy: [] },
-            { name: "Lion", icon: "🦁", counters: [], synergy: [] },
-            { name: "Zeus", icon: "⚡", counters: [], synergy: [] }
+            { name: "Pudge", icon: "🥩", counters: [], synergy: [] }, { name: "Juggernaut", icon: "🎭", counters: [], synergy: [] },
+            { name: "Crystal Maiden", icon: "👑", counters: [], synergy: [] }, { name: "Axe", icon: "🪓", counters: [], synergy: [] },
+            { name: "Invoker", icon: "🔮", counters: [], synergy: [] }, { name: "Phantom Assassin", icon: "🗡️", counters: [], synergy: [] },
+            { name: "Anti-Mage", icon: "🧙", counters: [], synergy: [] }, { name: "Shadow Fiend", icon: "💀", counters: [], synergy: [] },
+            { name: "Wraith King", icon: "👑", counters: [], synergy: [] }, { name: "Tidehunter", icon: "🍉", counters: [], synergy: [] },
+            { name: "Lion", icon: "🦁", counters: [], synergy: [] }, { name: "Zeus", icon: "⚡", counters: [], synergy: [] }
         ];
-
-        let availableHeroes = heroesPool.map(h => h.name);
-        let currentStep = 0;
-        let selectedHero = null;
-        let timerInterval = null;
-        let timeLeft = 30;
-
-        const radiantDraft = { bans: [], picks: [] };
-        const direDraft = { bans: [], picks: [] };
-
+        let availableHeroes = heroesPool.map(h => h.name), currentStep = 0, selectedHero = null, timerInterval = null, timeLeft = 30;
+        const radiantDraft = { bans: [], picks: [] }, direDraft = { bans: [], picks: [] };
         const draftSchedule = [
-            { type: "ban", side: false }, { type: "ban", side: false },
-            { type: "ban", side: true }, { type: "ban", side: true },
-            { type: "ban", side: false }, { type: "ban", side: true },
-            { type: "ban", side: true }, { type: "pick", side: false },
-            { type: "pick", side: true }, { type: "ban", side: false },
-            { type: "ban", side: false }, { type: "ban", side: true },
-            { type: "pick", side: true }, { type: "pick", side: false },
-            { type: "pick", side: false }, { type: "pick", side: true },
-            { type: "pick", side: true }, { type: "pick", side: false },
-            { type: "ban", side: false }, { type: "ban", side: true },
-            { type: "ban", side: false }, { type: "ban", side: true },
-            { type: "pick", side: false }, { type: "pick", side: true }
+            { type: "ban", side: false }, { type: "ban", side: false }, { type: "ban", side: true }, { type: "ban", side: true },
+            { type: "ban", side: false }, { type: "ban", side: true }, { type: "ban", side: true }, { type: "pick", side: false },
+            { type: "pick", side: true }, { type: "ban", side: false }, { type: "ban", side: false }, { type: "ban", side: true },
+            { type: "pick", side: true }, { type: "pick", side: false }, { type: "pick", side: false }, { type: "pick", side: true },
+            { type: "pick", side: true }, { type: "pick", side: false }, { type: "ban", side: false }, { type: "ban", side: true },
+            { type: "ban", side: false }, { type: "ban", side: true }, { type: "pick", side: false }, { type: "pick", side: true }
         ];
-
-        const statusMessage = document.getElementById('status-message');
-        const actionBtn = document.getElementById('action-btn');
-        const container = document.getElementById('heroes-container');
-        const timerDisplay = document.getElementById('timer-display');
-
+        const statusMessage = document.getElementById('status-message'), actionBtn = document.getElementById('action-btn'), container = document.getElementById('heroes-container'), timerDisplay = document.getElementById('timer-display');
         function initHeroesGrid() {
             container.innerHTML = "";
             heroesPool.forEach(hero => {
-                const card = document.createElement('div');
-                card.className = 'hero-card';
-                card.id = 'card-' + hero.name.replace(/\s+/g, '');
-                const iconDiv = document.createElement('div');
-                iconDiv.className = 'hero-icon';
-                iconDiv.innerText = hero.icon;
-                const nameLabel = document.createElement('div');
-                nameLabel.className = 'hero-name-label';
-                nameLabel.innerText = hero.name;
-                card.appendChild(iconDiv);
-                card.appendChild(nameLabel);
-                card.addEventListener('click', () => selectHero(hero.name));
-                container.appendChild(card);
+                const card = document.createElement('div'); card.className = 'hero-card'; card.id = 'card-' + hero.name.replace(/\s+/g, '');
+                const iconDiv = document.createElement('div'); iconDiv.className = 'hero-icon'; iconDiv.innerText = hero.icon;
+                const nameLabel = document.createElement('div'); nameLabel.className = 'hero-name-label'; nameLabel.innerText = hero.name;
+                card.appendChild(iconDiv); card.appendChild(nameLabel); card.addEventListener('click', () => selectHero(hero.name)); container.appendChild(card);
             });
         }
-
         window.selectHero = function(heroName) {
+            if (currentStep >= draftSchedule.length) return;
+            const currentTurn = draftSchedule[currentStep];
+            if (currentTurn.side === true || !availableHeroes.includes(heroName)) return;
+            if (selectedHero) { document.getElementById('card-' + selectedHero.replace(/\s+/g, '')).classList.remove('selected'); }
 
-if (currentStep >= draftSchedule.length) return;
-const currentTurn = draftSchedule[currentStep];
-if (currentTurn.side === true) {
-alert("Сейчас ход Компьютера! Нажмите на кнопку.");
-return;
-}
-if (!availableHeroes.includes(heroName)) return;
-if (selectedHero) {
-const oldId = 'card-' + selectedHero.replace(/\s+/g, '');
-const oldCard = document.getElementById(oldId);
-if (oldCard) oldCard.classList.remove('selected');
-}
-selectedHero = heroName;
-const newId = 'card-' + heroName.replace(/\s+/g, '');
-document.getElementById(newId).classList.add('selected');
-actionBtn.classList.remove('disabled');
-actionBtn.innerText = currentTurn.type === 'ban' ? 'Забанить героя' : 'Пикнуть героя';
-actionBtn.classList.add('player-turn');
+selectedHero = heroName; document.getElementById('card-' + heroName.replace(/\s+/g, '')).classList.add('selected');
+actionBtn.classList.remove('disabled'); actionBtn.innerText = currentTurn.type === 'ban' ? 'Забанить героя' : 'Пикнуть героя'; actionBtn.classList.add('player-turn');
 };
 function startTimer() {
-clearInterval(timerInterval);
-timeLeft = 30;
-timerDisplay.innerText = "ВРЕМЯ: " + timeLeft + " СЕК";
-timerInterval = setInterval(() => {
-timeLeft--;
-timerDisplay.innerText = "ВРЕМЯ: " + timeLeft + " СЕК";
-if (timeLeft <= 0) {
-clearInterval(timerInterval);
-handleTimeout();
-}
-}, 1000);
+clearInterval(timerInterval); timeLeft = 30; timerDisplay.innerText = "ВРЕМЯ: " + timeLeft + " СЕК";
+timerInterval = setInterval(() => { timeLeft--; timerDisplay.innerText = "ВРЕМЯ: " + timeLeft + " СЕК"; if (timeLeft <= 0) { clearInterval(timerInterval); handleTimeout(); } }, 1000);
 }
 function handleTimeout() {
 if (currentStep >= draftSchedule.length) return;
-const currentTurn = draftSchedule[currentStep];
-if (currentTurn.side === false) {
-if (availableHeroes.length > 0) {
-const randomHero = availableHeroes[Math.floor(Math.random() * availableHeroes.length)];
-executeDraftStep(randomHero);
-selectedHero = null;
-}
-} else {
-actionBtn.click();
-}
+if (draftSchedule[currentStep].side === false && availableHeroes.length > 0) { executeDraftStep(availableHeroes[Math.floor(Math.random() * availableHeroes.length)]); selectedHero = null; } else { actionBtn.click(); }
 }
 actionBtn.addEventListener('click', () => {
 if (currentStep >= draftSchedule.length) return;
 const currentTurn = draftSchedule[currentStep];
-if (currentTurn.side === false) {
-if (!selectedHero) {
-alert("Сначала выберите героя!");
-return;
-}
-executeDraftStep(selectedHero);
-selectedHero = null;
-} else {
+if (currentTurn.side === false) { if (!selectedHero) return; executeDraftStep(selectedHero); selectedHero = null; } else {
 if (availableHeroes.length === 0) return;
-let bestHero = availableHeroes;
-let maxScore = -999;
+let bestHero = availableHeroes[0], maxScore = -999; // Исправлено: теперь по умолчанию берется строка
 availableHeroes.forEach(heroName => {
-const heroData = heroesPool.find(h => h.name === heroName);
-let score = 0;
+const heroData = heroesPool.find(h => h.name === heroName); let score = 0;
 if (currentTurn.type === "pick") {
-radiantDraft.picks.forEach(enemyHero => {
-if (heroData.counters.includes(enemyHero)) score += 2;
-});
-direDraft.picks.forEach(allyHero => {
-if (heroData.synergy.includes(allyHero)) score += 1;
-});
-} else if (currentTurn.type === "ban") {
-direDraft.picks.forEach(allyHero => {
-const allyData = heroesPool.find(h => h.name === allyHero);
-if (allyData && allyData.counters.includes(heroName)) score += 2;
-});
-}
-score += Math.random() * 0.5;
-if (score > maxScore) {
-maxScore = score;
-bestHero = heroName;
-}
+radiantDraft.picks.forEach(e => { if (heroData.counters.includes(e)) score += 2; }); direDraft.picks.forEach(a => { if (heroData.synergy.includes(a)) score += 1; });
+} else { direDraft.picks.forEach(a => { const ally = heroesPool.find(h => h.name === a); if (ally && ally.counters.includes(heroName)) score += 2; }); }
+score += Math.random() * 0.5; if (score > maxScore) { maxScore = score; bestHero = heroName; }
 });
 executeDraftStep(bestHero);
 }
 });
 function executeDraftStep(heroName) {
-const currentTurn = draftSchedule[currentStep];
-const heroData = heroesPool.find(h => h.name === heroName);
-const currentSlotId = getSlotIdByTurn(currentTurn, currentStep);
-const currentSlotElement = document.getElementById(currentSlotId);
-if (currentSlotElement) {
-currentSlotElement.classList.remove('active-slot-highlight');
-currentSlotElement.innerText = heroData.icon;
-if (currentTurn.type === 'ban') {
-currentSlotElement.style.filter = 'grayscale(100%) brightness(40%)';
-}
-}
-const sidePrefix = currentTurn.side ? 'd' : 'r';
-const draftRef = currentTurn.side ? direDraft : radiantDraft;
-const arrayToPush = currentTurn.type === 'ban' ? draftRef.bans : draftRef.picks;
-arrayToPush.push(heroName);
+const currentTurn = draftSchedule[currentStep], heroData = heroesPool.find(h => h.name === heroName);
+const currentSlotId = getSlotIdByTurn(currentTurn, currentStep), currentSlotElement = document.getElementById(currentSlotId);
+if (currentSlotElement) { currentSlotElement.classList.remove('active-slot-highlight'); currentSlotElement.innerText = heroData.icon; if (currentTurn.type === 'ban') currentSlotElement.style.filter = 'grayscale(100%) brightness(40%)'; }
+(currentTurn.side ? direDraft : radiantDraft)[currentTurn.type === 'ban' ? 'bans' : 'picks'].push(heroName);
 availableHeroes = availableHeroes.filter(name => name !== heroName);
-const cardId = 'card-' + heroName.replace(/\s+/g, '');
-const card = document.getElementById(cardId);
-if (card) {
-card.classList.remove('selected');
-card.classList.add('disabled');
-}
-currentStep++;
-updateUI();
+document.getElementById('card-' + heroName.replace(/\s+/g, '')).className = 'hero-card disabled';
+currentStep++; updateUI();
 }
 function getSlotIdByTurn(turn, step) {
-const sidePrefix = turn.side ? 'd' : 'r';
-let count = 0;
-for (let i = 0; i < step; i++) {
-if (draftSchedule[i].side === turn.side && draftSchedule[i].type === turn.type) {
-count++;
-}
-}
-return sidePrefix + '-' + turn.type + '-' + count;
+let count = 0; for (let i = 0; i < step; i++) { if (draftSchedule[i].side === turn.side && draftSchedule[i].type === turn.type) count++; }
+return (turn.side ? 'd-' : 'r-') + turn.type + '-' + count;
 }
 function updateUI() {
-if (currentStep >= draftSchedule.length) {
-clearInterval(timerInterval);
-statusMessage.innerText = "Драфт окончен!";
-timerDisplay.innerText = "";
-actionBtn.innerText = "Конец";
-actionBtn.className = "disabled";
-return;
-}
-const nextTurn = draftSchedule[currentStep];
-const nextSlotId = getSlotIdByTurn(nextTurn, currentStep);
-const nextSlotElement = document.getElementById(nextSlotId);
-if (nextSlotElement) {
-nextSlotElement.classList.add('active-slot-highlight');
-}
-if (nextTurn.side === false) {
-statusMessage.innerText = nextTurn.type === 'ban' ? "Ваш ход: Банька героя" : "Ваш ход: Выберите Пик";
-actionBtn.innerText = "Выберите героя";
-actionBtn.className = "disabled";
-} else {
-statusMessage.innerText = nextTurn.type === 'ban' ? "Ход Тьмы (ИИ): Бан" : "Ход Тьмы (ИИ): Пик";
-actionBtn.innerText = "Ход Компьютера";
-actionBtn.className = "";
-}
+if (currentStep >= draftSchedule.length) { clearInterval(timerInterval); statusMessage.innerText = "Драфт окончен!"; timerDisplay.innerText = ""; actionBtn.innerText = "Конец"; actionBtn.className = "disabled"; return; }
+const nextTurn = draftSchedule[currentStep], nextSlotElement = document.getElementById(getSlotIdByTurn(nextTurn, currentStep));
+if (nextSlotElement) nextSlotElement.classList.add('active-slot-highlight');
+if (nextTurn.side === false) { statusMessage.innerText = nextTurn.type === 'ban' ? "Ваш ход: Банька героя" : "Ваш ход: Выберите Пик"; actionBtn.innerText = "Выберите героя"; actionBtn.className = "disabled"; }
+else { statusMessage.innerText = nextTurn.type === 'ban' ? "Ход Тьмы (ИИ): Бан" : "Ход Тьмы (ИИ): Пик"; actionBtn.innerText = "Ход Компьютера"; actionBtn.className = ""; }
 startTimer();
 }
-initHeroesGrid();
-updateUI();
+initHeroesGrid(); updateUI();
