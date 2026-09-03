@@ -1,19 +1,43 @@
-// Стабильная база данных героев (строго 12 первоначальных героев)
+// Расширенная база данных героев (32 персонажа)
 const heroesData = [
+    // СИЛА (Strength)
     { id: "axe", name: "Axe", icon: "🪓" },
     { id: "pudge", name: "Pudge", icon: "🥩" },
-    { id: "invoker", name: "Invoker", icon: "🔮" },
-    { id: "juggernaut", name: "Juggernaut", icon: "⚔️" },
-    { id: "crystal_maiden", name: "Crystal Maiden", icon: "❄️" },
-    { id: "shadow_fiend", name: "Shadow Fiend", icon: "💀" },
+    { id: "earthshaker", name: "Earthshaker", icon: "🐮" },
+    { id: "sven", name: "Sven", icon: "⚔️" },
+    { id: "undying", name: "Undying", icon: "🧟" },
+    { id: "tidehunter", name: "Tidehunter", icon: "🍉" },
+    { id: "wraith_king", name: "Wraith King", icon: "👑" },
+    { id: "slardar", name: "Slardar", icon: "🐟" },
+    { id: "doom", name: "Doom", icon: "😈" },
+    { id: "magnus", name: "Magnus", icon: "🦏" },
+
+    // ЛОВКОСТЬ (Agility)
+    { id: "juggernaut", name: "Juggernaut", icon: "🎭" },
     { id: "phantom_assassin", name: "Phantom Assassin", icon: "🗡️" },
+    { id: "shadow_fiend", name: "Shadow Fiend", icon: "💀" },
+    { id: "slark", name: "Slark", icon: "🦈" },
+    { id: "viper", name: "Viper", icon: "🐍" },
     { id: "sniper", name: "Sniper", icon: "🎯" },
+    { id: "drow_ranger", name: "Drow Ranger", icon: "🏹" },
+    { id: "faceless_void", name: "Faceless Void", icon: "⏳" },
+    { id: "templar_assassin", name: "Templar Assassin", icon: "🏵️" },
+    { id: "vengeful_spirit", name: "Vengeful Spirit", icon: "🦇" },
+
+    // ИНТЕЛЛЕКТ И УНИВЕРСАЛЫ (Intelligence / Universal)
+    { id: "invoker", name: "Invoker", icon: "🔮" },
+    { id: "crystal_maiden", name: "Crystal Maiden", icon: "❄️" },
     { id: "rubick", name: "Rubick", icon: "🟢" },
     { id: "anti_mage", name: "Anti-Mage", icon: "🧙‍♂️" },
-    { id: "slark", name: "Slark", icon: "🐟" },
-    { id: "earthshaker", name: "Earthshaker", icon: "🐮" }
+    { id: "lina", name: "Lina", icon: "🔥" },
+    { id: "winter_wyvern", name: "Winter Wyvern", icon: "🥶" },
+    { id: "grimstroke", name: "Grimstroke", icon: "🖌️" },
+    { id: "lion", name: "Lion", icon: "🦁" },
+    { id: "zeus", name: "Zeus", icon: "⚡" },
+    { id: "dazzle", name: "Dazzle", icon: "🧪" },
+    { id: "shadow_shaman", name: "Shadow Shaman", icon: "🦎" },
+    { id: "witch_doctor", name: "Witch Doctor", icon: "🥥" }
 ];
-
 // СТРОГО ВАША ПОСЛЕДОВАТЕЛЬНОСТЬ ИЗ 24 ШАГОВ ONE-BY-ONE
 // 'r' - Свет (Radiant), 'd' - Тьма (Dire)
 const draftSequence = [
