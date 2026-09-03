@@ -76,29 +76,19 @@ let selectedHeroId = null;
 const bannedHeroes = new Set();
 const pickedHeroes = new Set();
 
+// Наш новый, 100% стабильный источник картинок с Dotabuff
 function getHeroImageUrl(heroId) {
-    let formattedId = heroId.toLowerCase();
+    // Приводим ID к нижнему регистру и заменяем нижние подчеркивания на дефисы под формат Dotabuff
+    let formattedId = heroId.toLowerCase().replace(/_/g, '-');
     
-    // Преобразуем ID под строгие требования официального сервера Valve
-    if (formattedId === "shadow_fiend") formattedId = "nevermore";
-    if (formattedId === "anti_mage") formattedId = "antimage";
-    if (formattedId === "zeus") formattedId = "zuus";
-    if (formattedId === "necrophos") formattedId = "necrolyte";
-    if (formattedId === "vengeful_spirit") formattedId = "vengefulspirit";
-    if (formattedId === "crystal_maiden") formattedId = "crystal_maiden";
-    if (formattedId === "wraith_king") formattedId = "wraith_king";
-    if (formattedId === "drow_ranger") formattedId = "drow_ranger";
-    if (formattedId === "faceless_void") formattedId = "faceless_void";
-    if (formattedId === "templar_assassin") formattedId = "templar_assassin";
-    if (formattedId === "storm_spirit") formattedId = "storm_spirit";
-    if (formattedId === "skywrath_mage") formattedId = "skywrath_mage";
-    if (formattedId === "witch_doctor") formattedId = "witch_doctor";
-    if (formattedId === "shadow_shaman") formattedId = "shadow_shaman";
-    if (formattedId === "dark_willow") formattedId = "dark_willow";
-    if (formattedId === "winter_wyvern") formattedId = "winter_wyvern";
+    // Исправляем специфические исключения в названиях для базы Dotabuff
+    if (formattedId === "nevermore") formattedId = "shadow-fiend";
+    if (formattedId === "antimage") formattedId = "anti-mage";
+    if (formattedId === "zuus") formattedId = "zeus";
+    if (formattedId === "necrolyte") formattedId = "necrophos";
+    if (formattedId === "vengefulspirit") formattedId = "vengeful-spirit";
 
-    // Официальный глобальный CDN Dota 2
-    return `https://steamstatic.com{formattedId}.png`;
+    return `https://dotabuff.com{formattedId}.jpg`;
 }
 function init() {
     renderHeroesGrid();
