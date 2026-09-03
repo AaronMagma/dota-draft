@@ -2,28 +2,25 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Dota 2 Draft Simulator</title>
+    <title>Dota 2 Draft Simulator (Strength Only)</title>
     <style>
         body { background-color: #0b0c10; color: #e5e5e5; font-family: 'Arial', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         
-        .main-container { display: flex; width: 100%; max-width: 1300px; gap: 20px; margin-top: 10px; justify-content: center; align-items: flex-start; }
+        .main-container { display: flex; width: 100%; max-width: 1200px; gap: 20px; margin-top: 10px; justify-content: center; align-items: flex-start; }
         
         /* СЕТКА ГЕРОЕВ (Левая часть) */
-        .heroes-section { width: 70%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; background: #11141a; padding: 20px; border-radius: 6px; border: 1px solid #1f242d; box-sizing: border-box; }
+        .heroes-section { width: 65%; background: #11141a; padding: 20px; border-radius: 6px; border: 1px solid #1f242d; box-sizing: border-box; }
         .attribute-box { background: #161920; padding: 15px; border-radius: 4px; border: 1px solid #232935; }
-        .attr-title { font-size: 14px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; padding-bottom: 5px; border-bottom: 1px solid #2d3545; }
-        .attr-title.str { color: #ff4d4d; }
-        .attr-title.agi { color: #22c55e; }
-        .attr-title.int { color: #38bdf8; }
-        .attr-title.uni { color: #eab308; }
+        .attr-title { font-size: 16px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 1px solid #2d3545; color: #ff4d4d; }
         
-        .grid-container { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+        /* Сетка 4 в ряд для красивого отображения 12 героев */
+        .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         
         .hero-card { 
             cursor: pointer; 
             border: 1px solid #3a4454; 
             border-radius: 4px; 
-            aspect-ratio: 16/9; /* Прямоугольный формат под картинки Dotabuff */
+            aspect-ratio: 16/9; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -32,48 +29,38 @@
             position: relative; 
             overflow: hidden; 
         }
-        /* Добавляем стиль для картинок внутри сетки героев */
-       .hero-card img, .slot-display img {
+        
+        .hero-card img, .slot-display img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Картинка заполнит всю область без искажений */
+            object-fit: cover; 
             display: block;
         }
-        /* Настраиваем отображение картинок внутри правой вертикальной панели */
-        .slot-display img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
+        
         .hero-card:hover:not(.disabled) { border-color: #eab308; transform: scale(1.05); z-index: 10; box-shadow: 0 0 10px rgba(234,179,8,0.3); }
         .hero-card.selected { border-color: #22c55e; box-shadow: 0 0 12px #22c55e; z-index: 10; }
         .hero-card.disabled { filter: grayscale(100%) brightness(30%); opacity: 0.4; cursor: not-allowed; border-color: #1f242d; }
         
         /* СТАДИЯ ДРАФТА (Правая часть) */
-        .sidebar-draft { width: 28%; background: #11141a; padding: 20px; border-radius: 6px; border: 1px solid #1f242d; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
+        .sidebar-draft { width: 33%; background: #11141a; padding: 20px; border-radius: 6px; border: 1px solid #1f242d; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
         .mode-title { font-size: 11px; font-weight: bold; letter-spacing: 2px; color: #a1a1aa; text-transform: uppercase; margin-bottom: 5px; }
-        #status-message { font-size: 12px; font-weight: bold; color: #eab308; text-transform: uppercase; text-align: center; margin-bottom: 15px; letter-spacing: 1px; min-height: 32px; line-height: 1.4; }
+        #status-message { font-size: 14px; font-weight: bold; color: #eab308; text-transform: uppercase; text-align: center; margin-bottom: 15px; letter-spacing: 1px; min-height: 40px; line-height: 1.4; white-space: pre-line; }
         
         #action-btn { background-color: #161920; color: #4b5563; border: 1px solid #232935; padding: 14px; width: 100%; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; margin-bottom: 20px; }
         #action-btn.player-turn { background-color: #a91e1e; color: white; border-color: #e11d48; box-shadow: 0 4px 10px rgba(225,29,72,0.3); }
         #action-btn.player-turn:hover { background-color: #be1212; }
         #action-btn.disabled { background-color: #161920; color: #4b5563; border-color: #232935; cursor: not-allowed; }
         
-        /* ВЕРТИКАЛЬНАЯ ТАБЛИЦА ШАГОВ */
+        /* ТАБЛИЦА ШАГОВ */
         .panel-headers { display: flex; width: 100%; justify-content: space-between; font-size: 11px; font-weight: bold; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1px; padding: 0 5px 8px 5px; border-bottom: 1px solid #232935; margin-bottom: 5px; box-sizing: border-box; }
         .panel-headers .rad-h { color: #22c55e; }
         .panel-headers .dire-h { color: #f87171; text-align: right; }
         
-        ..draft-list { display: flex; flex-direction: column; gap: 4px; width: 100%; max-height: 480px; overflow-y: auto; padding-right: 2px; }
-        .draft-list::-webkit-scrollbar { width: 4px; }
-        .draft-list::-webkit-scrollbar-thumb { background: #2d3545; border-radius: 2px; }
+        .draft-list { display: flex; flex-direction: column; gap: 4px; width: 100%; box-sizing: border-box; }
 
-        /* Каждая строчка теперь строго поделена на 3 части */
         .draft-row { display: grid; grid-template-columns: 50px 1fr 50px; align-items: center; background: #161920; padding: 6px 10px; border-radius: 4px; border: 1px solid #1f242d; box-sizing: border-box; }
         .draft-row.active-row { border-color: #eab308; background: #1d222c; }
         
-        /* Колонка по центру: номер шага и тип действия */
         .row-center-info { display: flex; align-items: center; justify-content: center; gap: 10px; }
         .row-num { font-size: 10px; color: #52525b; font-weight: bold; }
         
@@ -81,41 +68,27 @@
         .row-type-badge.ban-badge { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
         .row-type-badge.pick-badge { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
         
-        /* Сами слоты теперь фиксированного размера и не прыгают */
         .slot-display { width: 42px; height: 28px; background: #0d0f13; border: 1px solid #3a4454; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 16px; box-sizing: border-box; }
-        .slot-display.empty-slot { border-style: dashed; opacity: 0.3; } /* Пустые ячейки сделаем слегка прозрачными для красоты */
+        .slot-display.empty-slot { border-style: dashed; opacity: 0.3; }
         
-        .slot-display.filled-ban { filter: grayscale(100%) brightness(40%); background: #221212; border-color: #552222; opacity: 1; }
-        .slot-display.filled-pick { background: #122216; border-color: #22552e; opacity: 1; }
+        .slot-display.filled-ban { filter: grayscale(100%) brightness(40%); background: #221212; border-color: #552222; }
+        .slot-display.filled-pick { background: #122216; border-color: #22552e; }
     </style>
 </head>
 <body>
 
     <div class="main-container">
-        <!-- СЕТКА ГЕРОЕВ ПО АТРИБУТАМ (Левая часть) -->
+        <!-- СЕТКА СИЛАЧЕЙ -->
         <div class="heroes-section">
             <div class="attribute-box">
-                <div class="attr-title str">Strength</div>
+                <div class="attr-title">Strength Heroes (12)</div>
                 <div id="str-container" class="grid-container"></div>
-            </div>
-            <div class="attribute-box">
-                <div class="attr-title agi">Agility</div>
-                <div id="grid-container" class="grid-container"></div> <!-- Был неверный ID, исправили на agi-container ниже в js -->
-                <div id="agi-container" class="grid-container"></div>
-            </div>
-            <div class="attribute-box">
-                <div class="attr-title int">Intelligence</div>
-                <div id="int-container" class="grid-container"></div>
-            </div>
-            <div class="attribute-box">
-                <div class="attr-title uni">Universal</div>
-                <div id="uni-container" class="grid-container"></div>
             </div>
         </div>
 
-        <!-- ТУРНИРНАЯ ВЕРТИКАЛЬНАЯ ПАНЕЛЬ (Правая часть) -->
+        <!-- ПАНЕЛЬ ДРАФТА -->
         <div class="sidebar-draft">
-            <div class="mode-title">Captains Mode</div>
+            <div class="mode-title">Short Draft Mode</div>
             <div id="status-message">ЗАГРУЗКА...</div>
             <button id="action-btn" class="disabled">ВЫБЕРИТЕ ГЕРОЯ</button>
             
@@ -124,16 +97,12 @@
                 <span class="dire-h">Dire</span>
             </div>
             
-            <!-- Сюда скрипт динамически добавит все 24 строки ходов -->
             <div id="draft-list-container" class="draft-list"></div>
         </div>
     </div>
 
-    <!-- Этот трюк заставит браузер скачивать абсолютно свежий файл при каждом обновлении -->
     <script>
-        const script = document.createElement('script');
-        script.src = 'script.js?v=' + Date.now();
-        document.body.appendChild(script);
+        document.write('<script src="script.js?v=' + Date.now() + '"><\/script>');
     </script>
 </body>
 </html>
