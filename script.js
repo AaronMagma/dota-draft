@@ -1,97 +1,89 @@
 const heroesPool = [
     // --- STRENGTH ---
-    { id: "axe", name: "Axe", icon: "🪓", attr: "str" },
-    { id: "pudge", name: "Pudge", icon: "🥩", attr: "str" },
-    { id: "earthshaker", name: "Earthshaker", icon: "🐮", attr: "str" },
-    { id: "sven", name: "Sven", icon: "⚔️", attr: "str" },
-    { id: "undying", name: "Undying", icon: "🧟", attr: "str" },
-    { id: "tidehunter", name: "Tidehunter", icon: "🍉", attr: "str" },
-    { id: "wraith_king", name: "Wraith King", icon: "👑", attr: "str" },
-    { id: "slardar", name: "Slardar", icon: "🐟", attr: "str" },
-    { id: "doom", name: "Doom", icon: "😈", attr: "str" },
-    { id: "magnus", name: "Magnus", icon: "🦏", attr: "str" },
-    { id: "kunkka", name: "Kunkka", icon: "🚢", attr: "str" },
-    { id: "tiny", name: "Tiny", icon: "🪨", attr: "str" },
+    { id: "axe", name: "Axe", attr: "str" },
+    { id: "pudge", name: "Pudge", attr: "str" },
+    { id: "earthshaker", name: "Earthshaker", attr: "str" },
+    { id: "sven", name: "Sven", attr: "str" },
+    { id: "undying", name: "Undying", attr: "str" },
+    { id: "tidehunter", name: "Tidehunter", attr: "str" },
+    { id: "wraith_king", name: "Wraith King", attr: "str" },
+    { id: "slardar", name: "Slardar", attr: "str" },
+    { id: "doom", name: "Doom", attr: "str" },
+    { id: "magnus", name: "Magnus", attr: "str" },
+    { id: "kunkka", name: "Kunkka", attr: "str" },
+    { id: "tiny", name: "Tiny", attr: "str" },
 
     // --- AGILITY ---
-    { id: "juggernaut", name: "Juggernaut", icon: "🎭", attr: "agi" },
-    { id: "phantom_assassin", name: "Phantom Assassin", icon: "🗡️", attr: "agi" },
-    { id: "shadow_fiend", name: "Shadow Fiend", icon: "💀", attr: "agi" },
-    { id: "slark", name: "Slark", icon: "🦈", attr: "agi" },
-    { id: "viper", name: "Viper", icon: "🐍", attr: "agi" },
-    { id: "sniper", name: "Sniper", icon: "🎯", attr: "agi" },
-    { id: "drow_ranger", name: "Drow Ranger", icon: "🏹", attr: "agi" },
-    { id: "faceless_void", name: "Faceless Void", icon: "⏳", attr: "agi" },
-    { id: "templar_assassin", name: "Templar Assassin", icon: "🏵️", attr: "agi" },
-    { id: "bloodseeker", name: "Bloodseeker", icon: "🩸", attr: "agi" },
-    { id: "ursa", name: "Ursa", icon: "🐻", attr: "agi" },
-    { id: "riki", name: "Riki", icon: "🐐", attr: "agi" },
+    { id: "juggernaut", name: "Juggernaut", attr: "agi" },
+    { id: "phantom_assassin", name: "Phantom Assassin", attr: "agi" },
+    { id: "nevermore", name: "Shadow Fiend", attr: "agi" }, // Официальный ID СФа в файлах игры — nevermore
+    { id: "slark", name: "Slark", attr: "agi" },
+    { id: "viper", name: "Viper", attr: "agi" },
+    { id: "sniper", name: "Sniper", attr: "agi" },
+    { id: "drow_ranger", name: "Drow Ranger", attr: "agi" },
+    { id: "faceless_void", name: "Faceless Void", attr: "agi" },
+    { id: "templar_assassin", name: "Templar Assassin", attr: "agi" },
+    { id: "bloodseeker", name: "Bloodseeker", attr: "agi" },
+    { id: "ursa", name: "Ursa", attr: "agi" },
+    { id: "riki", name: "Riki", attr: "agi" },
 
     // --- INTELLIGENCE ---
-    { id: "crystal_maiden", name: "Crystal Maiden", icon: "❄️", attr: "int" },
-    { id: "lina", name: "Lina", icon: "🔥", attr: "int" },
-    { id: "lion", name: "Lion", icon: "🦁", attr: "int" },
-    { id: "zeus", name: "Zeus", icon: "⚡", attr: "int" },
-    { id: "storm_spirit", name: "Storm Spirit", icon: "⚡", attr: "int" },
-    { id: "puck", name: "Puck", icon: "🧚", attr: "int" },
-    { id: "pugna", name: "Pugna", icon: "🟢", attr: "int" },
-    { id: "lich", name: "Lich", icon: "🥶", attr: "int" },
-    { id: "witch_doctor", name: "Witch Doctor", icon: "🥥", attr: "int" },
-    { id: "tinker", name: "Tinker", icon: "🤖", attr: "int" },
-    { id: "skywrath_mage", name: "Skywrath Mage", icon: "🦅", attr: "int" },
-    { id: "necrophos", name: "Necrophos", icon: "🤮", attr: "int" },
+    { id: "crystal_maiden", name: "Crystal Maiden", attr: "int" },
+    { id: "lina", name: "Lina", attr: "int" },
+    { id: "lion", name: "Lion", attr: "int" },
+    { id: "zuus", name: "Zeus", attr: "int" }, // Официальный ID Зевса в файлах — zuus
+    { id: "storm_spirit", name: "Storm Spirit", attr: "int" },
+    { id: "puck", name: "Puck", attr: "int" },
+    { id: "pugna", name: "Pugna", attr: "int" },
+    { id: "lich", name: "Lich", attr: "int" },
+    { id: "witch_doctor", name: "Witch Doctor", attr: "int" },
+    { id: "tinker", name: "Tinker", attr: "int" },
+    { id: "skywrath_mage", name: "Skywrath Mage", attr: "int" },
+    { id: "necrolyte", name: "Necrophos", attr: "int" }, // Официальный ID Некрофоса — necrolyte
 
     // --- UNIVERSAL ---
-    { id: "invoker", name: "Invoker", icon: "🔮", attr: "uni" },
-    { id: "rubick", name: "Rubick", icon: "🟢", attr: "uni" },
-    { id: "anti_mage", name: "Anti-Mage", icon: "🧙‍♂️", attr: "uni" },
-    { id: "winter_wyvern", name: "Winter Wyvern", icon: "🥶", attr: "uni" },
-    { id: "grimstroke", name: "Grimstroke", icon: "🖌️", attr: "uni" },
-    { id: "dazzle", name: "Dazzle", icon: "🧪", attr: "uni" },
-    { id: "shadow_shaman", name: "Shadow Shaman", icon: "🦎", attr: "uni" },
-    { id: "abaddon", name: "Abaddon", icon: "🐴", attr: "uni" },
-    { id: "marci", name: "Marci", icon: "👊", attr: "uni" },
-    { id: "dark_willow", name: "Dark Willow", icon: "🧚‍♀️", attr: "uni" },
-    { id: "vengeful_spirit", name: "Vengeful Spirit", icon: "🦇", attr: "uni" },
-    { id: "enigma", name: "Enigma", icon: "🕳️", attr: "uni" }
+    { id: "invoker", name: "Invoker", attr: "uni" },
+    { id: "rubick", name: "Rubick", attr: "uni" },
+    { id: "antimage", name: "Anti-Mage", attr: "uni" }, // Официальный ID Антимага — antimage
+    { id: "winter_wyvern", name: "Winter Wyvern", attr: "uni" },
+    { id: "grimstroke", name: "Grimstroke", attr: "uni" },
+    { id: "dazzle", name: "Dazzle", attr: "uni" },
+    { id: "shadow_shaman", name: "Shadow Shaman", attr: "uni" },
+    { id: "abaddon", name: "Abaddon", attr: "uni" },
+    { id: "marci", name: "Marci", attr: "uni" },
+    { id: "dark_willow", name: "Dark Willow", attr: "uni" },
+    { id: "vengefulspirit", name: "Vengeful Spirit", attr: "uni" }, // Официальный ID Венги — vengefulspirit
+    { id: "enigma", name: "Enigma", attr: "uni" }
 ];
 
 const draftSequence = [
-    { team: 'd', type: 'ban', index: 0 },  // 1й бан тьма
-    { team: 'd', type: 'ban', index: 1 },  // 2й бан тьма
-    { team: 'r', type: 'ban', index: 0 },  // 3й бан свет
-    { team: 'r', type: 'ban', index: 1 },  // 4й бан свет
-    { team: 'd', type: 'ban', index: 2 },  // 5й бан тьма
-    { team: 'r', type: 'ban', index: 2 },  // 6й бан свет
-    { team: 'r', type: 'ban', index: 3 },  // 7й бан свет 
-    { team: 'd', type: 'pick', index: 0 }, // 8й пик тьма
-    { team: 'r', type: 'pick', index: 0 }, // 9й пик свет
-    { team: 'd', type: 'ban', index: 3 },  // 10й бан тьма
-    { team: 'd', type: 'ban', index: 4 },  // 11й бан тьма
-    { team: 'r', type: 'ban', index: 4 },  // 12й бан свет
-    { team: 'r', type: 'pick', index: 1 }, // 13й пик свет
-    { team: 'd', type: 'pick', index: 1 }, // 14й пик тьма
-    { team: 'd', type: 'pick', index: 2 }, // 15й пик тьма
-    { team: 'r', type: 'pick', index: 2 }, // 16й пик свет
-    { team: 'r', type: 'pick', index: 3 }, // 17й пик свет
-    { team: 'd', type: 'pick', index: 3 }, // 18й пик тьма
-    { team: 'd', type: 'ban', index: 5 },  // 19й бан тьма (БЫЛ ОШИБОЧНЫЙ ПИК)
-    { team: 'r', type: 'ban', index: 5 },  // 20й бан свет (БЫЛ ОШИБОЧНЫЙ ПИК)
-    { team: 'd', type: 'ban', index: 6 },  // 21й бан тьма
-    { team: 'r', type: 'ban', index: 6 },  // 22й бан свет
-    { team: 'd', type: 'pick', index: 4 }, // 23й пик тьма (БЫЛ ОШИБОЧНЫЙ БАН)
-    { team: 'r', type: 'pick', index: 4 }  // 24й пик свет (БЫЛ ОШИБОЧНЫЙ БАН)
+    { team: 'd', type: 'ban', index: 0 },  { team: 'd', type: 'ban', index: 1 },
+    { team: 'r', type: 'ban', index: 0 },  { team: 'r', type: 'ban', index: 1 },
+    { team: 'd', type: 'ban', index: 2 },  { team: 'r', type: 'ban', index: 2 },
+    { team: 'r', type: 'ban', index: 3 },  { team: 'd', type: 'pick', index: 0 },
+    { team: 'r', type: 'pick', index: 0 }, { team: 'd', type: 'ban', index: 3 },
+    { team: 'd', type: 'ban', index: 4 },  { team: 'r', type: 'ban', index: 4 },
+    { team: 'r', type: 'pick', index: 1 }, { team: 'd', type: 'pick', index: 1 },
+    { team: 'd', type: 'pick', index: 2 }, { team: 'r', type: 'pick', index: 2 },
+    { team: 'r', type: 'pick', index: 3 }, { team: 'd', type: 'pick', index: 3 },
+    { team: 'd', type: 'ban', index: 5 },  { team: 'r', type: 'ban', index: 5 },
+    { team: 'd', type: 'ban', index: 6 },  { team: 'r', type: 'ban', index: 6 },
+    { team: 'd', type: 'pick', index: 4 }, { team: 'r', type: 'pick', index: 4 }
 ];
-
 
 let currentStepIndex = 0;
 let selectedHeroId = null;
 const bannedHeroes = new Set();
 const pickedHeroes = new Set();
 
+// Вспомогательная функция, которая собирает прямую ссылку на картинку героя с серверов Steam/Valve
+function getHeroImageUrl(heroId) {
+    return `https://steamstatic.com{heroId}.png`;
+}
+
 function init() {
     renderHeroesGrid();
-    renderDraftList(); // Строим вертикальный список ходов справа
+    renderDraftList();
     updateStatus();
     document.getElementById('action-btn').addEventListener('click', handleActionClick);
 }
@@ -107,7 +99,10 @@ function renderHeroesGrid() {
         card.className = 'hero-card';
         card.id = `card-${hero.id}`;
         card.title = hero.name;
-        card.innerHTML = `<div class="hero-icon">${hero.icon}</div>`;
+        
+        // Вместо текста-смайлика вставляем тег <img> с официальной аватаркой
+        card.innerHTML = `<img src="${getHeroImageUrl(hero.id)}" alt="${hero.name}">`;
+        
         card.addEventListener('click', () => selectHero(hero.id));
         
         const targetContainer = document.getElementById(`${hero.attr}-container`);
@@ -115,7 +110,6 @@ function renderHeroesGrid() {
     });
 }
 
-// Отрисовка всей структуры вертикальной панели справа
 function renderDraftList() {
     const listContainer = document.getElementById('draft-list-container');
     listContainer.innerHTML = '';
@@ -125,23 +119,20 @@ function renderDraftList() {
         row.className = 'draft-row';
         row.id = `step-row-${idx}`;
 
-        // Левый слот (Radiant)
         const radiantSlot = document.createElement('div');
         radiantSlot.className = 'slot-display empty-slot';
         if (step.team === 'r') {
-            radiantSlot.id = `panel-slot-${idx}`; // ID даем только активному для этого шага слоту
+            radiantSlot.id = `panel-slot-${idx}`;
             radiantSlot.className = 'slot-display';
         }
 
-        // Правый слот (Dire)
         const direSlot = document.createElement('div');
         direSlot.className = 'slot-display empty-slot';
         if (step.team === 'd') {
-            direSlot.id = `panel-slot-${idx}`; // ID даем только активному для этого шага слоту
+            direSlot.id = `panel-slot-${idx}`;
             direSlot.className = 'slot-display';
         }
 
-        // Центральная инфо-панель (Номер + Бадж)
         const centerInfo = document.createElement('div');
         centerInfo.className = 'row-center-info';
 
@@ -156,7 +147,6 @@ function renderDraftList() {
         centerInfo.appendChild(num);
         centerInfo.appendChild(badge);
 
-        // Собираем строку строго по структуре: [Radiant] [Центр] [Dire]
         row.appendChild(radiantSlot);
         row.appendChild(centerInfo);
         row.appendChild(direSlot);
@@ -164,7 +154,6 @@ function renderDraftList() {
         listContainer.appendChild(row);
     });
 }
-
 
 function selectHero(heroId) {
     if (currentStepIndex >= draftSequence.length || bannedHeroes.has(heroId) || pickedHeroes.has(heroId)) return;
@@ -188,12 +177,11 @@ function handleActionClick() {
     if (!selectedHeroId || currentStepIndex >= draftSequence.length) return;
 
     const step = draftSequence[currentStepIndex];
-    const hero = heroesPool.find(h => h.id === selectedHeroId);
     
-    // Находим нужную ячейку в вертикальной панели по текущему индексу шага
     const slotElement = document.getElementById(`panel-slot-${currentStepIndex}`);
     if (slotElement) {
-        slotElement.innerText = hero.icon;
+        // При подтверждении хода вставляем картинку героя прямо в ячейку правой панели
+        slotElement.innerHTML = `<img src="${getHeroImageUrl(selectedHeroId)}" alt="hero">`;
         slotElement.className += step.type === 'ban' ? ' filled-ban' : ' filled-pick';
     }
 
@@ -216,7 +204,6 @@ function handleActionClick() {
 function updateStatus() {
     const statusMessage = document.getElementById('status-message');
     
-    // Убираем старую подсветку строк
     document.querySelectorAll('.draft-row').forEach(r => r.classList.remove('active-row'));
 
     if (currentStepIndex >= draftSequence.length) {
@@ -226,7 +213,6 @@ function updateStatus() {
         return;
     }
 
-    // Подсвечиваем текущую активную строчку в вертикальной панели желтым цветом
     const activeRow = document.getElementById(`step-row-${currentStepIndex}`);
     if (activeRow) activeRow.classList.add('active-row');
 
