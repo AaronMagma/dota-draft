@@ -25,31 +25,48 @@
         #action-btn.disabled { background-color: #4b5563; cursor: not-allowed; opacity: 0.6; }
         .heroes-grid { 
     display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); /* Сделали ячейки чуть уже */
-    gap: 8px; 
+    /* Делаем сетку фиксированной по 12 героев в ряд, чтобы ничего не сжималось */
+    grid-template-columns: repeat(12, 1fr); 
+    gap: 12px; 
     width: 100%; 
-    max-width: 1100px; 
+    max-width: 1200px; 
     background: #2a2a2e; 
-    padding: 20px; 
+    padding: 25px; 
     border-radius: 8px; 
     box-sizing: border-box; 
 }
-        .hero-card { cursor: pointer; border: 2px solid #52525b; border-radius: 4px; padding: 10px 5px; text-align: center; transition: all 0.2s ease; position: relative; background-color: #141416; }
+        .hero-card { 
+    cursor: pointer; 
+    border: 2px solid #52525b; 
+    border-radius: 6px; 
+    /* Задали четкую высоту, чтобы карточки не «прыгали» */
+    height: 75px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease; 
+    background-color: #141416; 
+    box-sizing: border-box;
+    padding: 4px;
+}
         .hero-card:hover:not(.disabled) { border-color: #fbbf24; transform: scale(1.04); }
         .hero-card.selected { border-color: #22c55e; box-shadow: 0 0 10px #22c55e; }
         .hero-icon { 
-    font-size: 22px; /* Уменьшили смайлик, чтобы всё смотрелось аккуратно */
-    margin-bottom: 3px; 
+    font-size: 26px; /* Вернули смайликам нормальный крупный размер */
+    margin-bottom: 2px; 
 }
         .hero-card.disabled { filter: grayscale(100%); opacity: 0.25; cursor: not-allowed; border-color: #27272a; }
-        .hero-name-label { 
-    font-size: 9px; /* Сделали шрифт подписей чуть компактнее */
+       .hero-name-label { 
+    font-size: 10px; 
     text-align: center; 
     font-weight: bold; 
-    margin-top: 5px; 
+    color: #a1a1aa;
+    width: 100%;
+    /* Если имя не влезает, оно аккуратно скрывается с троеточием */
     white-space: nowrap; 
     overflow: hidden; 
-    text-overflow: ellipsis; /* Если имя длинное, оно аккуратно подрежется */
+    text-overflow: ellipsis; 
 }
     </style>
 </head>
