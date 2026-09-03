@@ -1,160 +1,74 @@
-const heroesData = [
-    // --- СИЛА (Strength) ---
-    { id: "abaddon", name: "Abaddon", icon: "🐴" },
-    { id: "alchemist", name: "Alchemist", icon: "🧪" },
-    { id: "axe", name: "Axe", icon: "🪓" },
-    { id: "beastmaster", name: "Beastmaster", icon: "🦅" },
-    { id: "brewmaster", name: "Brewmaster", icon: "🐼" },
-    { id: "bristleback", name: "Bristleback", icon: "🦔" },
-    { id: "centaur", name: "Centaur Warrunner", icon: "🐴" },
-    { id: "chaos_knight", name: "Chaos Knight", icon: "🐴" },
-    { id: "clockwerk", name: "Clockwerk", icon: "⚙️" },
-    { id: "doom", name: "Doom", icon: "😈" },
-    { id: "dragon_knight", name: "Dragon Knight", icon: "🐉" },
-    { id: "earth_spirit", name: "Earth Spirit", icon: "🗿" },
-    { id: "earthshaker", name: "Earthshaker", icon: "🐮" },
-    { id: "elder_titan", name: "Elder Titan", icon: "🔨" },
-    { id: "huskar", name: "Huskar", icon: "🔥" },
-    { id: "io", name: "Io", icon: "🔵" },
-    { id: "kunkka", name: "Kunkka", icon: "🚢" },
-    { id: "legion_commander", name: "Legion Commander", icon: "🛡️" },
-    { id: "lifestealer", name: "Lifestealer", icon: "🧛" },
-    { id: "lycan", name: "Lycan", icon: "🐺" },
-    { id: "magnus", name: "Magnus", icon: "🦏" },
-    { id: "marci", name: "Marci", icon: "👊" },
-    { id: "mars", name: "Mars", icon: "🛡️" },
-    { id: "night_stalker", name: "Night Stalker", icon: "🦇" },
-    { id: "omniknight", name: "Omniknight", icon: "🔨" },
-    { id: "phoenix", name: "Phoenix", icon: "🐦" },
-    { id: "primal_beast", name: "Primal Beast", icon: "🦖" },
-    { id: "pudge", name: "Pudge", icon: "🥩" },
-    { id: "sand_king", name: "Sand King", icon: "🦂" },
-    { id: "slardar", name: "Slardar", icon: "🐟" },
-    { id: "snapfire", name: "Snapfire", icon: "🦎" },
-    { id: "spirit_breaker", name: "Spirit Breaker", icon: "🐮" },
-    { id: "sven", name: "Sven", icon: "⚔️" },
-    { id: "tidehunter", name: "Tidehunter", icon: "🍉" },
-    { id: "timbersaw", name: "Timbersaw", icon: "🪚" },
-    { id: "tinker", name: "Tinker", icon: "🤖" },
-    { id: "tiny", name: "Tiny", icon: "🪨" },
-    { id: "treant", name: "Treant Protector", icon: "🌳" },
-    { id: "tusk", name: "Tusk", icon: "❄️" },
-    { id: "underlord", name: "Underlord", icon: "🟢" },
-    { id: "undying", name: "Undying", icon: "🧟" },
-    { id: "wraith_king", name: "Wraith King", icon: "👑" },
+const heroesPool = [
+    // --- STRENGTH ---
+    { id: "axe", name: "Axe", icon: "🪓", attr: "str" },
+    { id: "pudge", name: "Pudge", icon: "🥩", attr: "str" },
+    { id: "earthshaker", name: "Earthshaker", icon: "🐮", attr: "str" },
+    { id: "sven", name: "Sven", icon: "⚔️", attr: "str" },
+    { id: "undying", name: "Undying", icon: "🧟", attr: "str" },
+    { id: "tidehunter", name: "Tidehunter", icon: "🍉", attr: "str" },
+    { id: "wraith_king", name: "Wraith King", icon: "👑", attr: "str" },
+    { id: "slardar", name: "Slardar", icon: "🐟", attr: "str" },
+    { id: "doom", name: "Doom", icon: "😈", attr: "str" },
+    { id: "magnus", name: "Magnus", icon: "🦏", attr: "str" },
+    { id: "kunkka", name: "Kunkka", icon: "🚢", attr: "str" },
+    { id: "tiny", name: "Tiny", icon: "🪨", attr: "str" },
 
-    // --- ЛОВКОСТЬ (Agility) ---
-    { id: "anti_mage", name: "Anti-Mage", icon: "🧙‍♂️" },
-    { id: "arc_warden", name: "Arc Warden", icon: "⚡" },
-    { id: "bloodseeker", name: "Bloodseeker", icon: "🩸" },
-    { id: "bounty_hunter", name: "Bounty Hunter", icon: "💰" },
-    { id: "broodmother", name: "Broodmother", icon: "🕷️" },
-    { id: "clinkz", name: "Clinkz", icon: "🏹" },
-    { id: "drow_ranger", name: "Drow Ranger", icon: "🏹" },
-    { id: "ember_spirit", name: "Ember Spirit", icon: "🔥" },
-    { id: "faceless_void", name: "Faceless Void", icon: "⏳" },
-    { id: "gyrocopter", name: "Gyrocopter", icon: "🚁" },
-    { id: "hoodwink", name: "Hoodwink", icon: "🐿️" },
-    { id: "juggernaut", name: "Juggernaut", icon: "🎭" },
-    { id: "kez", name: "Kez", icon: "🦤" },
-    { id: "leshrac", name: "Leshrac", icon: "🐴" },
-    { id: "lone_druid", name: "Lone Druid", icon: "🐻" },
-    { id: "luna", name: "Luna", icon: "🌙" },
-    { id: "medusa", name: "Medusa", icon: "🐍" },
-    { id: "meepo", name: "Meepo", icon: "⛏️" },
-    { id: "monkey_king", name: "Monkey King", icon: "🐒" },
-    { id: "morphling", name: "Morphling", icon: "🌊" },
-    { id: "naga_siren", name: "Naga Siren", icon: "🧜‍♀️" },
-    { id: "nyx_assassin", name: "Nyx Assassin", icon: "🪲" },
-    { id: "pangolier", name: "Pangolier", icon: "🦔" },
-    { id: "phantom_assassin", name: "Phantom Assassin", icon: "🗡️" },
-    { id: "phantom_lancer", name: "Phantom Lancer", icon: "🔱" },
-    { id: "razor", name: "Razor", icon: "⚡" },
-    { id: "riki", name: "Riki", icon: "🐐" },
-    { id: "shadow_fiend", name: "Shadow Fiend", icon: "💀" },
-    { id: "slark", name: "Slark", icon: "🦈" },
-    { id: "sniper", name: "Sniper", icon: "🎯" },
-    { id: "spectre", name: "Spectre", icon: "👻" },
-    { id: "templar_assassin", name: "Templar Assassin", icon: "🏵️" },
-    { id: "terrorblade", name: "Terrorblade", icon: "😈" },
-    { id: "troll_warlord", name: "Troll Warlord", icon: "🪓" },
-    { id: "ursa", name: "Ursa", icon: "🐻" },
-    { id: "vengeful_spirit", name: "Vengeful Spirit", icon: "🦇" },
-    { id: "venomancer", name: "Venomancer", icon: "🐍" },
-    { id: "viper", name: "Viper", icon: "🐍" },
-    { id: "weaver", name: "Weaver", icon: "🕷️" },
+    // --- AGILITY ---
+    { id: "juggernaut", name: "Juggernaut", icon: "🎭", attr: "agi" },
+    { id: "phantom_assassin", name: "Phantom Assassin", icon: "🗡️", attr: "agi" },
+    { id: "shadow_fiend", name: "Shadow Fiend", icon: "💀", attr: "agi" },
+    { id: "slark", name: "Slark", icon: "🦈", attr: "agi" },
+    { id: "viper", name: "Viper", icon: "🐍", attr: "agi" },
+    { id: "sniper", name: "Sniper", icon: "🎯", attr: "agi" },
+    { id: "drow_ranger", name: "Drow Ranger", icon: "🏹", attr: "agi" },
+    { id: "faceless_void", name: "Faceless Void", icon: "⏳", attr: "agi" },
+    { id: "templar_assassin", name: "Templar Assassin", icon: "🏵️", attr: "agi" },
+    { id: "bloodseeker", name: "Bloodseeker", icon: "🩸", attr: "agi" },
+    { id: "ursa", name: "Ursa", icon: "🐻", attr: "agi" },
+    { id: "riki", name: "Riki", icon: "🐐", attr: "agi" },
 
-    // --- ИНТЕЛЛЕКТ (Intelligence) ---
-    { id: "ancient_apparition", name: "Ancient Apparition", icon: "❄️" },
-    { id: "bane", name: "Bane", icon: "🔮" },
-    { id: "batrider", name: "Batrider", icon: "🦇" },
-    { id: "chen", name: "Chen", icon: "🐴" },
-    { id: "crystal_maiden", name: "Crystal Maiden", icon: "❄️" },
-    { id: "dark_seer", name: "Dark Seer", icon: "🧠" },
-    { id: "dark_willow", name: "Dark Willow", icon: "🧚‍♀️" },
-    { id: "dazzle", name: "Dazzle", icon: "🧪" },
-    { id: "death_prophet", name: "Death Prophet", icon: "👻" },
-    { id: "disraptor", name: "Disruptor", icon: "🦖" },
-    { id: "enchanterss", name: "Enchantress", icon: "🦌" },
-    { id: "enigma", name: "Enigma", icon: "🕳️" },
-    { id: "grimstroke", name: "Grimstroke", icon: "🖌️" },
-    { id: "invoker", name: "Invoker", icon: "🔮" },
-    { id: "jakiro", name: "Jakiro", icon: "🐲" },
-    { id: "keeper_of_the_light", name: "Keeper of the Light", icon: "🐴" },
-    { id: "lich", name: "Lich", icon: "🥶" },
-    { id: "lina", name: "Lina", icon: "🔥" },
-    { id: "lion", name: "Lion", icon: "🦁" },
-    { id: "muerta", name: "Muerta", icon: "💀" },
-    { id: "nature_prophet", name: "Nature's Prophet", icon: "🌱" },
-    { id: "necrophos", name: "Necrophos", icon: "🤮" },
-    { id: "ogre_magi", name: "Ogre Magi", icon: "👹" },
-    { id: "oracle", name: "Oracle", icon: "👁️" },
-    { id: "outworld_destroyer", name: "Outworld Destroyer", icon: "🪐" },
-    { id: "puck", name: "Puck", icon: "🧚" },
-    { id: "pugna", name: "Pugna", icon: "🟢" },
-    { id: "queen_of_pain", name: "Queen of Pain", icon: "👑" },
-    { id: "rubick", name: "Rubick", icon: "🟢" },
-    { id: "shadow_demon", name: "Shadow Demon", icon: "😈" },
-    { id: "shadow_shaman", name: "Shadow Shaman", icon: "🦎" },
-    { id: "silencer", name: "Silencer", icon: "🤫" },
-    { id: "skywrath_mage", name: "Skywrath Mage", icon: "🦅" },
-    { id: "storm_spirit", name: "Storm Spirit", icon: "⚡" },
-    { id: "techies", name: "Techies", icon: "💣" },
-    { id: "tinker_old", name: "Visage", icon: "🪨" },
-    { id: "void_spirit", name: "Void Spirit", icon: "🔮" },
-    { id: "warlock", name: "Warlock", icon: "📜" },
-    { id: "windranger", name: "Windranger", icon: "🏹" },
-    { id: "winter_wyvern", name: "Winter Wyvern", icon: "🥶" },
-    { id: "witch_doctor", name: "Witch Doctor", icon: "🥥" },
-    { id: "zeus", name: "Zeus", icon: "⚡" }
+    // --- INTELLIGENCE ---
+    { id: "crystal_maiden", name: "Crystal Maiden", icon: "❄️", attr: "int" },
+    { id: "lina", name: "Lina", icon: "🔥", attr: "int" },
+    { id: "lion", name: "Lion", icon: "🦁", attr: "int" },
+    { id: "zeus", name: "Zeus", icon: "⚡", attr: "int" },
+    { id: "storm_spirit", name: "Storm Spirit", icon: "⚡", attr: "int" },
+    { id: "puck", name: "Puck", icon: "🧚", attr: "int" },
+    { id: "pugna", name: "Pugna", icon: "🟢", attr: "int" },
+    { id: "lich", name: "Lich", icon: "🥶", attr: "int" },
+    { id: "witch_doctor", name: "Witch Doctor", icon: "🥥", attr: "int" },
+    { id: "tinker", name: "Tinker", icon: "🤖", attr: "int" },
+    { id: "skywrath_mage", name: "Skywrath Mage", icon: "🦅", attr: "int" },
+    { id: "necrophos", name: "Necrophos", icon: "🤮", attr: "int" },
+
+    // --- UNIVERSAL ---
+    { id: "invoker", name: "Invoker", icon: "🔮", attr: "uni" },
+    { id: "rubick", name: "Rubick", icon: "🟢", attr: "uni" },
+    { id: "anti_mage", name: "Anti-Mage", icon: "🧙‍♂️", attr: "uni" },
+    { id: "winter_wyvern", name: "Winter Wyvern", icon: "🥶", attr: "uni" },
+    { id: "grimstroke", name: "Grimstroke", icon: "🖌️", attr: "uni" },
+    { id: "dazzle", name: "Dazzle", icon: "🧪", attr: "uni" },
+    { id: "shadow_shaman", name: "Shadow Shaman", icon: "🦎", attr: "uni" },
+    { id: "abaddon", name: "Abaddon", icon: "🐴", attr: "uni" },
+    { id: "marci", name: "Marci", icon: "👊", attr: "uni" },
+    { id: "dark_willow", name: "Dark Willow", icon: "🧚‍♀️", attr: "uni" },
+    { id: "vengeful_spirit", name: "Vengeful Spirit", icon: "🦇", attr: "uni" },
+    { id: "enigma", name: "Enigma", icon: "🕳️", attr: "uni" }
 ];
-// СТРОГО ВАША ПОСЛЕДОВАТЕЛЬНОСТЬ ИЗ 24 ШАГОВ ONE-BY-ONE
-// 'r' - Свет (Radiant), 'd' - Тьма (Dire)
+
 const draftSequence = [
-    { team: 'd', type: 'ban', index: 0 },  // 1й бан тьма
-    { team: 'd', type: 'ban', index: 1 },  // 2й бан тьма
-    { team: 'r', type: 'ban', index: 0 },  // 3й бан свет
-    { team: 'r', type: 'ban', index: 1 },  // 4й бан свет
-    { team: 'd', type: 'ban', index: 2 },  // 5й бан тьма
-    { team: 'r', type: 'ban', index: 2 },  // 6й бан свет
-    { team: 'r', type: 'ban', index: 3 },  // 7й бан свет 
-    { team: 'd', type: 'pick', index: 0 }, // 8й пик тьма
-    { team: 'r', type: 'pick', index: 0 }, // 9й пик свет
-    { team: 'd', type: 'ban', index: 3 },  // 10й бан тьма
-    { team: 'd', type: 'ban', index: 4 },  // 11й бан тьма
-    { team: 'r', type: 'ban', index: 4 },  // 12й бан свет
-    { team: 'r', type: 'pick', index: 1 }, // 13й пик свет
-    { team: 'd', type: 'pick', index: 1 }, // 14й пик тьма
-    { team: 'd', type: 'pick', index: 2 }, // 15й пик тьма
-    { team: 'r', type: 'pick', index: 2 }, // 16й пик свет
-    { team: 'r', type: 'pick', index: 3 }, // 17й пик свет
-    { team: 'd', type: 'pick', index: 3 }, // 18й пик тьма
-    { team: 'd', type: 'ban', index: 5 },  // 19й бан тьма
-    { team: 'r', type: 'ban', index: 5 },  // 20й бан свет
-    { team: 'd', type: 'ban', index: 6 },  // 21й бан тьма
-    { team: 'r', type: 'ban', index: 6 },  // 22й бан свет
-    { team: 'd', type: 'pick', index: 4 }, // 23й пик тьма
-    { team: 'r', type: 'pick', index: 4 }  // 24й пик свет
+    { team: 'd', type: 'ban', index: 0 }, { team: 'd', type: 'ban', index: 1 },
+    { team: 'r', type: 'ban', index: 0 }, { team: 'r', type: 'ban', index: 1 },
+    { team: 'd', type: 'ban', index: 2 }, { team: 'r', type: 'ban', index: 2 },
+    { team: 'r', type: 'ban', index: 3 }, { team: 'd', type: 'pick', index: 0 },
+    { team: 'r', type: 'pick', index: 0 }, { team: 'd', type: 'ban', index: 3 },
+    { team: 'd', type: 'ban', index: 4 }, { team: 'r', type: 'ban', index: 4 },
+    { team: 'r', type: 'pick', index: 1 }, { team: 'd', type: 'pick', index: 1 },
+    { team: 'd', type: 'pick', index: 2 }, { team: 'r', type: 'pick', index: 2 },
+    { team: 'r', type: 'pick', index: 3 }, { team: 'd', type: 'pick', index: 3 },
+    { team: 'd', type: 'pick', index: 4 }, { team: 'r', type: 'pick', index: 4 },
+    { team: 'd', type: 'ban', index: 5 }, { team: 'r', type: 'ban', index: 5 },
+    { team: 'd', type: 'ban', index: 6 }, { team: 'r', type: 'ban', index: 6 }
 ];
 
 let currentStepIndex = 0;
@@ -162,28 +76,30 @@ let selectedHeroId = null;
 const bannedHeroes = new Set();
 const pickedHeroes = new Set();
 
-const heroesContainer = document.getElementById('heroes-container');
-const statusMessage = document.getElementById('status-message');
-const actionBtn = document.getElementById('action-btn');
-
 function init() {
     renderHeroesGrid();
     updateStatus();
-    actionBtn.addEventListener('click', handleActionClick);
+    document.getElementById('action-btn').addEventListener('click', handleActionClick);
 }
 
 function renderHeroesGrid() {
-    heroesContainer.innerHTML = '';
-    heroesData.forEach(hero => {
+    // Очищаем все контейнеры атрибутов
+    document.getElementById('str-container').innerHTML = '';
+    document.getElementById('agi-container').innerHTML = '';
+    document.getElementById('int-container').innerHTML = '';
+    document.getElementById('uni-container').innerHTML = '';
+
+    heroesPool.forEach(hero => {
         const card = document.createElement('div');
         card.className = 'hero-card';
         card.id = `card-${hero.id}`;
-        card.innerHTML = `
-            <div class="hero-icon">${hero.icon}</div>
-            <div class="hero-name-label">${hero.name}</div>
-        `;
+        card.title = hero.name;
+        card.innerHTML = `<div class="hero-icon">${hero.icon}</div>`;
         card.addEventListener('click', () => selectHero(hero.id));
-        heroesContainer.appendChild(card);
+        
+        // Находим контейнер по атрибуту героя (str, agi, int, uni)
+        const targetContainer = document.getElementById(`${hero.attr}-container`);
+        if (targetContainer) targetContainer.appendChild(card);
     });
 }
 
@@ -196,65 +112,57 @@ function selectHero(heroId) {
     }
 
     selectedHeroId = heroId;
-    const currentCard = document.getElementById(`card-${heroId}`);
-    currentCard.classList.add('selected');
+    document.getElementById(`card-${heroId}`).classList.add('selected');
 
+    const actionBtn = document.getElementById('action-btn');
     actionBtn.classList.remove('disabled');
     actionBtn.classList.add('player-turn');
     const step = draftSequence[currentStepIndex];
-    actionBtn.innerText = step.type === 'ban' ? 'Забанить' : 'Пикнуть';
+    actionBtn.innerText = step.type === 'ban' ? 'ЗАБАНЯТЬ ГЕРОЯ' : 'ПИКНУТЬ ГЕРОЯ';
 }
 
 function handleActionClick() {
     if (!selectedHeroId || currentStepIndex >= draftSequence.length) return;
 
     const step = draftSequence[currentStepIndex];
-    const hero = heroesData.find(h => h.id === selectedHeroId);
+    const hero = heroesPool.find(h => h.id === selectedHeroId);
     
-    // Генерируем ID слота (например, d-ban-0 или r-pick-3) строго по вашему графику
     const slotId = `${step.team}-${step.type}-${step.index}`;
     const slotElement = document.getElementById(slotId);
-
     if (slotElement) {
         slotElement.innerText = hero.icon;
-        slotElement.style.backgroundColor = step.type === 'ban' ? '#451a1a' : '#1a4527';
     }
 
-    if (step.type === 'ban') {
-        bannedHeroes.add(selectedHeroId);
-    } else {
-        pickedHeroes.add(selectedHeroId);
-    }
+    if (step.type === 'ban') bannedHeroes.add(selectedHeroId);
+    else pickedHeroes.add(selectedHeroId);
 
-    const card = document.getElementById(`card-${selectedHeroId}`);
-    if (card) {
-        card.classList.remove('selected');
-        card.classList.add('disabled');
-    }
+    document.getElementById(`card-${selectedHeroId}`).classList.remove('selected');
+    document.getElementById(`card-${selectedHeroId}`).classList.add('disabled');
 
     selectedHeroId = null;
     currentStepIndex++;
 
-    actionBtn.classList.add('disabled');
-    actionBtn.classList.remove('player-turn');
-    actionBtn.innerText = 'Выберите героя';
+    const actionBtn = document.getElementById('action-btn');
+    actionBtn.className = 'disabled';
+    actionBtn.innerText = 'ВЫБЕРИТЕ ГЕРОЯ';
 
     updateStatus();
 }
 
 function updateStatus() {
+    const statusMessage = document.getElementById('status-message');
     if (currentStepIndex >= draftSequence.length) {
-        statusMessage.innerText = 'Драфт завершен!';
-        actionBtn.innerText = 'Конец';
-        actionBtn.classList.add('disabled');
+        statusMessage.innerText = 'ДРАФТ ЗАВЕРШЕН!';
+        statusMessage.style.color = "#fbbf24";
+        document.getElementById('action-btn').innerText = 'КОНЕЦ';
         return;
     }
 
     const step = draftSequence[currentStepIndex];
-    const teamName = step.team === 'r' ? 'Свет (Radiant)' : 'Тьма (Dire)';
+    const teamName = step.team === 'r' ? 'СВЕТ (RADIANT)' : 'ТЬМА (DIRE)';
     const actionName = step.type === 'ban' ? 'БАНЯТ' : 'ПИКАЮТ';
     
-    statusMessage.innerText = `Ход команды: ${teamName}\nОни ${actionName} герой #${step.index + 1}`;
+    statusMessage.innerText = `ХОД КОМАНДЫ: ${teamName}\nОНИ ${actionName} ГЕРОЙ #${step.index + 1}`;
     statusMessage.style.color = step.team === 'r' ? '#4ade80' : '#f87171';
 }
 
