@@ -78,12 +78,12 @@ const pickedHeroes = new Set();
 
 function init() {
     renderHeroesGrid();
+    renderDraftList(); // Строим вертикальный список ходов справа
     updateStatus();
     document.getElementById('action-btn').addEventListener('click', handleActionClick);
 }
 
 function renderHeroesGrid() {
-    // Очищаем все контейнеры атрибутов
     document.getElementById('str-container').innerHTML = '';
     document.getElementById('agi-container').innerHTML = '';
     document.getElementById('int-container').innerHTML = '';
@@ -97,9 +97,44 @@ function renderHeroesGrid() {
         card.innerHTML = `<div class="hero-icon">${hero.icon}</div>`;
         card.addEventListener('click', () => selectHero(hero.id));
         
-        // Находим контейнер по атрибуту героя (str, agi, int, uni)
         const targetContainer = document.getElementById(`${hero.attr}-container`);
         if (targetContainer) targetContainer.appendChild(card);
+    });
+}
+
+// Отрисовка всей структуры вертикальной панели справа
+function renderDraftList() {
+    const listContainer = document.getElementById('draft-list-container');
+    listContainer.innerHTML = '';
+
+    draftSequence.forEach((step, idx) => {
+        const row = document.createElement('div');
+        row.className = 'draft-row';
+        row.id = `step-row-${idx}`;
+
+        const num = document.createElement('div');
+        num.className = 'row-num';
+        num.innerText = idx + 1;
+
+        const badge = document.createElement('div');
+        badge.className = `row-type-badge ${step.type === 'ban' ? 'ban-badge' : 'pick-badge'}`;
+        badge.innerText = step.type;
+
+        const slot = document.createElement('div');
+        // Присваиваем класс слота в зависимости от стороны (Radiant - справа, Dire - слева)
+        slot.className = `slot-display ${step.team === 'd' ? 'dire-slot' : ''}`;
+        slot.id = `panel-slot-${idx}`; // Каждому шагу даем свой уникальный ID слота
+
+        row.appendChild(num);
+        if (step.team === 'd') {
+            row.appendChild(slot);
+            row.appendChild(badge);
+        } else {
+            row.appendChild(badge);
+            row.appendChild(slot);
+        }
+
+        listContainer.appendChild(row);
     });
 }
 
@@ -118,7 +153,7 @@ function selectHero(heroId) {
     actionBtn.classList.remove('disabled');
     actionBtn.classList.add('player-turn');
     const step = draftSequence[currentStepIndex];
-    actionBtn.innerText = step.type === 'ban' ? 'ЗАБАНЯТЬ ГЕРОЯ' : 'ПИКНУТЬ ГЕРОЯ';
+    actionBtn.innerText = step.type === 'ban' ? 'ЗАБАНИТЬ ГЕРОЯ' : 'ПИКНУТЬ ГЕРОЯ';
 }
 
 function handleActionClick() {
@@ -127,10 +162,11 @@ function handleActionClick() {
     const step = draftSequence[currentStepIndex];
     const hero = heroesPool.find(h => h.id === selectedHeroId);
     
-    const slotId = `${step.team}-${step.type}-${step.index}`;
-    const slotElement = document.getElementById(slotId);
+    // Находим нужную ячейку в вертикальной панели по текущему индексу шага
+    const slotElement = document.getElementById(`panel-slot-${currentStepIndex}`);
     if (slotElement) {
         slotElement.innerText = hero.icon;
+        slotElement.className += step.type === 'ban' ? ' filled-ban' : ' filled-pick';
     }
 
     if (step.type === 'ban') bannedHeroes.add(selectedHeroId);
@@ -151,12 +187,20 @@ function handleActionClick() {
 
 function updateStatus() {
     const statusMessage = document.getElementById('status-message');
+    
+    // Убираем старую подсветку строк
+    document.querySelectorAll('.draft-row').forEach(r => r.classList.remove('active-row'));
+
     if (currentStepIndex >= draftSequence.length) {
         statusMessage.innerText = 'ДРАФТ ЗАВЕРШЕН!';
         statusMessage.style.color = "#fbbf24";
         document.getElementById('action-btn').innerText = 'КОНЕЦ';
         return;
     }
+
+    // Подсвечиваем текущую активную строчку в вертикальной панели желтым цветом
+    const activeRow = document.getElementById(`step-row-${currentStepIndex}`);
+    if (activeRow) activeRow.classList.add('active-row');
 
     const step = draftSequence[currentStepIndex];
     const teamName = step.team === 'r' ? 'СВЕТ (RADIANT)' : 'ТЬМА (DIRE)';
