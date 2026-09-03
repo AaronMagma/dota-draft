@@ -76,9 +76,17 @@ let selectedHeroId = null;
 const bannedHeroes = new Set();
 const pickedHeroes = new Set();
 
-// Вспомогательная функция, которая собирает прямую ссылку на картинку героя с серверов Steam/Valve
+// Надежный CDN без блокировок со стороны Valve
 function getHeroImageUrl(heroId) {
-    return `https://steamstatic.com{heroId}.png`;
+    // Преобразуем некоторые ID под формат библиотеки
+    let formattedId = heroId;
+    if (heroId === "nevermore") formattedId = "shadow_fiend";
+    if (heroId === "zuus") formattedId = "zeus";
+    if (heroId === "necrolyte") formattedId = "necrophos";
+    if (heroId === "antimage") formattedId = "anti_mage";
+    if (heroId === "vengefulspirit") formattedId = "vengeful_spirit";
+
+    return `https://unpkg.com{formattedId}_sb.png`;
 }
 
 function init() {
