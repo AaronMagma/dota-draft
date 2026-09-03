@@ -112,6 +112,26 @@ function renderDraftList() {
         row.className = 'draft-row';
         row.id = `step-row-${idx}`;
 
+        // Левый слот (Radiant)
+        const radiantSlot = document.createElement('div');
+        radiantSlot.className = 'slot-display empty-slot';
+        if (step.team === 'r') {
+            radiantSlot.id = `panel-slot-${idx}`; // ID даем только активному для этого шага слоту
+            radiantSlot.className = 'slot-display';
+        }
+
+        // Правый слот (Dire)
+        const direSlot = document.createElement('div');
+        direSlot.className = 'slot-display empty-slot';
+        if (step.team === 'd') {
+            direSlot.id = `panel-slot-${idx}`; // ID даем только активному для этого шага слоту
+            direSlot.className = 'slot-display';
+        }
+
+        // Центральная инфо-панель (Номер + Бадж)
+        const centerInfo = document.createElement('div');
+        centerInfo.className = 'row-center-info';
+
         const num = document.createElement('div');
         num.className = 'row-num';
         num.innerText = idx + 1;
@@ -120,23 +140,18 @@ function renderDraftList() {
         badge.className = `row-type-badge ${step.type === 'ban' ? 'ban-badge' : 'pick-badge'}`;
         badge.innerText = step.type;
 
-        const slot = document.createElement('div');
-        // Присваиваем класс слота в зависимости от стороны (Radiant - справа, Dire - слева)
-        slot.className = `slot-display ${step.team === 'd' ? 'dire-slot' : ''}`;
-        slot.id = `panel-slot-${idx}`; // Каждому шагу даем свой уникальный ID слота
+        centerInfo.appendChild(num);
+        centerInfo.appendChild(badge);
 
-        row.appendChild(num);
-        if (step.team === 'd') {
-            row.appendChild(slot);
-            row.appendChild(badge);
-        } else {
-            row.appendChild(badge);
-            row.appendChild(slot);
-        }
+        // Собираем строку строго по структуре: [Radiant] [Центр] [Dire]
+        row.appendChild(radiantSlot);
+        row.appendChild(centerInfo);
+        row.appendChild(direSlot);
 
         listContainer.appendChild(row);
     });
 }
+
 
 function selectHero(heroId) {
     if (currentStepIndex >= draftSequence.length || bannedHeroes.has(heroId) || pickedHeroes.has(heroId)) return;
