@@ -57,19 +57,32 @@ const heroesPool = [
 ];
 
 const draftSequence = [
-    { team: 'd', type: 'ban', index: 0 }, { team: 'd', type: 'ban', index: 1 },
-    { team: 'r', type: 'ban', index: 0 }, { team: 'r', type: 'ban', index: 1 },
-    { team: 'd', type: 'ban', index: 2 }, { team: 'r', type: 'ban', index: 2 },
-    { team: 'r', type: 'ban', index: 3 }, { team: 'd', type: 'pick', index: 0 },
-    { team: 'r', type: 'pick', index: 0 }, { team: 'd', type: 'ban', index: 3 },
-    { team: 'd', type: 'ban', index: 4 }, { team: 'r', type: 'ban', index: 4 },
-    { team: 'r', type: 'pick', index: 1 }, { team: 'd', type: 'pick', index: 1 },
-    { team: 'd', type: 'pick', index: 2 }, { team: 'r', type: 'pick', index: 2 },
-    { team: 'r', type: 'pick', index: 3 }, { team: 'd', type: 'pick', index: 3 },
-    { team: 'd', type: 'pick', index: 4 }, { team: 'r', type: 'pick', index: 4 },
-    { team: 'd', type: 'ban', index: 5 }, { team: 'r', type: 'ban', index: 5 },
-    { team: 'd', type: 'ban', index: 6 }, { team: 'r', type: 'ban', index: 6 }
+    { team: 'd', type: 'ban', index: 0 },  // 1й бан тьма
+    { team: 'd', type: 'ban', index: 1 },  // 2й бан тьма
+    { team: 'r', type: 'ban', index: 0 },  // 3й бан свет
+    { team: 'r', type: 'ban', index: 1 },  // 4й бан свет
+    { team: 'd', type: 'ban', index: 2 },  // 5й бан тьма
+    { team: 'r', type: 'ban', index: 2 },  // 6й бан свет
+    { team: 'r', type: 'ban', index: 3 },  // 7й бан свет 
+    { team: 'd', type: 'pick', index: 0 }, // 8й пик тьма
+    { team: 'r', type: 'pick', index: 0 }, // 9й пик свет
+    { team: 'd', type: 'ban', index: 3 },  // 10й бан тьма
+    { team: 'd', type: 'ban', index: 4 },  // 11й бан тьма
+    { team: 'r', type: 'ban', index: 4 },  // 12й бан свет
+    { team: 'r', type: 'pick', index: 1 }, // 13й пик свет
+    { team: 'd', type: 'pick', index: 1 }, // 14й пик тьма
+    { team: 'd', type: 'pick', index: 2 }, // 15й пик тьма
+    { team: 'r', type: 'pick', index: 2 }, // 16й пик свет
+    { team: 'r', type: 'pick', index: 3 }, // 17й пик свет
+    { team: 'd', type: 'pick', index: 3 }, // 18й пик тьма
+    { team: 'd', type: 'ban', index: 5 },  // 19й бан тьма (БЫЛ ОШИБОЧНЫЙ ПИК)
+    { team: 'r', type: 'ban', index: 5 },  // 20й бан свет (БЫЛ ОШИБОЧНЫЙ ПИК)
+    { team: 'd', type: 'ban', index: 6 },  // 21й бан тьма
+    { team: 'r', type: 'ban', index: 6 },  // 22й бан свет
+    { team: 'd', type: 'pick', index: 4 }, // 23й пик тьма (БЫЛ ОШИБОЧНЫЙ БАН)
+    { team: 'r', type: 'pick', index: 4 }  // 24й пик свет (БЫЛ ОШИБОЧНЫЙ БАН)
 ];
+
 
 let currentStepIndex = 0;
 let selectedHeroId = null;
