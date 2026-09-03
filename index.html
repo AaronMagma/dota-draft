@@ -129,7 +129,11 @@
         </div>
     </div>
 
-    <!-- Версия v=11 для железного сброса кэша браузера -->
-    <script src="script.js?v=15"></script>
+    <!-- Этот трюк заставит браузер скачивать абсолютно свежий файл при каждом обновлении -->
+    <script>
+        const script = document.createElement('script');
+        script.src = 'script.js?v=' + Date.now();
+        document.body.appendChild(script);
+    </script>
 </body>
 </html>
