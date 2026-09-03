@@ -81,8 +81,8 @@ function renderHeroesGrid() {
         
         card.innerHTML = `
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 5px;">
-                <span style="font-size: 22px;">${hero.icon}</span>
-                <span style="font-size: 10px; font-weight: bold; color: #a1a1aa; text-align: center;">${hero.name}</span>
+                <span style="font-size: 18px;">${hero.icon}</span>
+                <span style="font-size: 9px; font-weight: bold; color: #a1a1aa; text-align: center;">${hero.name}</span>
             </div>
         `;
         
