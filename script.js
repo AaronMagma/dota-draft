@@ -199,26 +199,35 @@ currentStep++;
 updateUI();
 }
 function updateUI() {
-if (currentStep >= draftSchedule.length) {
-statusMessage.innerText = "Драфт окончен!";
-statusMessage.style.color = "#fbbf24";
-actionBtn.innerText = "Конец";
-actionBtn.className = "disabled";
-return;
+    if (currentStep >= draftSchedule.length) {
+        statusMessage.innerText = "Драфт окончен!";
+        statusMessage.style.color = "#fbbf24";
+        actionBtn.innerText = "Конец";
+        actionBtn.className = "disabled";
+        return;
+    }
+
+    const nextTurn = draftSchedule[currentStep];
+    
+    if (nextTurn.side === false) {
+        statusMessage.innerText = nextTurn.type === 'ban' ? "Ваш ход: Бан героя" : "Ваш ход: Выберите Пик";
+        statusMessage.style.color = "#4ade80";
+        actionBtn.innerText = "Выберите героя";
+        actionBtn.className = "disabled";
+    } else {
+        statusMessage.innerText = nextTurn.type === 'ban' ? "Ход Тьмы (ИИ): Думает над баном..." : "Ход Тьмы (ИИ): Выбирает пик...";
+        statusMessage.style.color = "#f87171";
+        actionBtn.innerText = "ИИ выбирает...";
+        actionBtn.className = "disabled";
+        
+        makeAiMove();
+    }
 }
-const nextTurn = draftSchedule[currentStep];
-if (nextTurn.side === false) {
-statusMessage.innerText = nextTurn.type === 'ban' ? "Ваш ход: Бан героя" : "Ваш ход: Выберите Пик";
-statusMessage.style.color = "#4ade80";
-actionBtn.innerText = "Выберите героя";
-actionBtn.className = "disabled";
-} else {
-statusMessage.innerText = nextTurn.type === 'ban' ? "Ход Тьмы (ИИ): Думает над баном..." : "Ход Тьмы (ИИ): Выбирает пик...";
-statusMessage.style.color = "#f87171";
-actionBtn.innerText = "ИИ выбирает...";
-actionBtn.className = "disabled";
-makeAiMove();
-}
-}
+
+// БЕЗОПАСНЫЙ ЗАПУСК: Ждем, пока браузер полностью построит HTML-дерево
+document.addEventListener('DOMContentLoaded', () => {
+    initHeroesGrid();
+    updateUI();
+});
 initHeroesGrid();
 updateUI();
