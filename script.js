@@ -1,18 +1,18 @@
 // Официальные CDN-картинки Valve/Steam, которые точно загрузятся
 const heroesPool = [
     // --- STRENGTH ---
-    { id: "axe", name: "Axe", attr: "str", img: "https://ru.dotabuff.com/assets/heroes/axe-b974399c8ee8079a6c83b2b6a8ca033a63defc0229b07b547f4befd775ca53f3.jpg" },
-    { id: "pudge", name: "Pudge", attr: "str", img: "httpsru.dotabuff.comassetsheroespudge-d8673aca5ef38b0cff4826c8c7d22e09e8e09b44940a86859c8161553caefa8c.jpg" },
-    { id: "earthshaker", name: "Earthshaker", attr: "str", img: "httpsru.dotabuff.comassetsheroesearthshaker-b491d33fcf49d6be267f9c01734b8684e4183c142c9cd0f3e0e1dc84207241a8.jpg" },
-    { id: "sven", name: "Sven", attr: "str", img: "httpsru.dotabuff.comassetsheroessven-33b31c39c41f43d6d00e525522fd9f24b971213541a2224b86abf67a39f313c0.jpg" },
-    { id: "undying", name: "Undying", attr: "str", img: "httpsru.dotabuff.comassetsheroesundying-a30a48d689e0b40f6afc6f6892a5f9d8d16549098043f29dcfd6e2221c5a51f0.jpg" },
-    { id: "tidehunter", name: "Tidehunter", attr: "str", img: "httpsru.dotabuff.comassetsheroestidehunter-89034daeb395b0cb9799f5c7b79220310407c382823b012f3c23d0a98f7d7e0a.jpg" },
-    { id: "wraith_king", name: "Wraith King", attr: "str", img: "httpsru.dotabuff.comassetsheroeswraith-king-233a53f103c784de0f480cec4f18dd8490bd6da44357154e4717dfb31ffbb2b3.jpg" },
-    { id: "slardar", name: "Slardar", attr: "str", img: "httpsru.dotabuff.comassetsheroesslardar-f8cad16974d24ca788a8da6aea7b74bf82f2d1df97bfdade68992011ed9ce7fa.jpg" },
-    { id: "doom", name: "Doom", attr: "str", img: "httpsru.dotabuff.comassetsheroesdoom-3b31f2b2a692a4d59e6e7f01abfb13a47fadde69b0d2ab15aa30878c945ad428.jpg" },
-    { id: "magnus", name: "Magnus", attr: "str", img: "httpsru.dotabuff.comassetsheroesmagnus-5d9d18053840882b32748dd0bff8659053daf53e2611ecbce64839e5fe77bc88.jpg" },
-    { id: "kunkka", name: "Kunkka", attr: "str", img: "httpsru.dotabuff.comassetsheroeskunkka-1360505f595012f22b938e9be7fa181916d6e8cde1f59fca4147c27c65fd0293.jpg" },
-    { id: "tiny", name: "Tiny", attr: "str", img: "httpsru.dotabuff.comassetsheroestiny-3dba927336577daaf57ddfde9e74f4b25d1a117bf3eb76c5635ddcbc8225bb61.jpg" }
+    { id: "axe", name: "Axe", attr: "str", img: "https://jsdelivr.net" },
+    { id: "pudge", name: "Pudge", attr: "str", img: "https://jsdelivr.net" },
+    { id: "earthshaker", name: "Earthshaker", attr: "str", img: "https://jsdelivr.net" },
+    { id: "sven", name: "Sven", attr: "str", img: "https://jsdelivr.net" },
+    { id: "undying", name: "Undying", attr: "str", img: "https://jsdelivr.net" },
+    { id: "tidehunter", name: "Tidehunter", attr: "str", img: "https://jsdelivr.net" },
+    { id: "wraith_king", name: "Wraith King", attr: "str", img: "https://jsdelivr.net" },
+    { id: "slardar", name: "Slardar", attr: "str", img: "https://jsdelivr.net" },
+    { id: "doom", name: "Doom", attr: "str", img: "https://jsdelivr.net" },
+    { id: "magnus", name: "Magnus", attr: "str", img: "https://jsdelivr.net" },
+    { id: "kunkka", name: "Kunkka", attr: "str", img: "https://jsdelivr.net" },
+    { id: "tiny", name: "Tiny", attr: "str", img: "https://jsdelivr.net" }
 ];
 
 // Официальный Captains Mode на 24 шага
