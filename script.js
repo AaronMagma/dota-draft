@@ -1,33 +1,58 @@
-// Официальные CDN-картинки Valve/Steam, которые точно загрузятся
+// Пул из 24 героев-силачей с эмодзи-иконками, чтобы хватило на весь драфт
 const heroesPool = [
-    // --- STRENGTH ---
-    { id: "axe", name: "Axe", attr: "str", img: "images/axe.png" },
-    { id: "pudge", name: "Pudge", attr: "str", img: "images/pudge.png" },
-    { id: "earthshaker", name: "Earthshaker", attr: "str", img: "images/earthshaker.png" },
-    { id: "sven", name: "Sven", attr: "str", img: "images/sven.png" },
-    { id: "undying", name: "Undying", attr: "str", img: "images/undying.png" },
-    { id: "tidehunter", name: "Tidehunter", attr: "str", img: "images/tidehunter.png" },
-    { id: "wraith_king", name: "Wraith King", attr: "str", img: "images/wraith_king.png" },
-    { id: "slardar", name: "Slardar", attr: "str", img: "images/slardar.png" },
-    { id: "doom", name: "Doom", attr: "str", img: "images/doom.png" },
-    { id: "magnus", name: "Magnus", attr: "str", img: "images/magnus.png" },
-    { id: "kunkka", name: "Kunkka", attr: "str", img: "images/kunkka.png" },
-    { id: "tiny", name: "Tiny", attr: "str", img: "images/tiny.png" }
+    { id: "axe", name: "Axe", attr: "str", icon: "🪓" },
+    { id: "pudge", name: "Pudge", attr: "str", icon: "🥩" },
+    { id: "earthshaker", name: "Earthshaker", attr: "str", icon: "🪨" },
+    { id: "sven", name: "Sven", attr: "str", icon: "⚔️" },
+    { id: "undying", name: "Undying", attr: "str", icon: "🧟" },
+    { id: "tidehunter", name: "Tidehunter", attr: "str", icon: "🍉" },
+    { id: "wraith_king", name: "Wraith King", attr: "str", icon: "👑" },
+    { id: "slardar", name: "Slardar", attr: "str", icon: "🐟" },
+    { id: "doom", name: "Doom", attr: "str", icon: "😈" },
+    { id: "magnus", name: "Magnus", attr: "str", icon: "🦏" },
+    { id: "kunkka", name: "Kunkka", attr: "str", icon: "⚓" },
+    { id: "tiny", name: "Tiny", attr: "str", icon: "🗿" },
+    // Дополнительные силачи, чтобы драфт на 24 шага работал без сбоев:
+    { id: "lifestealer", name: "Lifestealer", attr: "str", icon: "🦷" },
+    { id: "abaddon", name: "Abaddon", attr: "str", icon: "🐴" },
+    { id: "lycan", name: "Lycan", attr: "str", icon: "🐺" },
+    { id: "bristleback", name: "Bristleback", attr: "str", icon: "🦔" },
+    { id: "centaur", name: "Centaur", attr: "str", icon: "🛡️" },
+    { id: "dragon_knight", name: "Dragon Knight", attr: "str", icon: "🐉" },
+    { id: "huskar", name: "Huskar", attr: "str", icon: "🩸" },
+    { id: "alchemist", name: "Alchemist", attr: "str", icon: "🧪" },
+    { id: "spirit_breaker", name: "Spirit Breaker", attr: "str", icon: "🐮" },
+    { id: "timbersaw", name: "Timbersaw", attr: "str", icon: "🌲" },
+    { id: "mars", name: "Mars", attr: "str", icon: "⭕" },
+    { id: "underlord", name: "Underlord", attr: "str", icon: "🟢" }
 ];
-// Официальный Captains Mode на 24 шага
+
+// Ваш точный порядок ходов на 24 шага (Тьма начинает)
 const draftSequence = [
-    { step: 1, team: "radiant", type: "ban" },  { step: 2, team: "dire",    type: "ban" },
-    { step: 3, team: "radiant", type: "ban" },  { step: 4, team: "dire",    type: "ban" },
-    { step: 5, team: "radiant", type: "ban" },  { step: 6, team: "dire",    type: "ban" },
-    { step: 7, team: "radiant", type: "pick" }, { step: 8, team: "dire",    type: "pick" },
-    { step: 9, team: "dire",    type: "pick" }, { step: 10, team: "radiant", type: "pick" },
-    { step: 11, team: "radiant", type: "ban" }, { step: 12, team: "dire",    type: "ban" },
-    { step: 13, team: "radiant", type: "ban" }, { step: 14, team: "dire",    type: "ban" },
-    { step: 15, team: "dire",    type: "pick" }, { step: 16, team: "radiant", type: "pick" },
-    { step: 17, team: "dire",    type: "pick" }, { step: 18, team: "radiant", type: "pick" },
-    { step: 19, team: "dire",    type: "ban" },  { step: 20, team: "radiant", type: "ban" },
-    { step: 21, team: "dire",    type: "ban" },  { step: 22, team: "radiant", type: "ban" },
-    { step: 23, team: "radiant", type: "pick" }, { step: 24, team: "dire",    type: "pick" }
+    { step: 1, team: "dire", type: "ban" },
+    { step: 2, team: "dire", type: "ban" },
+    { step: 3, team: "radiant", type: "ban" },
+    { step: 4, team: "radiant", type: "ban" },
+    { step: 5, team: "dire", type: "ban" },
+    { step: 6, team: "radiant", type: "ban" },
+    { step: 7, team: "radiant", type: "ban" },
+    { step: 8, team: "dire", type: "pick" },
+    { step: 9, team: "radiant", type: "pick" },
+    { step: 10, team: "dire", type: "ban" },
+    { step: 11, team: "dire", type: "ban" },
+    { step: 12, team: "radiant", type: "ban" },
+    { step: 13, team: "radiant", type: "pick" },
+    { step: 14, team: "dire", type: "pick" },
+    { step: 15, team: "dire", type: "pick" },
+    { step: 16, team: "radiant", type: "pick" },
+    { step: 17, team: "radiant", type: "pick" },
+    { step: 18, team: "dire", type: "pick" },
+    { step: 19, team: "dire", type: "ban" },
+    { step: 20, team: "radiant", type: "ban" },
+    { step: 21, team: "dire", type: "ban" },
+    { step: 22, team: "radiant", type: "ban" },
+    { step: 23, team: "dire", type: "pick" },
+    { step: 24, team: "radiant", type: "pick" }
 ];
 
 let currentStepIndex = 0;
@@ -53,7 +78,13 @@ function renderHeroesGrid() {
         const card = document.createElement("div");
         card.className = "hero-card";
         card.id = `grid-hero-${hero.id}`;
-        card.innerHTML = `<img src="${hero.img}" alt="${hero.name}" title="${hero.name}">`;
+        
+        card.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 5px;">
+                <span style="font-size: 22px;">${hero.icon}</span>
+                <span style="font-size: 10px; font-weight: bold; color: #a1a1aa; text-align: center;">${hero.name}</span>
+            </div>
+        `;
         
         card.addEventListener("click", () => selectHero(hero.id));
         container.appendChild(card);
@@ -138,7 +169,7 @@ function commitCurrentTurn() {
     if (slot) {
         slot.classList.remove("empty-slot");
         slot.classList.add(currentTurn.type === "ban" ? "filled-ban" : "filled-pick");
-        slot.innerHTML = `<img src="${hero.img}" alt="${hero.name}">`;
+        slot.innerHTML = `<span style="font-size: 16px;">${hero.icon}</span>`;
     }
 
     currentStepIndex++;
@@ -153,10 +184,8 @@ function updateUI() {
 
     document.querySelectorAll(".draft-row").forEach(r => r.classList.remove("active-row"));
 
-    // Проверка: если сыграли все 24 шага ИЛИ если все 12 героев уже забанены/пикнуты
-    const totalUsed = bannedHeroes.size + pickedHeroes.size;
-    if (currentStepIndex >= draftSequence.length || totalUsed >= heroesPool.length) {
-        statusMsg.textContent = totalUsed >= heroesPool.length ? "ГЕРОИ ЗАКОНЧИЛИСЬ!" : "ДРАФТ ЗАВЕРШЕН!";
+    if (currentStepIndex >= draftSequence.length) {
+        statusMsg.textContent = "ДРАФТ ЗАВЕРШЕН!";
         statusMsg.style.color = "#22c55e";
         actionBtn.textContent = "КОНЕЦ";
         actionBtn.className = "disabled";
