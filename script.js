@@ -203,41 +203,37 @@ function renderHeroesGrid() {
 }
 
 function renderDraftRows() {
-    const listContainer = document.getElementById("draft-list-container");
-    listContainer.innerHTML = "";
+    const leftCol = document.getElementById("left-slots-column");
+    const numCol = document.getElementById("numbers-column");
+    const rightCol = document.getElementById("right-slots-column");
+
+    if (!leftCol || !numCol || !rightCol) return;
+
+    leftCol.innerHTML = "";
+    numCol.innerHTML = "";
+    rightCol.innerHTML = "";
 
     draftSequence.forEach((config, index) => {
-        const row = document.createElement("div");
-        row.className = "draft-row";
-        row.id = `draft-row-${index}`;
+        // 1. Создаем центральный номер шага
+        const numLabel = document.createElement("div");
+        numLabel.className = "num-label";
+        numLabel.textContent = config.step;
+        numCol.appendChild(numLabel);
 
+        // 2. Создаем левый слот (Radiant)
         const leftSlot = document.createElement("div");
         leftSlot.id = `slot-left-${index}`;
         leftSlot.className = "slot-display empty-slot";
+        // Маленькая текстовая подсказка b/p внутри пустого слота для наглядности
+        leftSlot.textContent = config.team === "radiant" ? (config.type === "ban" ? "B" : "P") : "";
+        leftCol.appendChild(leftSlot);
 
+        // 3. Создаем правый слот (Dire)
         const rightSlot = document.createElement("div");
         rightSlot.id = `slot-right-${index}`;
         rightSlot.className = "slot-display empty-slot";
-
-        const centerInfo = document.createElement("div");
-        centerInfo.className = "row-center-info";
-        
-        const numLabel = document.createElement("span");
-        numLabel.className = "row-num";
-        numLabel.textContent = config.step;
-
-        const badge = document.createElement("span");
-        badge.className = `row-type-badge ${config.type}-badge`;
-        badge.textContent = config.type;
-
-        centerInfo.appendChild(numLabel);
-        centerInfo.appendChild(badge);
-
-        row.appendChild(leftSlot);
-        row.appendChild(centerInfo);
-        row.appendChild(rightSlot);
-
-        listContainer.appendChild(row);
+        rightSlot.textContent = config.team === "dire" ? (config.type === "ban" ? "B" : "P") : "";
+        rightCol.appendChild(rightSlot);
     });
 }
 
@@ -275,17 +271,17 @@ function commitCurrentTurn() {
         card.classList.add("disabled");
     }
 
+    // Находим правильный слот на основе команды
     const targetSlotId = currentTurn.team === "radiant" ? `slot-left-${currentStepIndex}` : `slot-right-${currentStepIndex}`;
     const slot = document.getElementById(targetSlotId);
     if (slot) {
-        slot.classList.remove("empty-slot");
+        slot.classList.remove("empty-slot", "active-slot");
         slot.classList.add(currentTurn.type === "ban" ? "filled-ban" : "filled-pick");
-        slot.innerHTML = `<span style="font-size: 16px;">${hero.icon}</span>`;
+        slot.innerHTML = `<span style="font-size: 13px;">${hero.icon}</span>`;
     }
 
     currentStepIndex++;
     selectedHeroId = null;
-    
     updateUI();
 }
 
@@ -293,7 +289,8 @@ function updateUI() {
     const statusMsg = document.getElementById("status-message");
     const actionBtn = document.getElementById("action-btn");
 
-    document.querySelectorAll(".draft-row").forEach(r => r.classList.remove("active-row"));
+    // Сбрасываем старую подсветку активного хода со всех слотов
+    document.querySelectorAll(".slot-display").forEach(s => s.classList.remove("active-slot"));
 
     if (currentStepIndex >= draftSequence.length) {
         statusMsg.textContent = "ДРАФТ ЗАВЕРШЕН!";
@@ -307,12 +304,14 @@ function updateUI() {
     const teamName = turn.team === "radiant" ? "Radiant (Свет)" : "Dire (Тьма)";
     const actionName = turn.type === "ban" ? "БАНИТ" : "ВЫБИРАЕТ";
     
-    statusMsg.textContent = `${teamName}\n${actionName}`;
+    statusMsg.textContent = `${teamName} ${actionName}`;
     statusMsg.style.color = turn.team === "radiant" ? "#22c55e" : "#f87171";
 
-    const activeRow = document.getElementById(`draft-row-${currentStepIndex}`);
-    if (activeRow) {
-        activeRow.classList.add("active-row");
+    // Подсвечиваем рамкой текущий активный слот, который ждет выбора героя
+    const activeSlotId = turn.team === "radiant" ? `slot-left-${currentStepIndex}` : `slot-right-${currentStepIndex}`;
+    const activeSlot = document.getElementById(activeSlotId);
+    if (activeSlot) {
+        activeSlot.classList.add("active-slot");
     }
 
     if (selectedHeroId) {
