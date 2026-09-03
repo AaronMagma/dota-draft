@@ -19,7 +19,33 @@
         
         .grid-container { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
         
-        .hero-card { cursor: pointer; border: 1px solid #3a4454; border-radius: 4px; aspect-ratio: 16/13; display: flex; align-items: center; justify-content: center; background-color: #0d0f13; font-size: 24px; transition: all 0.15s ease; position: relative; overflow: hidden; }
+        .hero-card { 
+            cursor: pointer; 
+            border: 1px solid #3a4454; 
+            border-radius: 4px; 
+            aspect-ratio: 16/9; /* Изменили на стандартный формат картинок Доты */
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background-color: #0d0f13; 
+            transition: all 0.15s ease; 
+            position: relative; 
+            overflow: hidden; 
+        }
+        /* Добавляем стиль для картинок внутри сетки героев */
+        .hero-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Картинка заполнит всю карточку без искажений */
+            display: block;
+        }
+        /* Настраиваем отображение картинок внутри правой вертикальной панели */
+        .slot-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
         .hero-card:hover:not(.disabled) { border-color: #eab308; transform: scale(1.05); z-index: 10; box-shadow: 0 0 10px rgba(234,179,8,0.3); }
         .hero-card.selected { border-color: #22c55e; box-shadow: 0 0 12px #22c55e; z-index: 10; }
         .hero-card.disabled { filter: grayscale(100%) brightness(30%); opacity: 0.4; cursor: not-allowed; border-color: #1f242d; }
@@ -104,6 +130,6 @@
     </div>
 
     <!-- Версия v=11 для железного сброса кэша браузера -->
-    <script src="script.js?v=13"></script>
+    <script src="script.js?v=14"></script>
 </body>
 </html>
