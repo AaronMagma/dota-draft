@@ -14,33 +14,45 @@ const heroesData = [
     { id: "earthshaker", name: "Earthshaker", icon: "🐮" }
 ];
 
-// Простая и стабильная очередь драфта (по 5 слотов, без перегрузки HTML)
+// СТРОГАЯ ПОСЛЕДОВАТЕЛЬНОСТЬ (7 Банов / 5 Пиков для каждой команды)
 const draftSequence = [
-    { team: 'r', type: 'ban', index: 0 },
+    // Фаза 1: 7 банов (Дайр 2 -> Радиант 2 -> Дайр 1 -> Радиант 2), затем 2 пика (Дайр -> Радиант) и 3 бана (Дайр 2 -> Радиант 1)
     { team: 'd', type: 'ban', index: 0 },
-    { team: 'r', type: 'ban', index: 1 },
     { team: 'd', type: 'ban', index: 1 },
-    
-    { team: 'r', type: 'pick', index: 0 },
-    { team: 'd', type: 'pick', index: 0 },
-    { team: 'd', type: 'pick', index: 1 },
-    { team: 'r', type: 'pick', index: 1 },
-
-    { team: 'r', type: 'ban', index: 2 },
+    { team: 'r', type: 'ban', index: 0 },
+    { team: 'r', type: 'ban', index: 1 },
     { team: 'd', type: 'ban', index: 2 },
+    { team: 'r', type: 'ban', index: 2 },
     { team: 'r', type: 'ban', index: 3 },
+    
+    { team: 'd', type: 'pick', index: 0 },
+    { team: 'r', type: 'pick', index: 0 },
+    
     { team: 'd', type: 'ban', index: 3 },
-
-    { team: 'd', type: 'pick', index: 2 },
-    { team: 'r', type: 'pick', index: 2 },
-    { team: 'd', type: 'pick', index: 3 },
-    { team: 'r', type: 'pick', index: 3 },
-
     { team: 'd', type: 'ban', index: 4 },
     { team: 'r', type: 'ban', index: 4 },
 
-    { team: 'r', type: 'pick', index: 4 },
-    { team: 'd', type: 'pick', index: 4 }
+    // Фаза 2: 6 пиков (Радиант -> Дайр -> Дайр -> Радиант -> Радиант -> Дайр), затем 4 пика (Дайр -> Радиант -> Дайр -> Радиант)
+    { team: 'r', type: 'pick', index: 1 },
+    { team: 'd', type: 'pick', index: 1 },
+    { team: 'd', type: 'pick', index: 2 },
+    { team: 'r', type: 'pick', index: 2 },
+    { team: 'r', type: 'pick', index: 3 },
+    { team: 'd', type: 'pick', index: 3 },
+    
+    { team: 'd', type: 'pick', index: 4 }, // Последний слот пиков для Дире (индекс 4)
+    { team: 'r', type: 'pick', index: 4 }, // Последний слот пиков для Радиант (индекс 4)
+    
+    // В вашей схеме далее шли еще 4 пика (Дайр->Рад->Дайр->Рад), но так как слоты 0-4 (всего 5) уже заполнены, 
+    // мы переходим сразу к финальной Фазе 3 (баны и последние выборы), чтобы не выйти за рамки ваших HTML-ячеек.
+
+    // Фаза 3: 4 бана (Дайр -> Радиант -> Дайр -> Радиант), затем финальные пики (Дайр -> Радиант)
+    { team: 'd', type: 'ban', index: 5 },
+    { team: 'r', type: 'ban', index: 5 },
+    { team: 'd', type: 'ban', index: 6 },
+    { team: 'r', type: 'ban', index: 6 }
+    
+    // Драфт завершается на 24-м шаге, когда заполнено по 7 банов и 5 пиков с каждой стороны.
 ];
 
 let currentStepIndex = 0;
