@@ -16,7 +16,7 @@ const heroesPool = [
     // --- AGILITY ---
     { id: "juggernaut", name: "Juggernaut", attr: "agi" },
     { id: "phantom_assassin", name: "Phantom Assassin", attr: "agi" },
-    { id: "nevermore", name: "Shadow Fiend", attr: "agi" }, // Официальный ID СФа в файлах игры — nevermore
+    { id: "shadow_fiend", name: "Shadow Fiend", attr: "agi" },
     { id: "slark", name: "Slark", attr: "agi" },
     { id: "viper", name: "Viper", attr: "agi" },
     { id: "sniper", name: "Sniper", attr: "agi" },
@@ -31,7 +31,7 @@ const heroesPool = [
     { id: "crystal_maiden", name: "Crystal Maiden", attr: "int" },
     { id: "lina", name: "Lina", attr: "int" },
     { id: "lion", name: "Lion", attr: "int" },
-    { id: "zuus", name: "Zeus", attr: "int" }, // Официальный ID Зевса в файлах — zuus
+    { id: "zeus", name: "Zeus", attr: "int" },
     { id: "storm_spirit", name: "Storm Spirit", attr: "int" },
     { id: "puck", name: "Puck", attr: "int" },
     { id: "pugna", name: "Pugna", attr: "int" },
@@ -39,12 +39,12 @@ const heroesPool = [
     { id: "witch_doctor", name: "Witch Doctor", attr: "int" },
     { id: "tinker", name: "Tinker", attr: "int" },
     { id: "skywrath_mage", name: "Skywrath Mage", attr: "int" },
-    { id: "necrolyte", name: "Necrophos", attr: "int" }, // Официальный ID Некрофоса — necrolyte
+    { id: "necrophos", name: "Necrophos", attr: "int" },
 
     // --- UNIVERSAL ---
     { id: "invoker", name: "Invoker", attr: "uni" },
     { id: "rubick", name: "Rubick", attr: "uni" },
-    { id: "antimage", name: "Anti-Mage", attr: "uni" }, // Официальный ID Антимага — antimage
+    { id: "anti_mage", name: "Anti-Mage", attr: "uni" },
     { id: "winter_wyvern", name: "Winter Wyvern", attr: "uni" },
     { id: "grimstroke", name: "Grimstroke", attr: "uni" },
     { id: "dazzle", name: "Dazzle", attr: "uni" },
@@ -52,7 +52,7 @@ const heroesPool = [
     { id: "abaddon", name: "Abaddon", attr: "uni" },
     { id: "marci", name: "Marci", attr: "uni" },
     { id: "dark_willow", name: "Dark Willow", attr: "uni" },
-    { id: "vengefulspirit", name: "Vengeful Spirit", attr: "uni" }, // Официальный ID Венги — vengefulspirit
+    { id: "vengeful_spirit", name: "Vengeful Spirit", attr: "uni" },
     { id: "enigma", name: "Enigma", attr: "uni" }
 ];
 
@@ -76,16 +76,9 @@ let selectedHeroId = null;
 const bannedHeroes = new Set();
 const pickedHeroes = new Set();
 
-// Надежный CDN без блокировок со стороны Valve
+// Стабильный CDN с маленькими иконками (sb - small_horizontal)
 function getHeroImageUrl(heroId) {
-    // Преобразуем некоторые ID под формат библиотеки
-    let formattedId = heroId;
-    if (heroId === "nevermore") formattedId = "shadow_fiend";
-    if (heroId === "zuus") formattedId = "zeus";
-    if (heroId === "necrolyte") formattedId = "necrophos";
-    if (heroId === "antimage") formattedId = "anti_mage";
-    if (heroId === "vengefulspirit") formattedId = "vengeful_spirit";
-
+    let formattedId = heroId.toLowerCase().replace(/\s+/g, '_');
     return `https://unpkg.com{formattedId}_sb.png`;
 }
 
@@ -108,9 +101,7 @@ function renderHeroesGrid() {
         card.id = `card-${hero.id}`;
         card.title = hero.name;
         
-        // Вместо текста-смайлика вставляем тег <img> с официальной аватаркой
         card.innerHTML = `<img src="${getHeroImageUrl(hero.id)}" alt="${hero.name}">`;
-        
         card.addEventListener('click', () => selectHero(hero.id));
         
         const targetContainer = document.getElementById(`${hero.attr}-container`);
@@ -120,6 +111,7 @@ function renderHeroesGrid() {
 
 function renderDraftList() {
     const listContainer = document.getElementById('draft-list-container');
+    if (!listContainer) return;
     listContainer.innerHTML = '';
 
     draftSequence.forEach((step, idx) => {
@@ -188,7 +180,6 @@ function handleActionClick() {
     
     const slotElement = document.getElementById(`panel-slot-${currentStepIndex}`);
     if (slotElement) {
-        // При подтверждении хода вставляем картинку героя прямо в ячейку правой панели
         slotElement.innerHTML = `<img src="${getHeroImageUrl(selectedHeroId)}" alt="hero">`;
         slotElement.className += step.type === 'ban' ? ' filled-ban' : ' filled-pick';
     }
@@ -211,6 +202,7 @@ function handleActionClick() {
 
 function updateStatus() {
     const statusMessage = document.getElementById('status-message');
+    if (!statusMessage) return;
     
     document.querySelectorAll('.draft-row').forEach(r => r.classList.remove('active-row'));
 
@@ -232,4 +224,4 @@ function updateStatus() {
     statusMessage.style.color = step.team === 'r' ? '#4ade80' : '#f87171';
 }
 
-document.addEventListener('DOMContentLoaded', init);
+init();
