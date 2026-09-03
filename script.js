@@ -91,7 +91,7 @@ window.selectHero = function(heroName) {
     if (currentStep >= draftSchedule.length || isAiThinking) return;
     
     const currentTurn = draftSchedule[currentStep];
-    if (currentTurn.side === true) return; // Игнорируем клики в ход ИИ
+    if (currentTurn.side === true) return; 
     if (!availableHeroes.includes(heroName)) return;
 
     if (selectedHero) {
@@ -137,27 +137,23 @@ function makeAiMove() {
             let score = 0;
 
             if (currentTurn.type === "pick") {
-                // ИИ считает силу контрпиков против ваших персонажей
                 radiantDraft.picks.forEach(enemyHero => {
                     if (heroData.counters.includes(enemyHero)) score += 2;
                 });
-                // ИИ считает силу синергии со своими персонажами
                 direDraft.picks.forEach(allyHero => {
                     if (heroData.synergy.includes(allyHero)) score += 1;
                 });
             } else if (currentTurn.type === "ban") {
-                // ИИ банит то, что контрит его текущие пики
                 direDraft.picks.forEach(allyHero => {
                     const allyData = heroesPool.find(h => h.name === allyHero);
                     if (allyData && allyData.counters.includes(heroName)) score += 2;
                 });
-                // ИИ мешает вам взять хороших героев
                 radiantDraft.picks.forEach(enemyHero => {
                     if (heroData.counters.includes(enemyHero)) score += 1;
                 });
             }
 
-            score += Math.random() * 0.5; // Слегка разбавляем рандомом
+            score += Math.random() * 0.5;
 
             if (score > maxScore) {
                 maxScore = score;
@@ -182,12 +178,13 @@ function executeDraftStep(heroName) {
     }
 
     const sidePrefix = currentTurn.side ? 'd' : 'r';
+    const draftRef = currentTurn.side ? direDraft : radiantDraft;
+    const arrayToPush = currentTurn.type === 'ban' ? draftRef.bans : draftRef.picks;
+    const slotIndex = arrayToPush.length;
+    arrayToPush.push(heroName);
 
-const draftRef = currentTurn.side ? direDraft : radiantDraft;
-const arrayToPush = currentTurn.type === 'ban' ? draftRef.bans : draftRef.picks;
-const slotIndex = arrayToPush.length;
-arrayToPush.push(heroName);
-const slotId = sidePrefix + '-' + currentTurn.type + '-' + slotIndex;
+    const slotId = sidePrefix + '-' + currentTurn.type + '-' + slotIndex;
+
 const slotElement = document.getElementById(slotId);
 if (slotElement) {
 slotElement.innerText = heroData.icon;
@@ -199,35 +196,28 @@ currentStep++;
 updateUI();
 }
 function updateUI() {
-    if (currentStep >= draftSchedule.length) {
-        statusMessage.innerText = "Драфт окончен!";
-        statusMessage.style.color = "#fbbf24";
-        actionBtn.innerText = "Конец";
-        actionBtn.className = "disabled";
-        return;
-    }
-
-    const nextTurn = draftSchedule[currentStep];
-    
-    if (nextTurn.side === false) {
-        statusMessage.innerText = nextTurn.type === 'ban' ? "Ваш ход: Бан героя" : "Ваш ход: Выберите Пик";
-        statusMessage.style.color = "#4ade80";
-        actionBtn.innerText = "Выберите героя";
-        actionBtn.className = "disabled";
-    } else {
-        statusMessage.innerText = nextTurn.type === 'ban' ? "Ход Тьмы (ИИ): Думает над баном..." : "Ход Тьмы (ИИ): Выбирает пик...";
-        statusMessage.style.color = "#f87171";
-        actionBtn.innerText = "ИИ выбирает...";
-        actionBtn.className = "disabled";
-        
-        makeAiMove();
-    }
+if (currentStep >= draftSchedule.length) {
+statusMessage.innerText = "Драфт окончен!";
+statusMessage.style.color = "#fbbf24";
+actionBtn.innerText = "Конец";
+actionBtn.className = "disabled";
+return;
 }
-
-// БЕЗОПАСНЫЙ ЗАПУСК: Ждем, пока браузер полностью построит HTML-дерево
+const nextTurn = draftSchedule[currentStep];
+if (nextTurn.side === false) {
+statusMessage.innerText = nextTurn.type === 'ban' ? "Ваш ход: Бан героя" : "Ваш ход: Выберите Пик";
+statusMessage.style.color = "#4ade80";
+actionBtn.innerText = "Выберите героя";
+actionBtn.className = "disabled";
+} else {
+statusMessage.innerText = nextTurn.type === 'ban' ? "Ход Тьмы (ИИ): Думает над баном..." : "Ход Тьмы (ИИ): Выбирает пик...";
+statusMessage.style.color = "#f87171";
+actionBtn.innerText = "ИИ выбирает...";
+actionBtn.className = "disabled";
+makeAiMove();
+}
+}
 document.addEventListener('DOMContentLoaded', () => {
-    initHeroesGrid();
-    updateUI();
-});
 initHeroesGrid();
 updateUI();
+});
