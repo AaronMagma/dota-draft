@@ -1,3 +1,4 @@
+
 const heroesPool = [
     // --- STRENGTH ---
     { id: "axe", name: "Axe", attr: "str", img: "https://ru.dotabuff.com/assets/heroes/axe-b974399c8ee8079a6c83b2b6a8ca033a63defc0229b07b547f4befd775ca53f3.jpg" },
@@ -16,7 +17,7 @@ const heroesPool = [
     // --- AGILITY ---
     { id: "juggernaut", name: "Juggernaut", attr: "agi", img: "https://ru.dotabuff.com/assets/heroes/juggernaut-728c0be217dd13bb223cede80923e398b94449f398f43b9b259a404605c8140f.jpg" },
     { id: "phantom_assassin", name: "Phantom Assassin", attr: "agi", img: "https://ru.dotabuff.com/assets/heroes/phantom-assassin-7654f46ff00ddaefca29b284c7a70705a0c305250560f0543eaa8539e3d848f8.jpg" },
-    { id: "shadow_fiend", name: "Shadow Fiend", attr: "agi", img: "https://ru.dotabuff.com/assets/heroes/shadow-fiend-90e318481e82c840eafe05b7d53a05b670f380e9d6ee523f339449e355044296.jpg },
+    { id: "shadow_fiend", name: "Shadow Fiend", attr: "agi", img: "https://ru.dotabuff.com/assets/heroes/shadow-fiend-90e318481e82c840eafe05b7d53a05b670f380e9d6ee523f339449e355044296.jpg" },
     { id: "slark", name: "Slark", attr: "agi", img: "https://ru.dotabuff.com/assets/heroes/slark-b62a1c6367b7c887926fec8164a1b7fedc25b521e9522ddbc050b5249d686b47.jpg" },
     { id: "viper", name: "Viper", attr: "agi", img: "https://ru.dotabuff.com/assets/heroes/viper-c799c38e97f666a0b02e739ae184a0666842402616db97bedf786b50897b1ba6.jpg" },
     { id: "sniper", name: "Sniper", attr: "agi", img: "https://ru.dotabuff.com/assets/heroes/sniper-89ff3b0b138d76eb0808cec070f4c3ddb75f0de711fc8d8ab8b8b9ac039ea899.jpg" },
@@ -46,167 +47,178 @@ const heroesPool = [
     { id: "rubick", name: "Rubick", attr: "uni", img: "https://ru.dotabuff.com/assets/heroes/rubick-4f30f4875beef82cc20cac342bfcf650aabed1adcb567b5ed78821af442eaea7.jpg" },
     { id: "anti_mage", name: "Anti-Mage", attr: "uni", img: "https://ru.dotabuff.com/assets/heroes/anti-mage-fa86bcd90f43abc66cda02a553eb972bbd0ac9aa69d15307dde13571eb4f7086.jpg" },
     { id: "winter_wyvern", name: "Winter Wyvern", attr: "uni", img: "https://ru.dotabuff.com/assets/heroes/winter-wyvern-cd6fcab3fcf03594839a5b5d8fc2d3fc76421862e69237f6aab262ba1f4fe6f9.jpg" },
-t    { id: "grimstroke", name: "Grimstroke", attr: "uni", img: "https://ru.dotabuff.com/assets/heroes/grimstroke-6ac4ea704c561964f109dc8d2eced935d213a91559aae06ec272ebba20ac6cd3.jpg" },
+    { id: "grimstroke", name: "Grimstroke", attr: "uni", img: "https://ru.dotabuff.com/assets/heroes/grimstroke-6ac4ea704c561964f109dc8d2eced935d213a91559aae06ec272ebba20ac6cd3.jpg" },
     { id: "dazzle", name: "Dazzle", attr: "uni", img: "https://ru.dotabuff.com/assets/heroes/dazzle-86cf49171e9c0d74bf71fa7f120e88279f70c3e812ec36403b93fa1507539a4e.jpg" },
     { id: "shadow_shaman", name: "Shadow Shaman", attr: "uni", img: "https://ru.dotabuff.com/assets/heroes/shadow-shaman-ccbd7f6e10fd95fdf319a0f64be3b20dccae12ccfb28acabaf70910eb93abd9b.jpg" },
     { id: "abaddon", name: "Abaddon", attr: "uni", img: "https://ru.dotabuff.com/assets/heroes/abaddon-e43afc253c19735711317750488ba7f707ae555bba5dfa2fd1c484634e294c94.jpg" },
-    { id: "marci", name: "Marci", attr: "uni", img: "https://ru.dotabuff.com/assets/heroes/marci-9a0a2c4d90dc63116a5ba23439d97194915d3abd083cccc226a9b3c21fcdaa81.jpg" },
-    { id: "dark_willow", name: "Dark Willow", attr: "uni", img: "https://ru.dotabuff.com/assets/heroes/dark-willow-72b9b406f55446c501688c97f7954ac9c238bd48714cc322ca190d6fc1b6dbc2.jpg" },
-    { id: "vengeful_spirit", name: "Vengeful Spirit", attr: "uni", img: "https://ru.dotabuff.com/assets/heroes/vengeful-spirit-370c30a2378acbbe4af5d5bb64b2454d9e277c159fe9ed07b98ee29158a04c99.jpg" },
-    { id: "enigma", name: "Enigma", attr: "uni", img: "https://ru.dotabuff.com/assets/heroes/enigma-930c4e23bc271c65dd2943bb3fe556f3f5d933f45666fceba5d11d63ad083eb4.jpg" }
+    { id: "marci", name: "Marci", attr: "uni", img: "https://ru.dotabuff.com/assets/heroes/marci-9a0a2c4d90dc63116a5ba23439d97194915d3abd083cccc226a9b3c21fcdaa81.jpg" }
 ];
-
-const draftSequence = [
-    { team: 'd', type: 'ban', index: 0 },  { team: 'd', type: 'ban', index: 1 },
-    { team: 'r', type: 'ban', index: 0 },  { team: 'r', type: 'ban', index: 1 }
+// Официальный паттерн Captains Mode (24 шага драфта)const draftSequence = [
+    { step: 1,  team: "radiant", type: "ban" },
+    { step: 2,  team: "dire",    type: "ban" },
+    { step: 3,  team: "radiant", type: "ban" },
+    { step: 4,  team: "dire",    type: "ban" },
+    { step: 5,  team: "radiant", type: "ban" },
+    { step: 6,  team: "dire",    type: "ban" },
+    { step: 7,  team: "radiant", type: "ban" },
+    { step: 8,  team: "dire",    type: "ban" },
+    
+    { step: 9,  team: "radiant", type: "pick" },
+    { step: 10, team: "dire",    type: "pick" },
+    { step: 11, team: "dire",    type: "pick" },
+    { step: 12, team: "radiant", type: "pick" },
+    
+    { step: 13, team: "radiant", type: "ban" },
+    { step: 14, team: "dire",    type: "ban" },
+    { step: 15, team: "radiant", type: "ban" },
+    { step: 16, team: "dire",    type: "ban" },
+    
+    { step: 17, team: "dire",    type: "pick" },
+    { step: 18, team: "radiant", type: "pick" },
+    { step: 19, team: "dire",    type: "pick" },
+    { step: 20, team: "radiant", type: "pick" },
+    
+    { step: 21, team: "dire",    type: "ban" },
+    { step: 22, team: "radiant", type: "ban" },
+    { step: 23, team: "radiant", type: "pick" },
+    { step: 24, team: "dire",    type: "pick" }
 ];
-
-let currentStepIndex = 0;
-let selectedHeroId = null;
-const bannedHeroes = new Set();
-const pickedHeroes = new Set();
-
-function init() {
+let currentStepIndex = 0;let selectedHeroId = null;const bannedHeroes = new Set();const pickedHeroes = new Set();
+// Инициализация при загрузке страницы
+document.addEventListener("DOMContentLoaded", () => {
     renderHeroesGrid();
-    renderDraftList();
-    updateStatus();
-    document.getElementById('action-btn').addEventListener('click', handleActionClick);
+    renderDraftRows();
+    updateUI();
+    
+    // Вешаем обработчик на главную кнопку действия
+    const actionBtn = document.getElementById("action-btn");
+    actionBtn.addEventListener("click", commitCurrentTurn);
+});
+// 1. Отрисовка сетки героев по атрибутамfunction renderHeroesGrid() {
+
+heroesPool.forEach(hero => {
+const container = document.getElementById(${hero.attr}-container);
+if (!container) return;
+const card = document.createElement("div");
+card.className = "hero-card";
+card.id = grid-hero-${hero.id};
+card.innerHTML = <img src="${hero.img}" alt="${hero.name}" title="${hero.name}">;
+card.addEventListener("click", () => selectHero(hero.id));
+container.appendChild(card);
+});
 }
-
-function renderHeroesGrid() {
-    document.getElementById('str-container').innerHTML = '';
-    document.getElementById('agi-container').innerHTML = '';
-    document.getElementById('int-container').innerHTML = '';
-    document.getElementById('uni-container').innerHTML = '';
-
-    heroesPool.forEach(hero => {
-        const card = document.createElement('div');
-        card.className = 'hero-card';
-        card.id = `card-${hero.id}`;
-        card.title = hero.name;
-        
-        card.innerHTML = `<img src="${hero.img}" alt="${hero.name}">`;
-        card.addEventListener('click', () => selectHero(hero.id));
-        
-        const targetContainer = document.getElementById(`${hero.attr}-container`);
-        if (targetContainer) targetContainer.appendChild(card);
-    });
+// 2. Отрисовка 24 строк в правой панели драфта
+function renderDraftRows() {
+const listContainer = document.getElementById("draft-list-container");
+listContainer.innerHTML = "";
+draftSequence.forEach((config, index) => {
+const row = document.createElement("div");
+row.className = "draft-row";
+row.id = draft-row-${index};
+// Левый слот (для Radiant) или пушка
+const leftSlot = document.createElement("div");
+leftSlot.id = slot-left-${index};
+leftSlot.className = "slot-display empty-slot";
+// Правый слот (для Dire) или пушка
+const rightSlot = document.createElement("div");
+rightSlot.id = slot-right-${index};
+rightSlot.className = "slot-display empty-slot";
+// Центральная информация (номер шага и бейдж)
+const centerInfo = document.createElement("div");
+centerInfo.className = "row-center-info";
+const numLabel = document.createElement("span");
+numLabel.className = "row-num";
+numLabel.textContent = config.step;
+const badge = document.createElement("span");
+badge.className = row-type-badge ${config.type}-badge;
+badge.textContent = config.type;
+centerInfo.appendChild(numLabel);
+centerInfo.appendChild(badge);
+// Распределяем слоты по командам
+row.appendChild(leftSlot);
+row.appendChild(centerInfo);
+row.appendChild(rightSlot);
+listContainer.appendChild(row);
+});
 }
-
-function renderDraftList() {
-    const listContainer = document.getElementById('draft-list-container');
-    if (!listContainer) return;
-    listContainer.innerHTML = '';
-
-    draftSequence.forEach((step, idx) => {
-        const row = document.createElement('div');
-        row.className = 'draft-row';
-        row.id = `step-row-${idx}`;
-
-        const radiantSlot = document.createElement('div');
-        radiantSlot.className = 'slot-display empty-slot';
-        if (step.team === 'r') {
-            radiantSlot.id = `panel-slot-${idx}`;
-            radiantSlot.className = 'slot-display';
-        }
-
-        const direSlot = document.createElement('div');
-        direSlot.className = 'slot-display empty-slot';
-        if (step.team === 'd') {
-            direSlot.id = `panel-slot-${idx}`;
-            direSlot.className = 'slot-display';
-        }
-
-        const centerInfo = document.createElement('div');
-        centerInfo.className = 'row-center-info';
-
-        const num = document.createElement('div');
-        num.className = 'row-num';
-        num.innerText = idx + 1;
-
-        const badge = document.createElement('div');
-        badge.className = `row-type-badge ${step.type === 'ban' ? 'ban-badge' : 'pick-badge'}`;
-        badge.innerText = step.type;
-
-        centerInfo.appendChild(num);
-        centerInfo.appendChild(badge);
-
-        row.appendChild(radiantSlot);
-        row.appendChild(centerInfo);
-        row.appendChild(direSlot);
-
-        listContainer.appendChild(row);
-    });
-}
-
+// 3. Выбор героя кликом в сетке
 function selectHero(heroId) {
-    if (currentStepIndex >= draftSequence.length || bannedHeroes.has(heroId) || pickedHeroes.has(heroId)) return;
-
-    if (selectedHeroId) {
-        const prevCard = document.getElementById(`card-${selectedHeroId}`);
-        if (prevCard) prevCard.classList.remove('selected');
-    }
-
-    selectedHeroId = heroId;
-    document.getElementById(`card-${heroId}`).classList.add('selected');
-
-    const actionBtn = document.getElementById('action-btn');
-    actionBtn.classList.remove('disabled');
-    actionBtn.classList.add('player-turn');
-    const step = draftSequence[currentStepIndex];
-    actionBtn.innerText = step.type === 'ban' ? 'ЗАБАНИТЬ ГЕРОЯ' : 'ПИКНУТЬ ГЕРОЯ';
+if (currentStepIndex >= draftSequence.length) return; // Конец драфта
+if (bannedHeroes.has(heroId) || pickedHeroes.has(heroId)) return; // Уже забанен или пикнут
+// Снимаем выделение со старого
+if (selectedHeroId) {
+const oldCard = document.getElementById(grid-hero-${selectedHeroId});
+if (oldCard) oldCard.classList.remove("selected");
+}
+// Выбираем нового
+selectedHeroId = heroId;
+const newCard = document.getElementById(grid-hero-${heroId});
+if (newCard) newCard.classList.add("selected");
+updateUI();
+}
+// 4. Подтверждение выбора (Клик по красной кнопке или Enter)
+function commitCurrentTurn() {
+if (!selectedHeroId || currentStepIndex >= draftSequence.length) return;
+const currentTurn = draftSequence[currentStepIndex];
+const hero = heroesPool.find(h => h.id === selectedHeroId);
+// Добавляем в соответствующий реестр
+if (currentTurn.type === "ban") {
+bannedHeroes.add(selectedHeroId);
+} else {
+pickedHeroes.add(selectedHeroId);
+}
+// Визуально отключаем карточку героя в сетке
+const card = document.getElementById(grid-hero-${selectedHeroId});
+if (card) {
+card.classList.remove("selected");
+card.classList.add("disabled");
+}
+// Заполняем картинку в строке лога шагов
+const targetSlotId = currentTurn.team === "radiant" ? slot-left-${currentStepIndex} : slot-right-${currentStepIndex};
+const slot = document.getElementById(targetSlotId);
+if (slot) {
+slot.classList.remove("empty-slot");
+slot.classList.add(currentTurn.type === "ban" ? "filled-ban" : "filled-pick");
+slot.innerHTML = <img src="${hero.img}" alt="${hero.name}">;
+}
+// Переходим к следующему шагу
+currentStepIndex++;
+selectedHeroId = null;
+updateUI();
+}
+// 5. Обновление текстов, статусов и активности кнопок
+function updateUI() {
+const statusMsg = document.getElementById("status-message");
+const actionBtn = document.getElementById("action-btn");
+// Удаляем прошлые подсветки строк
+document.querySelectorAll(".draft-row").forEach(r => r.classList.remove("active-row"));
+if (currentStepIndex >= draftSequence.length) {
+statusMsg.textContent = "ДРАФТ ЗАВЕРШЕН!";
+statusMsg.style.color = "#22c55e";
+actionBtn.textContent = "КОНЕЦ";
+actionBtn.className = "disabled";
+return;
+}
+// Получаем данные текущего хода
+const turn = draftSequence[currentStepIndex];
+const teamName = turn.team === "radiant" ? "СИЛЫ СВЕТА (Radiant)" : "СИЛЫ ТЬМЫ (Dire)";
+const actionName = turn.type === "ban" ? "БАНИТ" : "ВЫБИРАЕТ";
+statusMsg.textContent = ${teamName}\n${actionName};
+statusMsg.style.color = turn.team === "radiant" ? "#22c55e" : "#f87171";
+// Подсвечиваем текущую строчку драфта в меню
+const activeRow = document.getElementById(draft-row-${currentStepIndex});
+if (activeRow) {
+activeRow.classList.add("active-row");
+activeRow.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+// Управляем кнопкой
+if (selectedHeroId) {
+const selectedHero = heroesPool.find(h => h.id === selectedHeroId);
+actionBtn.textContent = ПОДТВЕРДИТЬ: ${selectedHero.name};
+actionBtn.className = "player-turn";
+} else {
+actionBtn.textContent = turn.type === "ban" ? "ЗАБАНЬТЕ ГЕРОЯ" : "ВЫБЕРИТЕ ГЕРОЯ";
+actionBtn.className = "disabled";
+}
 }
 
-function handleActionClick() {
-    if (!selectedHeroId || currentStepIndex >= draftSequence.length) return;
-
-    const step = draftSequence[currentStepIndex];
-    const hero = heroesPool.find(h => h.id === selectedHeroId);
-    
-    const slotElement = document.getElementById(`panel-slot-${currentStepIndex}`);
-    if (slotElement) {
-        slotElement.innerHTML = `<img src="${hero.img}" alt="hero">`;
-        slotElement.className += step.type === 'ban' ? ' filled-ban' : ' filled-pick';
-    }
-
-    if (step.type === 'ban') bannedHeroes.add(selectedHeroId);
-    else pickedHeroes.add(selectedHeroId);
-
-    document.getElementById(`card-${selectedHeroId}`).classList.remove('selected');
-    document.getElementById(`card-${selectedHeroId}`).classList.add('disabled');
-
-    selectedHeroId = null;
-    currentStepIndex++;
-
-    const actionBtn = document.getElementById('action-btn');
-    actionBtn.className = 'disabled';
-    actionBtn.innerText = 'ВЫБЕРИТЕ ГЕРОЯ';
-
-    updateStatus();
-}
-
-function updateStatus() {
-    const statusMessage = document.getElementById('status-message');
-    if (!statusMessage) return;
-    
-    document.querySelectorAll('.draft-row').forEach(r => r.classList.remove('active-row'));
-
-    if (currentStepIndex >= draftSequence.length) {
-        statusMessage.innerText = 'ДРАФТ ЗАВЕРШЕН!';
-        statusMessage.style.color = "#fbbf24";
-        document.getElementById('action-btn').innerText = 'КОНЕЦ';
-        return;
-    }
-
-    const activeRow = document.getElementById(`step-row-${currentStepIndex}`);
-    if (activeRow) activeRow.classList.add('active-row');
-
-    const step = draftSequence[currentStepIndex];
-    const teamName = step.team === 'r' ? 'СВЕТ (RADIANT)' : 'ТЬМА (DIRE)';
-    const actionName = step.type === 'ban' ? 'БАНЯТ' : 'ПИКАЮТ';
-    
-    statusMessage.innerText = `ХОД КОМАНДЫ: ${teamName}\nОНИ ${actionName} ГЕРОЙ #${step.index + 1}`;
-    statusMessage.style.color = step.team === 'r' ? '#4ade80' : '#f87171';
-}
-
-init();
