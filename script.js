@@ -44,24 +44,24 @@ let availableHeroes = heroesPool.map(h => h.name);let currentStep = 0;let select
 const radiantDraft = { bans: [], picks: [] };const direDraft = { bans: [], picks: [] };
 // СТРОГО ВАША ПОСЛЕДОВАТЕЛЬНОСТЬ (7 Банов / 5 Пиков для каждой команды)// side: false - Игрок (Свет / Radiant), side: true - Компьютер (Тьма / Dire)const draftSchedule = [
     // Фаза 1: 7 банов, затем 2 пика и 3 бана
-    { type: "ban", side: true }, { type: "ban", side: true },   // Дайр -> Дайр
-    { type: "ban", side: false }, { type: "ban", side: false }, // Радиант -> Радиант
-    { type: "ban", side: true },                                // Дайр
-    { type: "ban", side: false }, { type: "ban", side: false }, // Радиант -> Радиант
-    { type: "pick", side: true }, { type: "pick", side: false },// Дайр -> Радиант
-    { type: "ban", side: true }, { type: "ban", side: true },   // Дайр -> Дайр
-    { type: "ban", side: false },                               // Радиант
+    { type: "ban", side: true }, { type: "ban", side: true },
+    { type: "ban", side: false }, { type: "ban", side: false },
+    { type: "ban", side: true },
+    { type: "ban", side: false }, { type: "ban", side: false },
+    { type: "pick", side: true }, { type: "pick", side: false },
+    { type: "ban", side: true }, { type: "ban", side: true },
+    { type: "ban", side: false },
 
     // Фаза 2: 6 пиков, затем 4 пика
-    { type: "pick", side: false }, { type: "pick", side: true }, { type: "pick", side: true }, // Радиант -> Дайр -> Дайр
-    { type: "pick", side: false }, { type: "pick", side: false }, { type: "pick", side: true },// Радиант -> Радиант -> Дайр
-    { type: "pick", side: true }, { type: "pick", side: false },                               // Дайр -> Радиант
-    { type: "pick", side: true }, { type: "pick", side: false },                               // Дайр -> Радиант
+    { type: "pick", side: false }, { type: "pick", side: true }, { type: "pick", side: true },
+    { type: "pick", side: false }, { type: "pick", side: false }, { type: "pick", side: true },
+    { type: "pick", side: true }, { type: "pick", side: false },
+    { type: "pick", side: true }, { type: "pick", side: false },
 
     // Фаза 3: 4 бана, затем финальные пики
-    { type: "ban", side: true }, { type: "ban", side: false },  // Дайр -> Радиант
-    { type: "ban", side: true }, { type: "ban", side: false },  // Дайр -> Радиант
-    { type: "pick", side: true }, { type: "pick", side: false } // Дайр -> Радиант
+    { type: "ban", side: true }, { type: "ban", side: false },
+    { type: "ban", side: true }, { type: "ban", side: false },
+    { type: "pick", side: true }, { type: "pick", side: false }
 ];
 const statusMessage = document.getElementById('status-message');const actionBtn = document.getElementById('action-btn');const container = document.getElementById('heroes-container');
 function initHeroesGrid() {
@@ -184,19 +184,21 @@ function executeDraftStep(heroName) {
     arrayToPush.push(heroName);
 
     const slotId = sidePrefix + '-' + currentTurn.type + '-' + slotIndex;
+    const slotElement = document.getElementById(slotId);
+    
+    if (slotElement) {
+        slotElement.innerText = heroData.icon;
+        if (currentTurn.type === 'ban') {
+            slotElement.style.filter = 'grayscale(100%) brightness(40%)';
+        }
+    }
 
-const slotElement = document.getElementById(slotId);
-if (slotElement) {
-slotElement.innerText = heroData.icon;
-if (currentTurn.type === 'ban') {
-slotElement.style.filter = 'grayscale(100%) brightness(40%)';
-}
-}
-currentStep++;
-updateUI();
+    currentStep++;
+    updateUI();
 }
 function updateUI() {
-if (currentStep >= draftSchedule.length) {
+    if (currentStep >= draftSchedule.length) {
+
 statusMessage.innerText = "Драфт окончен!";
 statusMessage.style.color = "#fbbf24";
 actionBtn.innerText = "Конец";
