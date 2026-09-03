@@ -1,20 +1,19 @@
 // Официальные CDN-картинки Valve/Steam, которые точно загрузятся
 const heroesPool = [
     // --- STRENGTH ---
-    { id: "axe", name: "Axe", attr: "str", img: "https://jsdelivr.net" },
-    { id: "pudge", name: "Pudge", attr: "str", img: "https://jsdelivr.net" },
-    { id: "earthshaker", name: "Earthshaker", attr: "str", img: "https://jsdelivr.net" },
-    { id: "sven", name: "Sven", attr: "str", img: "https://jsdelivr.net" },
-    { id: "undying", name: "Undying", attr: "str", img: "https://jsdelivr.net" },
-    { id: "tidehunter", name: "Tidehunter", attr: "str", img: "https://jsdelivr.net" },
-    { id: "wraith_king", name: "Wraith King", attr: "str", img: "https://jsdelivr.net" },
-    { id: "slardar", name: "Slardar", attr: "str", img: "https://jsdelivr.net" },
-    { id: "doom", name: "Doom", attr: "str", img: "https://jsdelivr.net" },
-    { id: "magnus", name: "Magnus", attr: "str", img: "https://jsdelivr.net" },
-    { id: "kunkka", name: "Kunkka", attr: "str", img: "https://jsdelivr.net" },
-    { id: "tiny", name: "Tiny", attr: "str", img: "https://jsdelivr.net" }
+    { id: "axe", name: "Axe", attr: "str", img: "images/axe.png" },
+    { id: "pudge", name: "Pudge", attr: "str", img: "images/pudge.png" },
+    { id: "earthshaker", name: "Earthshaker", attr: "str", img: "images/earthshaker.png" },
+    { id: "sven", name: "Sven", attr: "str", img: "images/sven.png" },
+    { id: "undying", name: "Undying", attr: "str", img: "images/undying.png" },
+    { id: "tidehunter", name: "Tidehunter", attr: "str", img: "images/tidehunter.png" },
+    { id: "wraith_king", name: "Wraith King", attr: "str", img: "images/wraith_king.png" },
+    { id: "slardar", name: "Slardar", attr: "str", img: "images/slardar.png" },
+    { id: "doom", name: "Doom", attr: "str", img: "images/doom.png" },
+    { id: "magnus", name: "Magnus", attr: "str", img: "images/magnus.png" },
+    { id: "kunkka", name: "Kunkka", attr: "str", img: "images/kunkka.png" },
+    { id: "tiny", name: "Tiny", attr: "str", img: "images/tiny.png" }
 ];
-
 // Официальный Captains Mode на 24 шага
 const draftSequence = [
     { step: 1, team: "radiant", type: "ban" },  { step: 2, team: "dire",    type: "ban" },
