@@ -1,4 +1,4 @@
-// Стабильная база данных героев (самый первый рабочий список)
+// Стабильная база данных героев (строго 12 первоначальных героев)
 const heroesData = [
     { id: "axe", name: "Axe", icon: "🪓" },
     { id: "pudge", name: "Pudge", icon: "🥩" },
@@ -14,45 +14,33 @@ const heroesData = [
     { id: "earthshaker", name: "Earthshaker", icon: "🐮" }
 ];
 
-// СТРОГАЯ ПОСЛЕДОВАТЕЛЬНОСТЬ (7 Банов / 5 Пиков для каждой команды)
+// СТРОГО ВАША ПОСЛЕДОВАТЕЛЬНОСТЬ ИЗ 24 ШАГОВ ONE-BY-ONE
+// 'r' - Свет (Radiant), 'd' - Тьма (Dire)
 const draftSequence = [
-    // Фаза 1: 7 банов (Дайр 2 -> Радиант 2 -> Дайр 1 -> Радиант 2), затем 2 пика (Дайр -> Радиант) и 3 бана (Дайр 2 -> Радиант 1)
-    { team: 'd', type: 'ban', index: 0 },
-    { team: 'd', type: 'ban', index: 1 },
-    { team: 'r', type: 'ban', index: 0 },
-    { team: 'r', type: 'ban', index: 1 },
-    { team: 'd', type: 'ban', index: 2 },
-    { team: 'r', type: 'ban', index: 2 },
-    { team: 'r', type: 'ban', index: 3 },
-    
-    { team: 'd', type: 'pick', index: 0 },
-    { team: 'r', type: 'pick', index: 0 },
-    
-    { team: 'd', type: 'ban', index: 3 },
-    { team: 'd', type: 'ban', index: 4 },
-    { team: 'r', type: 'ban', index: 4 },
-
-    // Фаза 2: 6 пиков (Радиант -> Дайр -> Дайр -> Радиант -> Радиант -> Дайр), затем 4 пика (Дайр -> Радиант -> Дайр -> Радиант)
-    { team: 'r', type: 'pick', index: 1 },
-    { team: 'd', type: 'pick', index: 1 },
-    { team: 'd', type: 'pick', index: 2 },
-    { team: 'r', type: 'pick', index: 2 },
-    { team: 'r', type: 'pick', index: 3 },
-    { team: 'd', type: 'pick', index: 3 },
-    
-    { team: 'd', type: 'pick', index: 4 }, // Последний слот пиков для Дире (индекс 4)
-    { team: 'r', type: 'pick', index: 4 }, // Последний слот пиков для Радиант (индекс 4)
-    
-    // В вашей схеме далее шли еще 4 пика (Дайр->Рад->Дайр->Рад), но так как слоты 0-4 (всего 5) уже заполнены, 
-    // мы переходим сразу к финальной Фазе 3 (баны и последние выборы), чтобы не выйти за рамки ваших HTML-ячеек.
-
-    // Фаза 3: 4 бана (Дайр -> Радиант -> Дайр -> Радиант), затем финальные пики (Дайр -> Радиант)
-    { team: 'd', type: 'ban', index: 5 },
-    { team: 'r', type: 'ban', index: 5 },
-    { team: 'd', type: 'ban', index: 6 },
-    { team: 'r', type: 'ban', index: 6 }
-    
-    // Драфт завершается на 24-м шаге, когда заполнено по 7 банов и 5 пиков с каждой стороны.
+    { team: 'd', type: 'ban', index: 0 },  // 1й бан тьма
+    { team: 'd', type: 'ban', index: 1 },  // 2й бан тьма
+    { team: 'r', type: 'ban', index: 0 },  // 3й бан свет
+    { team: 'r', type: 'ban', index: 1 },  // 4й бан свет
+    { team: 'd', type: 'ban', index: 2 },  // 5й бан тьма
+    { team: 'r', type: 'ban', index: 2 },  // 6й бан свет
+    { team: 'r', type: 'ban', index: 3 },  // 7й бан свет 
+    { team: 'd', type: 'pick', index: 0 }, // 8й пик тьма
+    { team: 'r', type: 'pick', index: 0 }, // 9й пик свет
+    { team: 'd', type: 'ban', index: 3 },  // 10й бан тьма
+    { team: 'd', type: 'ban', index: 4 },  // 11й бан тьма
+    { team: 'r', type: 'ban', index: 4 },  // 12й бан свет
+    { team: 'r', type: 'pick', index: 1 }, // 13й пик свет
+    { team: 'd', type: 'pick', index: 1 }, // 14й пик тьма
+    { team: 'd', type: 'pick', index: 2 }, // 15й пик тьма
+    { team: 'r', type: 'pick', index: 2 }, // 16й пик свет
+    { team: 'r', type: 'pick', index: 3 }, // 17й пик свет
+    { team: 'd', type: 'pick', index: 3 }, // 18й пик тьма
+    { team: 'd', type: 'ban', index: 5 },  // 19й бан тьма
+    { team: 'r', type: 'ban', index: 5 },  // 20й бан свет
+    { team: 'd', type: 'ban', index: 6 },  // 21й бан тьма
+    { team: 'r', type: 'ban', index: 6 },  // 22й бан свет
+    { team: 'd', type: 'pick', index: 4 }, // 23й пик тьма
+    { team: 'r', type: 'pick', index: 4 }  // 24й пик свет
 ];
 
 let currentStepIndex = 0;
@@ -108,6 +96,8 @@ function handleActionClick() {
 
     const step = draftSequence[currentStepIndex];
     const hero = heroesData.find(h => h.id === selectedHeroId);
+    
+    // Генерируем ID слота (например, d-ban-0 или r-pick-3) строго по вашему графику
     const slotId = `${step.team}-${step.type}-${step.index}`;
     const slotElement = document.getElementById(slotId);
 
@@ -123,14 +113,16 @@ function handleActionClick() {
     }
 
     const card = document.getElementById(`card-${selectedHeroId}`);
-    card.classList.remove('selected');
-    card.classList.add('disabled');
+    if (card) {
+        card.classList.remove('selected');
+        card.classList.add('disabled');
+    }
 
     selectedHeroId = null;
     currentStepIndex++;
 
     actionBtn.classList.add('disabled');
-    actionBtn.removeClassName ? actionBtn.removeClassName('player-turn') : actionBtn.classList.remove('player-turn');
+    actionBtn.classList.remove('player-turn');
     actionBtn.innerText = 'Выберите героя';
 
     updateStatus();
