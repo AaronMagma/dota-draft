@@ -77,23 +77,28 @@ const bannedHeroes = new Set();
 const pickedHeroes = new Set();
 
 function getHeroImageUrl(heroId) {
-    // Приводим ID к нижнему регистру и заменяем пробелы на нижнее подчеркивание
-    let formattedId = heroId.toLowerCase().replace(/\s+/g, '_');
+    let formattedId = heroId.toLowerCase();
     
-    // Исправляем исключения для старых системных имен Valve
-    if (formattedId === "wraith_king") formattedId = "skeleton_king";
+    // Преобразуем ID под строгие требования официального сервера Valve
+    if (formattedId === "shadow_fiend") formattedId = "nevermore";
+    if (formattedId === "anti_mage") formattedId = "antimage";
     if (formattedId === "zeus") formattedId = "zuus";
     if (formattedId === "necrophos") formattedId = "necrolyte";
-    if (formattedId === "windranger") formattedId = "windrunner";
-    if (formattedId === "io") formattedId = "wisp";
     if (formattedId === "vengeful_spirit") formattedId = "vengefulspirit";
-    if (formattedId === "queen_of_pain") formattedId = "queenofpain";
-    if (formattedId === "nature's_prophet") formattedId = "furion";
-    if (formattedId === "treant_protector") formattedId = "treant";
-    if (formattedId === "centaur_warrunner") formattedId = "centaur";
-    if (formattedId === "magnus") formattedId = "magnataur";
+    if (formattedId === "crystal_maiden") formattedId = "crystal_maiden";
+    if (formattedId === "wraith_king") formattedId = "wraith_king";
+    if (formattedId === "drow_ranger") formattedId = "drow_ranger";
+    if (formattedId === "faceless_void") formattedId = "faceless_void";
+    if (formattedId === "templar_assassin") formattedId = "templar_assassin";
+    if (formattedId === "storm_spirit") formattedId = "storm_spirit";
+    if (formattedId === "skywrath_mage") formattedId = "skywrath_mage";
+    if (formattedId === "witch_doctor") formattedId = "witch_doctor";
+    if (formattedId === "shadow_shaman") formattedId = "shadow_shaman";
+    if (formattedId === "dark_willow") formattedId = "dark_willow";
+    if (formattedId === "winter_wyvern") formattedId = "winter_wyvern";
 
-    return `https://unpkg.com{formattedId}_sb.png`;
+    // Официальный глобальный CDN Dota 2
+    return `https://steamstatic.com{formattedId}.png`;
 }
 function init() {
     renderHeroesGrid();
