@@ -76,12 +76,25 @@ let selectedHeroId = null;
 const bannedHeroes = new Set();
 const pickedHeroes = new Set();
 
-// Стабильный CDN с маленькими иконками (sb - small_horizontal)
 function getHeroImageUrl(heroId) {
+    // Приводим ID к нижнему регистру и заменяем пробелы на нижнее подчеркивание
     let formattedId = heroId.toLowerCase().replace(/\s+/g, '_');
+    
+    // Исправляем исключения для старых системных имен Valve
+    if (formattedId === "wraith_king") formattedId = "skeleton_king";
+    if (formattedId === "zeus") formattedId = "zuus";
+    if (formattedId === "necrophos") formattedId = "necrolyte";
+    if (formattedId === "windranger") formattedId = "windrunner";
+    if (formattedId === "io") formattedId = "wisp";
+    if (formattedId === "vengeful_spirit") formattedId = "vengefulspirit";
+    if (formattedId === "queen_of_pain") formattedId = "queenofpain";
+    if (formattedId === "nature's_prophet") formattedId = "furion";
+    if (formattedId === "treant_protector") formattedId = "treant";
+    if (formattedId === "centaur_warrunner") formattedId = "centaur";
+    if (formattedId === "magnus") formattedId = "magnataur";
+
     return `https://unpkg.com{formattedId}_sb.png`;
 }
-
 function init() {
     renderHeroesGrid();
     renderDraftList();
