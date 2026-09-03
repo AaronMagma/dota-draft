@@ -1,30 +1,36 @@
-// Пул из 24 героев-силачей с эмодзи-иконками, чтобы хватило на весь драфт
+// Полный пул героев, разбитый на 4 класса по 6 штук в каждом
 const heroesPool = [
+    // --- STRENGTH (Сила) ---
     { id: "axe", name: "Axe", attr: "str", icon: "🪓" },
     { id: "pudge", name: "Pudge", attr: "str", icon: "🥩" },
     { id: "earthshaker", name: "Earthshaker", attr: "str", icon: "🪨" },
     { id: "sven", name: "Sven", attr: "str", icon: "⚔️" },
     { id: "undying", name: "Undying", attr: "str", icon: "🧟" },
-    { id: "tidehunter", name: "Tidehunter", attr: "str", icon: "🍉" },
-    { id: "wraith_king", name: "Wraith King", attr: "str", icon: "👑" },
     { id: "slardar", name: "Slardar", attr: "str", icon: "🐟" },
-    { id: "doom", name: "Doom", attr: "str", icon: "😈" },
-    { id: "magnus", name: "Magnus", attr: "str", icon: "🦏" },
-    { id: "kunkka", name: "Kunkka", attr: "str", icon: "⚓" },
-    { id: "tiny", name: "Tiny", attr: "str", icon: "🗿" },
-    // Дополнительные силачи, чтобы драфт на 24 шага работал без сбоев:
-    { id: "lifestealer", name: "Lifestealer", attr: "str", icon: "🦷" },
-    { id: "abaddon", name: "Abaddon", attr: "str", icon: "🐴" },
-    { id: "lycan", name: "Lycan", attr: "str", icon: "🐺" },
-    { id: "bristleback", name: "Bristleback", attr: "str", icon: "🦔" },
-    { id: "centaur", name: "Centaur", attr: "str", icon: "🛡️" },
-    { id: "dragon_knight", name: "Dragon Knight", attr: "str", icon: "🐉" },
-    { id: "huskar", name: "Huskar", attr: "str", icon: "🩸" },
-    { id: "alchemist", name: "Alchemist", attr: "str", icon: "🧪" },
-    { id: "spirit_breaker", name: "Spirit Breaker", attr: "str", icon: "🐮" },
-    { id: "timbersaw", name: "Timbersaw", attr: "str", icon: "🌲" },
-    { id: "mars", name: "Mars", attr: "str", icon: "⭕" },
-    { id: "underlord", name: "Underlord", attr: "str", icon: "🟢" }
+
+    // --- AGILITY (Ловкость) ---
+    { id: "juggernaut", name: "Juggernaut", attr: "agi", icon: "👺" },
+    { id: "phantom_assassin", name: "PA", attr: "agi", icon: "🗡️" },
+    { id: "sniper", name: "Sniper", attr: "agi", icon: "🎯" },
+    { id: "anti_mage", name: "Anti-Mage", attr: "agi", icon: "🔮" },
+    { id: "bloodseeker", name: "Bloodseeker", attr: "agi", icon: "🩸" },
+    { id: "viper", name: "Viper", attr: "agi", icon: "🐍" },
+
+    // --- INTELLIGENCE (Интеллект) ---
+    { id: "crystal_maiden", name: "CM", attr: "int", icon: "❄️" },
+    { id: "invoker", name: "Invoker", attr: "int", icon: "☄️" },
+    { id: "storm_spirit", name: "Storm", attr: "int", icon: "⚡" },
+    { id: "witch_doctor", name: "WD", attr: "int", icon: "🧪" },
+    { id: "lina", name: "Lina", attr: "int", icon: "🔥" },
+    { id: "shadow_shaman", name: "Shaman", attr: "int", icon: "🐍" },
+
+    // --- UNIVERSAL (Универсалы) ---
+    { id: "abaddon", name: "Abaddon", attr: "uni", icon: "🐴" },
+    { id: "lycan", name: "Lycan", attr: "uni", icon: "🐺" },
+    { id: "magnus", name: "Magnus", attr: "uni", icon: "🦏" },
+    { id: "windranger", name: "WR", attr: "uni", icon: "🏹" },
+    { id: "mirana", name: "Mirana", attr: "uni", icon: "🐯" },
+    { id: "timbersaw", name: "Timbersaw", attr: "uni", icon: "🌲" }
 ];
 
 // Ваш точный порядок ходов на 24 шага (Тьма начинает)
@@ -70,24 +76,33 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function renderHeroesGrid() {
-    const container = document.getElementById("str-container");
-    if (!container) return;
-    container.innerHTML = "";
+    // Очищаем все контейнеры классов перед заполнением
+    const containers = {
+        str: document.getElementById("str-container"),
+        agi: document.getElementById("agi-container"),
+        int: document.getElementById("int-container"),
+        uni: document.getElementById("uni-container")
+    };
+    
+    Object.values(containers).forEach(c => { if (c) c.innerHTML = ""; });
 
     heroesPool.forEach(hero => {
+        const targetContainer = containers[hero.attr];
+        if (!targetContainer) return;
+
         const card = document.createElement("div");
         card.className = "hero-card";
         card.id = `grid-hero-${hero.id}`;
         
         card.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 5px;">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 2px;">
                 <span style="font-size: 18px;">${hero.icon}</span>
-                <span style="font-size: 9px; font-weight: bold; color: #a1a1aa; text-align: center;">${hero.name}</span>
+                <span style="font-size: 9px; font-weight: bold; color: #a1a1aa; text-align: center; white-space: nowrap;">${hero.name}</span>
             </div>
         `;
         
         card.addEventListener("click", () => selectHero(hero.id));
-        container.appendChild(card);
+        targetContainer.appendChild(card);
     });
 }
 
