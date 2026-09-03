@@ -1,20 +1,85 @@
 const heroesPool = [
-    // --- НАША ИДЕАЛЬНАЯ ТЕСТОВАЯ ЧЕТВЕРКА СИЛЫ ---
-    { id: "axe", name: "Axe", attr: "str", img: "https://dotabuff.com" },
-    { id: "pudge", name: "Pudge", attr: "str", img: "https://ru.dotabuff.com/assets/heroes/pudge-d8673aca5ef38b0cff4826c8c7d22e09e8e09b44940a86859c8161553caefa8c.jpg" },
-    { id: "earthshaker", name: "Earthshaker", attr: "str", img: "https://ru.dotabuff.com/assets/heroes/earthshaker-b491d33fcf49d6be267f9c01734b8684e4183c142c9cd0f3e0e1dc84207241a8.jpg" },
-    { id: "sven", name: "Sven", attr: "str", img: "https://ru.dotabuff.com/assets/heroes/sven-33b31c39c41f43d6d00e525522fd9f24b971213541a2224b86abf67a39f313c0.jpg" }
+    // --- STRENGTH ---
+    { id: "axe", name: "Axe", attr: "str" },
+    { id: "pudge", name: "Pudge", attr: "str" },
+    { id: "earthshaker", name: "Earthshaker", attr: "str" },
+    { id: "sven", name: "Sven", attr: "str" },
+    { id: "undying", name: "Undying", attr: "str" },
+    { id: "tidehunter", name: "Tidehunter", attr: "str" },
+    { id: "wraith_king", name: "Wraith King", attr: "str" },
+    { id: "slardar", name: "Slardar", attr: "str" },
+    { id: "doom_bringer", name: "Doom", attr: "str" }, // Системный ID
+    { id: "magnataur", name: "Magnus", attr: "str" },   // Системный ID
+    { id: "kunkka", name: "Kunkka", attr: "str" },
+    { id: "tiny", name: "Tiny", attr: "str" },
+
+    // --- AGILITY ---
+    { id: "juggernaut", name: "Juggernaut", attr: "agi" },
+    { id: "phantom_assassin", name: "Phantom Assassin", attr: "agi" },
+    { id: "nevermore", name: "Shadow Fiend", attr: "agi" }, // Системный ID СФа
+    { id: "slark", name: "Slark", attr: "agi" },
+    { id: "viper", name: "Viper", attr: "agi" },
+    { id: "sniper", name: "Sniper", attr: "agi" },
+    { id: "drow_ranger", name: "Drow Ranger", attr: "agi" },
+    { id: "faceless_void", name: "Faceless Void", attr: "agi" },
+    { id: "templar_assassin", name: "Templar Assassin", attr: "agi" },
+    { id: "bloodseeker", name: "Bloodseeker", attr: "agi" },
+    { id: "ursa", name: "Ursa", attr: "agi" },
+    { id: "riki", name: "Riki", attr: "agi" },
+
+    // --- INTELLIGENCE ---
+    { id: "crystal_maiden", name: "Crystal Maiden", attr: "int" },
+    { id: "lina", name: "Lina", attr: "int" },
+    { id: "lion", name: "Lion", attr: "int" },
+    { id: "zuus", name: "Zeus", attr: "int" }, // Системный ID Зевса
+    { id: "storm_spirit", name: "Storm Spirit", attr: "int" },
+    { id: "puck", name: "Puck", attr: "int" },
+    { id: "pugna", name: "Pugna", attr: "int" },
+    { id: "lich", name: "Lich", attr: "int" },
+    { id: "witch_doctor", name: "Witch Doctor", attr: "int" },
+    { id: "tinker", name: "Tinker", attr: "int" },
+    { id: "skywrath_mage", name: "Skywrath Mage", attr: "int" },
+    { id: "necrolyte", name: "Necrophos", attr: "int" }, // Системный ID Некрофоса
+
+    // --- UNIVERSAL ---
+    { id: "invoker", name: "Invoker", attr: "uni" },
+    { id: "rubick", name: "Rubick", attr: "uni" },
+    { id: "antimage", name: "Anti-Mage", attr: "uni" }, // Системный ID Антимага
+    { id: "winter_wyvern", name: "Winter Wyvern", attr: "uni" },
+    { id: "grimstroke", name: "Grimstroke", attr: "uni" },
+    { id: "dazzle", name: "Dazzle", attr: "uni" },
+    { id: "shadow_shaman", name: "Shadow Shaman", attr: "uni" },
+    { id: "abaddon", name: "Abaddon", attr: "uni" },
+    { id: "marci", name: "Marci", attr: "uni" },
+    { id: "dark_willow", name: "Dark Willow", attr: "uni" },
+    { id: "vengefulspirit", name: "Vengeful Spirit", attr: "uni" }, // Системный ID Венги
+    { id: "enigma", name: "Enigma", attr: "uni" }
 ];
 
 const draftSequence = [
     { team: 'd', type: 'ban', index: 0 },  { team: 'd', type: 'ban', index: 1 },
-    { team: 'r', type: 'ban', index: 0 },  { team: 'r', type: 'ban', index: 1 }
+    { team: 'r', type: 'ban', index: 0 },  { team: 'r', type: 'ban', index: 1 },
+    { team: 'd', type: 'ban', index: 2 },  { team: 'r', type: 'ban', index: 2 },
+    { team: 'r', type: 'ban', index: 3 },  { team: 'd', type: 'pick', index: 0 },
+    { team: 'r', type: 'pick', index: 0 }, { team: 'd', type: 'ban', index: 3 },
+    { team: 'd', type: 'ban', index: 4 },  { team: 'r', type: 'ban', index: 4 },
+    { team: 'r', type: 'pick', index: 1 }, { team: 'd', type: 'pick', index: 1 },
+    { team: 'd', type: 'pick', index: 2 }, { team: 'r', type: 'pick', index: 2 },
+    { team: 'r', type: 'pick', index: 3 }, { team: 'd', type: 'pick', index: 3 },
+    { team: 'd', type: 'ban', index: 5 },  { team: 'r', type: 'ban', index: 5 },
+    { team: 'd', type: 'ban', index: 6 },  { team: 'r', type: 'ban', index: 6 },
+    { team: 'd', type: 'pick', index: 4 }, { team: 'r', type: 'pick', index: 4 }
 ];
 
 let currentStepIndex = 0;
 let selectedHeroId = null;
 const bannedHeroes = new Set();
 const pickedHeroes = new Set();
+
+// Официальная железная ссылка на CDN Valve, которая теперь сработает из-за правильных системных ID
+function getHeroImageUrl(heroId) {
+    return `https://steamstatic.com{heroId}.png`;
+}
 
 function init() {
     renderHeroesGrid();
@@ -35,7 +100,7 @@ function renderHeroesGrid() {
         card.id = `card-${hero.id}`;
         card.title = hero.name;
         
-        card.innerHTML = `<img src="${hero.img}" alt="${hero.name}">`;
+        card.innerHTML = `<img src="${getHeroImageUrl(hero.id)}" alt="${hero.name}">`;
         card.addEventListener('click', () => selectHero(hero.id));
         
         const targetContainer = document.getElementById(`${hero.attr}-container`);
@@ -111,11 +176,10 @@ function handleActionClick() {
     if (!selectedHeroId || currentStepIndex >= draftSequence.length) return;
 
     const step = draftSequence[currentStepIndex];
-    const hero = heroesPool.find(h => h.id === selectedHeroId);
     
     const slotElement = document.getElementById(`panel-slot-${currentStepIndex}`);
     if (slotElement) {
-        slotElement.innerHTML = `<img src="${hero.img}" alt="hero">`;
+        slotElement.innerHTML = `<img src="${getHeroImageUrl(selectedHeroId)}" alt="hero">`;
         slotElement.className += step.type === 'ban' ? ' filled-ban' : ' filled-pick';
     }
 
