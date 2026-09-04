@@ -1,5 +1,6 @@
+
 const heroesPool = [
-    // --- STRENGTH (Сила) — 33 героя по вашим рядам ---
+    // --- STRENGTH (Сила) — 35 героев строго по вашим рядам (без дублей) ---
     { id: "alchemist", name: "Alchemist", attr: "str", icon: "🧪" },
     { id: "axe", name: "Axe", attr: "str", icon: "🪓" },
     { id: "bristleback", name: "Bristleback", attr: "str", icon: "🦔" },
@@ -34,11 +35,10 @@ const heroesPool = [
     { id: "undying", name: "Undying", attr: "str", icon: "🧟" },
     { id: "wraith_king", name: "Wraith King", attr: "str", icon: "👑" },
 
-    // --- AGILITY (Ловкость) — 35 героев строго по вашим рядам ---
+    // --- AGILITY (Ловкость) — 31 герой строго по вашим рядам (без дублей) ---
     { id: "anti_mage", name: "Anti-Mage", attr: "agi", icon: "🔮" },
     { id: "bloodseeker", name: "Bloodseeker", attr: "agi", icon: "🩸" },
     { id: "bounty_hunter", name: "Bounty Hunter", attr: "agi", icon: "💰" },
-    { id: "broodmother", name: "Broodmother", attr: "agi", icon: "🕷️" },
     { id: "clinkz", name: "Clinkz", attr: "agi", icon: "🏹" },
     { id: "drow_ranger", name: "Drow", attr: "agi", icon: "❄️" },
     { id: "ember_spirit", name: "Ember", attr: "agi", icon: "🔥" },
@@ -47,11 +47,9 @@ const heroesPool = [
     { id: "hoodwink", name: "Hoodwink", attr: "agi", icon: "🐿️" },
     { id: "juggernaut", name: "Juggernaut", attr: "agi", icon: "👺" },
     { id: "kez", name: "Kez", attr: "agi", icon: "🦤" },
-    { id: "lone_druid", name: "LD", attr: "agi", icon: "🐻" },
     { id: "luna", name: "Luna", attr: "agi", icon: "🌙" },
     { id: "medusa", name: "Medusa", attr: "agi", icon: "🐍" },
     { id: "meepo", name: "Meepo", attr: "agi", icon: "⛏️" },
-    { id: "mirana", name: "Mirana", attr: "agi", icon: "🐯" },
     { id: "monkey_king", name: "MK", attr: "agi", icon: "🐒" },
     { id: "morphling", name: "Morphling", attr: "agi", icon: "🌊" },
     { id: "naga_siren", name: "Naga", attr: "agi", icon: "🧜" },
@@ -67,15 +65,13 @@ const heroesPool = [
     { id: "terrorblade", name: "TB", attr: "agi", icon: "😈" },
     { id: "troll_warlord", name: "Troll", attr: "agi", icon: "🪓" },
     { id: "ursa", name: "Ursa", attr: "agi", icon: "🐻" },
-    { id: "vengeful_spirit", name: "Vengeful", attr: "agi", icon: "🦅" },
     { id: "viper", name: "Viper", attr: "agi", icon: "🐍" },
     { id: "weaver", name: "Weaver", attr: "agi", icon: "🕷️" },
 
-    // --- INTELLIGENCE (Интеллект) — 34 героя строго по вашим рядам ---
+    // --- INTELLIGENCE (Интеллект) — 33 героя строго по вашим рядам (без дублей) ---
     { id: "ancient_apparition", name: "AA", attr: "int", icon: "🥶" },
-    { id: "chen", name: "Chen", attr: "int", icon: "🐘" }, // Опечатка полностью исправлена
+    { id: "chen", name: "Chen", attr: "int", icon: "🐘" },
     { id: "crystal_maiden", name: "CM", attr: "int", icon: "❄️" },
-    { id: "dark_seer", name: "Dark Seer", attr: "int", icon: "🧠" },
     { id: "dark_willow", name: "Willow", attr: "int", icon: "🧚" },
     { id: "disruptor", name: "Disruptor", attr: "int", icon: "🌩️" },
     { id: "enchantress", name: "Enchant", attr: "int", icon: "🦌" },
@@ -107,7 +103,7 @@ const heroesPool = [
     { id: "witch_doctor", name: "WD", attr: "int", icon: "🧪" },
     { id: "zeus", name: "Zeus", attr: "int", icon: "☁️" },
 
-    // --- UNIVERSAL (Универсалы) — 22 героя строго по вашему скриншоту ---
+    // --- UNIVERSAL (Универсалы) — ровно 22 героя строго по вашему скриншоту ---
     { id: "abaddon", name: "Abaddon", attr: "uni", icon: "🐴" },
     { id: "arc_warden", name: "Arc Warden", attr: "uni", icon: "🌀" },
     { id: "bane", name: "Bane", attr: "uni", icon: "👁️" },
@@ -131,7 +127,7 @@ const heroesPool = [
     { id: "void_spirit", name: "Void Spirit", attr: "uni", icon: "🌌" },
     { id: "windranger", name: "WR", attr: "uni", icon: "🍃" }
 ];
-const draftSequence = [
+// Ваш точный порядок ходов на 24 шага (Тьма начинает)const draftSequence = [
     { step: 1, team: "dire", type: "ban" },
     { step: 2, team: "dire", type: "ban" },
     { step: 3, team: "radiant", type: "ban" },
@@ -163,13 +159,15 @@ document.addEventListener("DOMContentLoaded", () => {
     renderHeroesGrid();
     renderDraftRows();
     updateUI();
-
-const actionBtn = document.getElementById("action-btn");
-actionBtn.addEventListener("click", commitCurrentTurn);
-setTimeout(checkBotTurn, 500);
+    const actionBtn = document.getElementById("action-btn");
+    actionBtn.addEventListener("click", commitCurrentTurn);
+    
+    // Заставит бота мгновенно проснуться при открытии сайта
+    setTimeout(checkBotTurn, 500); 
 });
 function renderHeroesGrid() {
-const containers = {
+    const containers = {
+
 str: document.getElementById("str-container"),
 agi: document.getElementById("agi-container"),
 int: document.getElementById("int-container"),
@@ -181,9 +179,9 @@ const targetContainer = containers[hero.attr];
 if (!targetContainer) return;
 const card = document.createElement("div");
 card.className = "hero-card";
-card.id = "grid-hero-" + hero.id; // Кавычки восстановлены
-// Крупный текст, жирный шрифт и правильный синтаксис
-card.innerHTML = <div style="display: flex; flex-direction: column; align-items: center; justify-content: space-between; width: 100%; height: 100%; padding-top: 5px; box-sizing: border-box;"> <span style="font-size: 20px; line-height: 1;">${hero.icon}</span> <div style="background: rgba(0, 0, 0, 0.75); width: 100%; text-align: center; padding: 2px 0;"> <span style="font-size: 9px; font-weight: bold; color: #ffffff; letter-spacing: 0.4px; text-transform: uppercase; white-space: nowrap; display: block; overflow: hidden; text-overflow: ellipsis; max-width: 100%; padding: 0 2px; box-sizing: border-box;">${hero.name}</span> </div> </div>;
+card.id = grid-hero-${hero.id};
+// ОБНОВЛЕННЫЙ ВАРИАНТ: Текст теперь белый, жирный и на контрастной подложке снизу
+card.innerHTML = <div style="display: flex; flex-direction: column; align-items: center; justify-content: space-between; width: 100%; height: 100%; padding-top: 2px; box-sizing: border-box;"> <span style="font-size: 16px; line-height: 1;">${hero.icon}</span> <div style="background: rgba(0, 0, 0, 0.7); width: 100%; text-align: center; padding: 2px 0;"> <span style="font-size: 8px; font-weight: 900; color: #ffffff; letter-spacing: 0.3px; text-transform: uppercase; white-space: nowrap; display: block; overflow: hidden; text-overflow: ellipsis; max-width: 100%; padding: 0 2px; box-sizing: border-box;">${hero.name}</span> </div> </div>;
 card.addEventListener("click", () => selectHero(hero.id));
 targetContainer.appendChild(card);
 });
@@ -202,12 +200,12 @@ numLabel.className = "num-label";
 numLabel.textContent = config.step;
 numCol.appendChild(numLabel);
 const leftSlot = document.createElement("div");
-leftSlot.id = "slot-left-" + index; // Кавычки восстановлены
+leftSlot.id = slot-left-${index};
 leftSlot.className = "slot-display empty-slot";
 leftSlot.textContent = config.team === "radiant" ? (config.type === "ban" ? "B" : "P") : "";
 leftCol.appendChild(leftSlot);
 const rightSlot = document.createElement("div");
-rightSlot.id = "slot-right-" + index; // Кавычки восстановлены
+rightSlot.id = slot-right-${index};
 rightSlot.className = "slot-display empty-slot";
 rightSlot.textContent = config.team === "dire" ? (config.type === "ban" ? "B" : "P") : "";
 rightCol.appendChild(rightSlot);
@@ -216,13 +214,14 @@ rightCol.appendChild(rightSlot);
 function selectHero(heroId) {
 if (currentStepIndex >= draftSequence.length) return;
 if (bannedHeroes.has(heroId) || pickedHeroes.has(heroId)) return;
+// БЛОКИРОВКА: Игрок не может выбирать героев кликом, если сейчас ходит Dire (ИИ)
 if (draftSequence[currentStepIndex].team === "dire") return;
 if (selectedHeroId) {
-const oldCard = document.getElementById("grid-hero-" + selectedHeroId); // Кавычки восстановлены
+const oldCard = document.getElementById(grid-hero-${selectedHeroId});
 if (oldCard) oldCard.classList.remove("selected");
 }
 selectedHeroId = heroId;
-const newCard = document.getElementById("grid-hero-" + heroId); // Кавычки восстановлены
+const newCard = document.getElementById(grid-hero-${heroId});
 if (newCard) newCard.classList.add("selected");
 updateUI();
 }
@@ -235,12 +234,12 @@ bannedHeroes.add(selectedHeroId);
 } else {
 pickedHeroes.add(selectedHeroId);
 }
-const card = document.getElementById("grid-hero-" + selectedHeroId); // Кавычки восстановлены
+const card = document.getElementById(grid-hero-${selectedHeroId});
 if (card) {
 card.classList.remove("selected");
 card.classList.add("disabled");
 }
-const targetSlotId = currentTurn.team === "radiant" ? "slot-left-" + currentStepIndex : "slot-right-" + currentStepIndex; // Кавычки восстановлены
+const targetSlotId = currentTurn.team === "radiant" ? slot-left-${currentStepIndex} : slot-right-${currentStepIndex};
 const slot = document.getElementById(targetSlotId);
 if (slot) {
 slot.classList.remove("empty-slot", "active-slot");
@@ -250,6 +249,7 @@ slot.innerHTML = <span style="font-size: 13px;">${hero.icon}</span>;
 currentStepIndex++;
 selectedHeroId = null;
 updateUI();
+// Проверяем следующий ход через небольшую паузу
 setTimeout(checkBotTurn, 400);
 }
 function updateUI() {
@@ -266,13 +266,14 @@ return;
 const turn = draftSequence[currentStepIndex];
 const teamName = turn.team === "radiant" ? "Radiant (Свет)" : "Dire (Тьма)";
 const actionName = turn.type === "ban" ? "БАНИТ" : "ВЫБИРАЕТ";
-statusMsg.textContent = turn.team === "radiant" ? "Radiant (Свет)\n" + actionName : "Dire (Тьма)\n" + actionName;
+statusMsg.textContent = ${teamName}\n${actionName};
 statusMsg.style.color = turn.team === "radiant" ? "#22c55e" : "#f87171";
-const activeSlotId = turn.team === "radiant" ? "slot-left-" + currentStepIndex : "slot-right-" + currentStepIndex; // Кавычки восстановлены
+const activeSlotId = turn.team === "radiant" ? slot-left-${currentStepIndex} : slot-right-${currentStepIndex};
 const activeSlot = document.getElementById(activeSlotId);
 if (activeSlot) {
 activeSlot.classList.add("active-slot");
 }
+// Если сейчас ходит ИИ (Dire), кнопка для игрока блокируется
 if (turn.team === "dire") {
 actionBtn.textContent = "ДУМАЕТ КОМПЬЮТЕР...";
 actionBtn.className = "disabled";
@@ -280,7 +281,7 @@ return;
 }
 if (selectedHeroId) {
 const selectedHero = heroesPool.find(h => h.id === selectedHeroId);
-actionBtn.textContent = "ПОДТВЕРДИТЬ: " + selectedHero.name;
+actionBtn.textContent = ПОДТВЕРДИТЬ: ${selectedHero.name};
 actionBtn.className = "player-turn";
 } else {
 actionBtn.textContent = turn.type === "ban" ? "ЗАБАНЬТЕ ГЕРОЯ" : "ВЫБЕРИТЕ ГЕРОЯ";
@@ -290,19 +291,19 @@ actionBtn.className = "disabled";
 function checkBotTurn() {
 if (currentStepIndex >= draftSequence.length) return;
 const turn = draftSequence[currentStepIndex];
-if (turn.team === "radiant") return;
+if (turn.team === "radiant") return; // Ход игрока, бот ждет
 const availableHeroes = heroesPool.filter(h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id));
 if (availableHeroes.length === 0) return;
 const randomIndex = Math.floor(Math.random() * availableHeroes.length);
 const botSelectedHero = availableHeroes[randomIndex];
 selectedHeroId = botSelectedHero.id;
-const card = document.getElementById("grid-hero-" + selectedHeroId); // Кавычки восстановлены
+const card = document.getElementById(grid-hero-${selectedHeroId});
 if (card) {
 card.classList.add("selected");
 }
 const actionBtn = document.getElementById("action-btn");
 const actionText = turn.type === "ban" ? "БАН" : "ПИК";
-actionBtn.textContent = "КОМПЬЮТЕР: " + actionText + " " + botSelectedHero.name;
+actionBtn.textContent = КОМПЬЮТЕР: ${actionText} ${botSelectedHero.name};
 setTimeout(() => {
 if (!selectedHeroId) return;
 if (turn.type === "ban") {
@@ -310,12 +311,12 @@ bannedHeroes.add(selectedHeroId);
 } else {
 pickedHeroes.add(selectedHeroId);
 }
-const cardFinal = document.getElementById("grid-hero-" + selectedHeroId); // Кавычки восстановлены
+const cardFinal = document.getElementById(grid-hero-${selectedHeroId});
 if (cardFinal) {
 cardFinal.classList.remove("selected");
 cardFinal.classList.add("disabled");
 }
-const targetSlotId = turn.team === "radiant" ? "slot-left-" + currentStepIndex : "slot-right-" + currentStepIndex; // Кавычки восстановлены
+const targetSlotId = turn.team === "radiant" ? slot-left-${currentStepIndex} : slot-right-${currentStepIndex};
 const slot = document.getElementById(targetSlotId);
 if (slot) {
 slot.classList.remove("empty-slot", "active-slot");
@@ -325,6 +326,7 @@ slot.innerHTML = <span style="font-size: 14px;">${botSelectedHero.icon}</span>;
 currentStepIndex++;
 selectedHeroId = null;
 updateUI();
+// Проверяем следующий ход (у Тьмы есть сдвоенные ходы)
 setTimeout(checkBotTurn, 400);
 }, 1200);
 }
