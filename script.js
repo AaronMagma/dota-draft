@@ -1,6 +1,6 @@
-
+// Полный пул героев, разбитый на 4 класса по 6 штук в каждом
 const heroesPool = [
-    // --- STRENGTH (Сила) — 33 героя по вашим рядам (без дублей) ---
+    // --- STRENGTH (Сила) — 35 героев строго по вашим рядам (без дублей) ---
     { id: "alchemist", name: "Alchemist", attr: "str", icon: "🧪" },
     { id: "axe", name: "Axe", attr: "str", icon: "🪓" },
     { id: "bristleback", name: "Bristleback", attr: "str", icon: "🦔" },
@@ -127,6 +127,9 @@ const heroesPool = [
     { id: "void_spirit", name: "Void Spirit", attr: "uni", icon: "🌌" },
     { id: "windranger", name: "WR", attr: "uni", icon: "🍃" }
 ];
+
+
+// Ваш точный порядок ходов на 24 шага (Тьма начинает)
 const draftSequence = [
     { step: 1, team: "dire", type: "ban" },
     { step: 2, team: "dire", type: "ban" },
@@ -153,7 +156,11 @@ const draftSequence = [
     { step: 23, team: "dire", type: "pick" },
     { step: 24, team: "radiant", type: "pick" }
 ];
-let currentStepIndex = 0;let selectedHeroId = null;const bannedHeroes = new Set();const pickedHeroes = new Set();
+
+let currentStepIndex = 0;
+let selectedHeroId = null;
+const bannedHeroes = new Set();
+const pickedHeroes = new Set();
 
 document.addEventListener("DOMContentLoaded", () => {
     renderHeroesGrid();
@@ -162,206 +169,157 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const actionBtn = document.getElementById("action-btn");
     actionBtn.addEventListener("click", commitCurrentTurn);
-
-    // Дополнительный запуск: будим ИИ-бота через полсекунды
-    setTimeout(checkBotTurn, 500);
 });
+
 function renderHeroesGrid() {
+    // Очищаем все контейнеры классов перед заполнением
     const containers = {
         str: document.getElementById("str-container"),
+        agi: document.getElementById("agi-container"),
+        int: document.getElementById("int-container"),
+        uni: document.getElementById("uni-container")
+    };
+    
+    Object.values(containers).forEach(c => { if (c) c.innerHTML = ""; });
 
-agi: document.getElementById("agi-container"),
-int: document.getElementById("int-container"),
-uni: document.getElementById("uni-container")
-};
-Object.values(containers).forEach(c => { if (c) c.innerHTML = ""; });
-heroesPool.forEach(hero => {
-const targetContainer = containers[hero.attr];
-if (!targetContainer) return;
-const card = document.createElement("div");
-card.className = "hero-card";
-card.id = grid-hero-${hero.id};
-card.innerHTML = <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 2px;"> <span style="font-size: 18px;">${hero.icon}</span> <span style="font-size: 9px; font-weight: bold; color: #a1a1aa; text-align: center; white-space: nowrap;">${hero.name}</span> </div>;
-card.addEventListener("click", () => selectHero(hero.id));
-targetContainer.appendChild(card);
-});
+    heroesPool.forEach(hero => {
+        const targetContainer = containers[hero.attr];
+        if (!targetContainer) return;
+
+        const card = document.createElement("div");
+        card.className = "hero-card";
+        card.id = `grid-hero-${hero.id}`;
+        
+        card.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 2px;">
+                <span style="font-size: 18px;">${hero.icon}</span>
+                <span style="font-size: 9px; font-weight: bold; color: #a1a1aa; text-align: center; white-space: nowrap;">${hero.name}</span>
+            </div>
+        `;
+        
+        card.addEventListener("click", () => selectHero(hero.id));
+        targetContainer.appendChild(card);
+    });
 }
+
 function renderDraftRows() {
-const leftCol = document.getElementById("left-slots-column");
-const numCol = document.getElementById("numbers-column");
-const rightCol = document.getElementById("right-slots-column");
-if (!leftCol || !numCol || !rightCol) return;
-leftCol.innerHTML = "";
-numCol.innerHTML = "";
-rightCol.innerHTML = "";
-draftSequence.forEach((config, index) => {
-const numLabel = document.createElement("div");
-numLabel.className = "num-label";
-numLabel.textContent = config.step;
-numCol.appendChild(numLabel);
-const leftSlot = document.createElement("div");
-leftSlot.id = slot-left-${index};
-leftSlot.className = "slot-display empty-slot";
-leftSlot.textContent = config.team === "radiant" ? (config.type === "ban" ? "B" : "P") : "";
-leftCol.appendChild(leftSlot);
-const rightSlot = document.createElement("div");
-rightSlot.id = slot-right-${index};
-rightSlot.className = "slot-display empty-slot";
-rightSlot.textContent = config.team === "dire" ? (config.type === "ban" ? "B" : "P") : "";
-rightCol.appendChild(rightSlot);
-});
+    const leftCol = document.getElementById("left-slots-column");
+    const numCol = document.getElementById("numbers-column");
+    const rightCol = document.getElementById("right-slots-column");
+
+    if (!leftCol || !numCol || !rightCol) return;
+
+    leftCol.innerHTML = "";
+    numCol.innerHTML = "";
+    rightCol.innerHTML = "";
+
+    draftSequence.forEach((config, index) => {
+        // 1. Создаем центральный номер шага
+        const numLabel = document.createElement("div");
+        numLabel.className = "num-label";
+        numLabel.textContent = config.step;
+        numCol.appendChild(numLabel);
+
+        // 2. Создаем левый слот (Radiant)
+        const leftSlot = document.createElement("div");
+        leftSlot.id = `slot-left-${index}`;
+        leftSlot.className = "slot-display empty-slot";
+        // Маленькая текстовая подсказка b/p внутри пустого слота для наглядности
+        leftSlot.textContent = config.team === "radiant" ? (config.type === "ban" ? "B" : "P") : "";
+        leftCol.appendChild(leftSlot);
+
+        // 3. Создаем правый слот (Dire)
+        const rightSlot = document.createElement("div");
+        rightSlot.id = `slot-right-${index}`;
+        rightSlot.className = "slot-display empty-slot";
+        rightSlot.textContent = config.team === "dire" ? (config.type === "ban" ? "B" : "P") : "";
+        rightCol.appendChild(rightSlot);
+    });
 }
+
 function selectHero(heroId) {
-if (currentStepIndex >= draftSequence.length) return;
-if (bannedHeroes.has(heroId) || pickedHeroes.has(heroId)) return;
-// Блокируем выбор игрока, если сейчас ход компьютера (Dire)
-if (draftSequence[currentStepIndex].team === "dire") return;
-if (selectedHeroId) {
-const oldCard = document.getElementById(grid-hero-${selectedHeroId});
-if (oldCard) oldCard.classList.remove("selected");
-}
-selectedHeroId = heroId;
-const newCard = document.getElementById(grid-hero-${heroId});
-if (newCard) newCard.classList.add("selected");
-updateUI();
-}
-function commitCurrentTurn() {
-if (!selectedHeroId || currentStepIndex >= draftSequence.length) return;
-const currentTurn = draftSequence[currentStepIndex];
-const hero = heroesPool.find(h => h.id === selectedHeroId);
-if (currentTurn.type === "ban") {
-bannedHeroes.add(selectedHeroId);
-} else {
-pickedHeroes.add(selectedHeroId);
-}
-const card = document.getElementById(grid-hero-${selectedHeroId});
-if (card) {
-card.classList.remove("selected");
-card.classList.add("disabled");
-}
-const targetSlotId = currentTurn.team === "radiant" ? slot-left-${currentStepIndex} : slot-right-${currentStepIndex};
-const slot = document.getElementById(targetSlotId);
-if (slot) {
-slot.classList.remove("empty-slot", "active-slot");
-slot.classList.add(currentTurn.type === "ban" ? "filled-ban" : "filled-pick");
-slot.innerHTML = <span style="font-size: 13px;">${hero.icon}</span>;
-}
-currentStepIndex++;
-selectedHeroId = null;
-updateUI();
-// Передаем управление боту с минимальной задержкой
-setTimeout(checkBotTurn, 400);
-}
-function updateUI() {
-const statusMsg = document.getElementById("status-message");
-const actionBtn = document.getElementById("action-btn");
-document.querySelectorAll(".slot-display").forEach(s => s.classList.remove("active-slot"));
-if (currentStepIndex >= draftSequence.length) {
-statusMsg.textContent = "ДРАФТ ЗАВЕРШЕН!";
-statusMsg.style.color = "#22c55e";
-actionBtn.textContent = "КОНЕЦ";
-actionBtn.className = "disabled";
-return;
-}
-const turn = draftSequence[currentStepIndex];
-const teamName = turn.team === "radiant" ? "Radiant (Свет)" : "Dire (Тьма)";
-const actionName = turn.type === "ban" ? "БАНИТ" : "ВЫБИРАЕТ";
-statusMsg.textContent = ${teamName} ${actionName};
-statusMsg.style.color = turn.team === "radiant" ? "#22c55e" : "#f87171";
-const activeSlotId = turn.team === "radiant" ? slot-left-${currentStepIndex} : slot-right-${currentStepIndex};
-const activeSlot = document.getElementById(activeSlotId);
-if (activeSlot) {
-activeSlot.classList.add("active-slot");
-}
-// Если сейчас ходит ИИ (Dire), кнопка блокируется
-if (turn.team === "dire") {
-actionBtn.textContent = "ДУМАЕТ КОМПЬЮТЕР...";
-actionBtn.className = "disabled";
-return;
-}
-if (selectedHeroId) {
-const selectedHero = heroesPool.find(h => h.id === selectedHeroId);
-actionBtn.textContent = ПОДТВЕРДИТЬ: ${selectedHero.name};
-actionBtn.className = "player-turn";
-} else {
-actionBtn.textContent = turn.type === "ban" ? "ЗАБАНЬТЕ ГЕРОЯ" : "ВЫБЕРИТЕ ГЕРОЯ";
-actionBtn.className = "disabled";
-}
-}
-// --- А ТЕПЕРЬ ДОБАВЛЯЕМ ЖИВОГО БОТА В САМЫЙ КОНЕЦ ФАЙЛА ---
-
-// 1. Изменяем запуск загрузки: будим бота через полсекунды после открытия страницы
-document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(checkBotTurn, 500);
-});
-
-// 2. Логика автоматического выбора для компьютерного бота
-function checkBotTurn() {
     if (currentStepIndex >= draftSequence.length) return;
+    if (bannedHeroes.has(heroId) || pickedHeroes.has(heroId)) return;
+
+    if (selectedHeroId) {
+        const oldCard = document.getElementById(`grid-hero-${selectedHeroId}`);
+        if (oldCard) oldCard.classList.remove("selected");
+    }
+
+    selectedHeroId = heroId;
+    const newCard = document.getElementById(`grid-hero-${heroId}`);
+    if (newCard) newCard.classList.add("selected");
+
+    updateUI();
+}
+
+function commitCurrentTurn() {
+    if (!selectedHeroId || currentStepIndex >= draftSequence.length) return;
+
+    const currentTurn = draftSequence[currentStepIndex];
+    const hero = heroesPool.find(h => h.id === selectedHeroId);
+
+    if (currentTurn.type === "ban") {
+        bannedHeroes.add(selectedHeroId);
+    } else {
+        pickedHeroes.add(selectedHeroId);
+    }
+
+    const card = document.getElementById(`grid-hero-${selectedHeroId}`);
+    if (card) {
+        card.classList.remove("selected");
+        card.classList.add("disabled");
+    }
+
+    // Находим правильный слот на основе команды
+    const targetSlotId = currentTurn.team === "radiant" ? `slot-left-${currentStepIndex}` : `slot-right-${currentStepIndex}`;
+    const slot = document.getElementById(targetSlotId);
+    if (slot) {
+        slot.classList.remove("empty-slot", "active-slot");
+        slot.classList.add(currentTurn.type === "ban" ? "filled-ban" : "filled-pick");
+        slot.innerHTML = `<span style="font-size: 13px;">${hero.icon}</span>`;
+    }
+
+    currentStepIndex++;
+    selectedHeroId = null;
+    updateUI();
+}
+
+function updateUI() {
+    const statusMsg = document.getElementById("status-message");
+    const actionBtn = document.getElementById("action-btn");
+
+    // Сбрасываем старую подсветку активного хода со всех слотов
+    document.querySelectorAll(".slot-display").forEach(s => s.classList.remove("active-slot"));
+
+    if (currentStepIndex >= draftSequence.length) {
+        statusMsg.textContent = "ДРАФТ ЗАВЕРШЕН!";
+        statusMsg.style.color = "#22c55e";
+        actionBtn.textContent = "КОНЕЦ";
+        actionBtn.className = "disabled";
+        return;
+    }
 
     const turn = draftSequence[currentStepIndex];
-    if (turn.team === "radiant") return; // Если ход Светлых (Игрока) — бот ждет
-
-    // Находим доступных героев для ИИ
-    const availableHeroes = heroesPool.filter(h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id));
-    if (availableHeroes.length === 0) return;
-
-    const randomIndex = Math.floor(Math.random() * availableHeroes.length);
-    const botSelectedHero = availableHeroes[randomIndex];
-
-    selectedHeroId = botSelectedHero.id;
+    const teamName = turn.team === "radiant" ? "Radiant (Свет)" : "Dire (Тьма)";
+    const actionName = turn.type === "ban" ? "БАНИТ" : "ВЫБИРАЕТ";
     
-    // Подсвечиваем рамкой карту, которую выбрал бот
-    const card = document.getElementById("grid-hero-" + selectedHeroId);
-    if (card) {
-        card.classList.add("selected");
+    statusMsg.textContent = `${teamName} ${actionName}`;
+    statusMsg.style.color = turn.team === "radiant" ? "#22c55e" : "#f87171";
+
+    // Подсвечиваем рамкой текущий активный слот, который ждет выбора героя
+    const activeSlotId = turn.team === "radiant" ? `slot-left-${currentStepIndex}` : `slot-right-${currentStepIndex}`;
+    const activeSlot = document.getElementById(activeSlotId);
+    if (activeSlot) {
+        activeSlot.classList.add("active-slot");
     }
 
-    // Пишем на кнопке, кого забирает компьютер
-    const actionBtn = document.getElementById("action-btn");
-    const actionText = turn.type === "ban" ? "БАН" : "ПИК";
-    if (actionBtn) {
-        actionBtn.textContent = "КОМПЬЮТЕР: " + actionText + " " + botSelectedHero.name;
+    if (selectedHeroId) {
+        const selectedHero = heroesPool.find(h => h.id === selectedHeroId);
+        actionBtn.textContent = `ПОДТВЕРДИТЬ: ${selectedHero.name}`;
+        actionBtn.className = "player-turn";
+    } else {
+        actionBtn.textContent = turn.type === "ban" ? "ЗАБАНЬТЕ ГЕРОЯ" : "ВЫБЕРИТЕ ГЕРОЯ";
+        actionBtn.className = "disabled";
     }
-
-    // Через 1.2 секунды бот сам фиксирует ход
-    setTimeout(() => {
-        if (!selectedHeroId) return;
-
-        if (turn.type === "ban") {
-            bannedHeroes.add(selectedHeroId);
-        } else {
-            pickedHeroes.add(selectedHeroId);
-        }
-
-        const cardFinal = document.getElementById("grid-hero-" + selectedHeroId);
-        if (cardFinal) {
-            cardFinal.classList.remove("selected");
-            cardFinal.classList.add("disabled");
-        }
-
-        const targetSlotId = turn.team === "radiant" ? "slot-left-" + currentStepIndex : "slot-right-" + currentStepIndex;
-        const slot = document.getElementById(targetSlotId);
-        if (slot) {
-            slot.classList.remove("empty-slot", "active-slot");
-            slot.classList.add(turn.type === "ban" ? "filled-ban" : "filled-pick");
-            slot.innerHTML = `<span style="font-size: 14px;">${botSelectedHero.icon}</span>`;
-        }
-
-        currentStepIndex++;
-        selectedHeroId = null;
-        updateUI();
-
-        // Проверяем следующий ход (вдруг опять ходит бот)
-        setTimeout(checkBotTurn, 400);
-    }, 1200);
 }
-
-// 3. Блокируем клики игрока по сетке, когда наступает ход компьютера (Dire)
-const originalSelectHero = selectHero;
-selectHero = function(heroId) {
-    if (currentStepIndex >= draftSequence.length) return;
-    if (draftSequence[currentStepIndex].team === "dire") return; // Ход ИИ — кликать нельзя
-    
-    originalSelectHero(heroId);
-};
