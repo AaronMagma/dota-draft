@@ -293,7 +293,14 @@ function commitCurrentTurn() {
     if (slot) {
         slot.classList.remove("empty-slot", "active-slot");
         slot.classList.add(currentTurn.type === "ban" ? "filled-ban" : "filled-pick");
-        slot.innerHTML = `<span style="font-size: 13px;">${hero.icon}</span>`;
+        
+        // 🔥 ТЕПЕРЬ СЮДА ВЫВОДИТСЯ И ИКОНКА, И ИМЯ ГЕРОЯ:
+        slot.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;">
+                <span style="font-size: 13px;">${hero.icon}</span>
+                <span style="font-size: 10px; font-weight: bold; color: #ffffff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px;">${hero.name}</span>
+            </div>
+        `;
     }
 
     currentStepIndex++;
