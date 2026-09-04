@@ -337,31 +337,62 @@ function checkBotTurn() {
     if (currentStepIndex >= draftSequence.length) return;
 
     const turn = draftSequence[currentStepIndex];
-    if (turn.team === "radiant") return; // Если ход Светлых (Игрока) — бот ждет
+    if (turn.team === "radiant") return; // Если ход игрока — бот ждет
 
-    // Находим доступных героев для ИИ
+    // 1. Ищем всех доступных героев
     const availableHeroes = heroesPool.filter(h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id));
     if (availableHeroes.length === 0) return;
 
-    const randomIndex = Math.floor(Math.random() * availableHeroes.length);
-    const botSelectedHero = availableHeroes[randomIndex];
+    // Списки приоритетов строго по мете The International 2026
+    const sPlusTier = ["treant_protector"]; // Всегда в бан/пик на 1 стадии
+    const sTier = ["earth_spirit", "invoker", "shadow_fiend"]; // Топ винрейт и востребованность
+    const aTier = ["ember_spirit", "centaur", "hoodwink", "winter_wyvern", "keeper_of_the_light"]; // Сильная мета по позициям
+    const trashTier = ["templar_assassin", "spirit_breaker", "puck"]; // Бот не берет их, если есть выбор
 
+    let botSelectedHero = null;
+
+    // С шансом 85% бот заберет метового героя
+    if (Math.random() < 0.85) {
+        // Проверяем S+ Тир (Трент)
+        const availableSPlus = availableHeroes.filter(h => sPlusTier.includes(h.id));
+        if (availableSPlus.length > 0) {
+            botSelectedHero = availableSPlus[Math.floor(Math.random() * availableSPlus.length)];
+        } else {
+            // Проверяем S Тир (Земляной, СФ, Инвокер)
+            const availableSTier = availableHeroes.filter(h => sTier.includes(h.id));
+            if (availableSTier.length > 0) {
+                botSelectedHero = availableSTier[Math.floor(Math.random() * availableSTier.length)];
+            } else {
+                // Проверяем A Тир (Центавр, Эмбер, Худвинк, Виверна, Котл)
+                const availableATier = availableHeroes.filter(h => aTier.includes(h.id));
+                if (availableATier.length > 0) {
+                    botSelectedHero = availableATier[Math.floor(Math.random() * availableATier.length)];
+                }
+            }
+        }
+    }
+
+    // Если мета занята или бот решил сыграть нестандартно — берем случайного (исключая мусорный тир)
+    if (!botSelectedHero) {
+        const cleanPool = availableHeroes.filter(h => !trashTier.includes(h.id));
+        const finalPool = cleanPool.length > 0 ? cleanPool : availableHeroes;
+        botSelectedHero = finalPool[Math.floor(Math.random() * finalPool.length)];
+    }
+
+    // Фиксируем выбор бота
     selectedHeroId = botSelectedHero.id;
     
-    // Подсвечиваем рамкой карту, которую выбрал бот
     const card = document.getElementById("grid-hero-" + selectedHeroId);
     if (card) {
         card.classList.add("selected");
     }
 
-    // Пишем на кнопке, кого забирает компьютер
     const actionBtn = document.getElementById("action-btn");
     const actionText = turn.type === "ban" ? "БАН" : "ПИК";
     if (actionBtn) {
         actionBtn.textContent = "КОМПЬЮТЕР: " + actionText + " " + botSelectedHero.name;
     }
 
-    // Через 1.2 секунды бот сам фиксирует ход
     setTimeout(() => {
         if (!selectedHeroId) return;
 
@@ -389,7 +420,7 @@ function checkBotTurn() {
         selectedHeroId = null;
         updateUI();
 
-        // Проверяем следующий ход (вдруг опять ходит бот)
+        // Проверяем следующий ход
         setTimeout(checkBotTurn, 400);
     }, 1200);
 }
