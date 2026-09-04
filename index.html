@@ -6,112 +6,56 @@
     <style>
         body { background-color: #0b0c10; color: #e5e5e5; font-family: 'Arial', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
 
-.main-container { display: flex; width: 100%; max-width: 1550px; gap: 15px; margin-top: 5px; justify-content: center; align-items: flex-start; height: 92vh; }
+        .main-container { display: flex; width: 100%; max-width: 1550px; gap: 15px; margin-top: 5px; justify-content: center; align-items: flex-start; height: 92vh; }
 
-/* СЕТКА ГЕРОЕВ (Левая часть) */
-.heroes-section { width: 73%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; background: #11141a; padding: 15px; border-radius: 6px; border: 1px solid #1f242d; box-sizing: border-box; height: 100%; overflow-y: auto; }
-.attribute-box { background: #161920; padding: 10px; border-radius: 4px; border: 1px solid #232935; }
-.attr-title { font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #2d3545; }
-.attr-title.str { color: #ff4d4d; }
-.attr-title.agi { color: #22c55e; }
-.attr-title.int { color: #38bdf8; }
-.attr-title.uni { color: #eab308; }
-.grid-container { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+        /* СЕТКА ГЕРОЕВ (Левая часть) */
+        .heroes-section { width: 73%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; background: #11141a; padding: 15px; border-radius: 6px; border: 1px solid #1f242d; box-sizing: border-box; height: 100%; overflow-y: auto; }
+        .heroes-section::-webkit-scrollbar { width: 4px; }
+        .heroes-section::-webkit-scrollbar-thumb { background: #2d3545; border-radius: 2px; }
 
-.hero-card { cursor: pointer; border: 1px solid #3a4454; border-radius: 3px; aspect-ratio: 16/11; display: flex; align-items: center; justify-content: center; background-color: #0d0f13; transition: all 0.12s ease; position: relative; overflow: hidden; }
-.hero-card:hover:not(.disabled) { border-color: #eab308; transform: scale(1.08); z-index: 10; box-shadow: 0 0 8px rgba(234,179,8,0.4); }
-.hero-card.selected { border-color: #22c55e; box-shadow: 0 0 10px #22c55e; z-index: 10; }
-.hero-card.disabled { filter: grayscale(100%) brightness(25%); opacity: 0.3; cursor: not-allowed; border-color: #1f242d; }
+        .attribute-box { background: #161920; padding: 10px; border-radius: 4px; border: 1px solid #232935; }
+        .attr-title { font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #2d3545; }
+        .attr-title.str { color: #ff4d4d; }
+        .attr-title.agi { color: #22c55e; }
+        .attr-title.int { color: #38bdf8; }
+        .attr-title.uni { color: #eab308; }
+        .grid-container { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
 
-/* СТАДИЯ ДРАФТА (Правая часть — Сжатая и Компактная) */
-.sidebar-draft { width: 25%; background: #11141a; padding: 12px; border-radius: 6px; border: 1px solid #1f242d; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; height: 100%; justify-content: space-between; }
-.mode-title { font-size: 11px; font-weight: bold; letter-spacing: 2px; color: #a1a1aa; text-transform: uppercase; margin-bottom: 2px; }
-#status-message { font-size: 12px; font-weight: bold; color: #eab308; text-transform: uppercase; text-align: center; letter-spacing: 1px; margin-bottom: 5px; min-height: 20px; }
+        .hero-card { cursor: pointer; border: 1px solid #3a4454; border-radius: 3px; aspect-ratio: 16/11; display: flex; align-items: center; justify-content: center; background-color: #0d0f13; transition: all 0.12s ease; position: relative; overflow: hidden; }
+        .hero-card:hover:not(.disabled) { border-color: #eab308; transform: scale(1.08); z-index: 10; box-shadow: 0 0 8px rgba(234,179,8,0.4); }
+        .hero-card.selected { border-color: #22c55e; box-shadow: 0 0 10px #22c55e; z-index: 10; }
+        .hero-card.disabled { filter: grayscale(100%) brightness(25%); opacity: 0.3; cursor: not-allowed; border-color: #1f242d; }
 
-.panel-headers { display: flex; width: 100%; justify-content: space-between; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; padding: 0 10px 5px 10px; border-bottom: 1px solid #232935; box-sizing: border-box; margin-bottom: 5px; }
-.panel-headers .rad-h { color: #22c55e; }
-.panel-headers .dire-h { color: #f87171; }
+        /* СТАДИЯ ДРАФТА (Правая часть — Сжатая и Компактная) */
+        .sidebar-draft { width: 25%; background: #11141a; padding: 12px; border-radius: 6px; border: 1px solid #1f242d; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; height: 100%; justify-content: space-between; }
+        .mode-title { font-size: 11px; font-weight: bold; letter-spacing: 2px; color: #a1a1aa; text-transform: uppercase; margin-bottom: 2px; }
+        #status-message { font-size: 12px; font-weight: bold; color: #eab308; text-transform: uppercase; text-align: center; letter-spacing: 1px; margin-bottom: 5px; min-height: 20px; }
 
-/* ТРИ ВЕРТИКАЛЬНЫЕ КОЛОНКИ В СТИЛЕ DOTA DRAFT WARS */
-.draft-columns-container { display: grid; grid-template-columns: 1fr 30px 1fr; width: 100%; gap: 5px; flex-grow: 1; align-items: stretch; margin-bottom: 10px; }
-.column-slots { display: flex; flex-direction: column; justify-content: space-between; gap: 2px; }
-.column-numbers { display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 2px; font-size: 9px; color: #52525b; font-weight: bold; }
+        .panel-headers { display: flex; width: 100%; justify-content: space-between; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; padding: 0 10px 5px 10px; border-bottom: 1px solid #232935; box-sizing: border-box; margin-bottom: 5px; }
+        .panel-headers .rad-h { color: #22c55e; }
+        .panel-headers .dire-h { color: #f87171; }
 
-/* Стили ячеек (высота подбирается автоматически, чтобы занять весь экран!) */
-.slot-display { width: 100%; flex-grow: 1; min-height: 18px; background: #0d0f13; border: 1px solid #1f242d; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 12px; box-sizing: border-box; transition: all 0.2s; position: relative; }
-.slot-display.empty-slot { opacity: 0.15; border-color: #232935; }
-.slot-display.active-slot { border-color: #eab308; background: #1d222c; box-shadow: inset 0 0 5px rgba(234,179,8,0.2); }
+        /* ТРИ ВЕРТИКАЛЬНЫЕ КОЛОНКИ В СТИЛЕ DOTA DRAFT WARS */
+        .draft-columns-container { display: grid; grid-template-columns: 1fr 30px 1fr; width: 100%; gap: 5px; flex-grow: 1; align-items: stretch; margin-bottom: 10px; }
+        .column-slots { display: flex; flex-direction: column; justify-content: space-between; gap: 2px; }
+        .column-numbers { display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 2px; font-size: 9px; color: #52525b; font-weight: bold; }
 
-/* Специальные индикаторы BAN и PICK прямо поверх слотов */
-.slot-display.filled-ban { background: #221212; border-color: #ef4444; box-shadow: inset 0 0 5px rgba(239, 68, 68, 0.4); }
-.slot-display.filled-pick { background: #122216; border-color: #22c55e; box-shadow: inset 0 0 5px rgba(34, 197, 94, 0.4); }
+        /* Стили ячеек (высота подбирается автоматически, чтобы занять весь экран!) */
+        .slot-display { width: 100%; flex-grow: 1; min-height: 18px; background: #0d0f13; border: 1px solid #1f242d; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 12px; box-sizing: border-box; transition: all 0.2s; position: relative; }
+        .slot-display.empty-slot { opacity: 0.15; border-color: #232935; border-style: dashed; }
+        .slot-display.active-slot { border-color: #eab308; background: #1d222c; box-shadow: inset 0 0 5px rgba(234,179,8,0.2); }
 
-.num-label { display: flex; align-items: center; justify-content: center; flex-grow: 1; width: 100%; border-bottom: 1px solid rgba(35, 41, 53, 0.3); }
+        /* Специальные индикаторы BAN и PICK прямо поверх слотов */
+        .slot-display.filled-ban { filter: grayscale(100%) brightness(40%); background: #221212; border-color: #ef4444; box-shadow: inset 0 0 5px rgba(239, 68, 68, 0.4); }
+        .slot-display.filled-pick { background: #122216; border-color: #22c55e; box-shadow: inset 0 0 5px rgba(34, 197, 94, 0.4); }
 
-/* КНОПКА ДЕЙСТВИЯ — ТЕПЕРЬ СЛИТНАЯ В САМОМ НИЗУ ПАНЕЛИ */
-#action-btn { background-color: #161920; color: #4b5563; border: 1px solid #232935; padding: 12px; width: 100%; font-size: 11px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; box-sizing: border-box; }
-#action-btn.player-turn { background-color: #a91e1e; color: white; border-color: #e11d48; box-shadow: 0 4px 8px rgba(225,29,72,0.3); }
-#action-btn.player-turn:hover { background-color: #be1212; }
-#action-btn.disabled { background-color: #161920; color: #4b5563; border-color: #232935; cursor: not-allowed; }
+        .num-label { display: flex; align-items: center; justify-content: center; flex-grow: 1; width: 100%; border-bottom: 1px solid rgba(35, 41, 53, 0.3); }
 
-        
-        .draft-list { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 2px; /* Уменьшили расстояние между строчками с 4px до 2px */
-    width: 100%; 
-    max-height: 440px; /* Было 540px — сжали общую высоту панели */
-    overflow-y: auto; 
-    padding-right: 2px; 
-    box-sizing: border-box; 
-}
-        .draft-list::-webkit-scrollbar { width: 4px; }
-        .draft-list::-webkit-scrollbar-thumb { background: #2d3545; border-radius: 2px; }
-
-        .draft-row { 
-    display: grid; 
-    grid-template-columns: 40px 1fr 40px; /* Сделали слоты чуть уже */
-    align-items: center; 
-    background: #161920; 
-    padding: 3px 6px; /* Было 5px 8px — урезали внутренние отступы */
-    border-radius: 4px; 
-    border: 1px solid #1f242d; 
-    box-sizing: border-box; 
-}
-        .draft-row.active-row { border-color: #eab308; background: #1d222c; }
-        
-        .row-center-info { display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .row-num { font-size: 10px; color: #52525b; font-weight: bold; }
-        
-        .row-type-badge { 
-    font-size: 8px; 
-    font-weight: bold; 
-    text-transform: uppercase; 
-    padding: 1px 4px; 
-    border-radius: 2px; 
-    letter-spacing: 0.5px; 
-    text-align: center; 
-    min-width: 28px; /* Сделали бейджи компактнее */
-}
-        .row-type-badge.ban-badge { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .row-type-badge.pick-badge { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
-        
-        .slot-display { 
-    width: 32px; /* Было 38px */
-    height: 22px; /* Было 25px */
-    background: #0d0f13; 
-    border: 1px solid #3a4454; 
-    border-radius: 3px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    font-size: 12px; /* Уменьшили размер эмодзи в слотах */
-    box-sizing: border-box; 
-}
-        .slot-display.empty-slot { border-style: dashed; opacity: 0.3; }
-        
-        .slot-display.filled-ban { filter: grayscale(100%) brightness(40%); background: #221212; border-color: #552222; }
-        .slot-display.filled-pick { background: #122216; border-color: #22552e; }
+        /* КНОПКА ДЕЙСТВИЯ — ТЕПЕРЬ СЛИТНАЯ В САМОМ НИЗУ ПАНЕЛИ */
+        #action-btn { background-color: #161920; color: #4b5563; border: 1px solid #232935; padding: 12px; width: 100%; font-size: 11px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; box-sizing: border-box; }
+        #action-btn.player-turn { background-color: #a91e1e; color: white; border-color: #e11d48; box-shadow: 0 4px 8px rgba(225,29,72,0.3); }
+        #action-btn.player-turn:hover { background-color: #be1212; }
+        #action-btn.disabled { background-color: #161920; color: #4b5563; border-color: #232935; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -139,29 +83,24 @@
 
         <!-- ПАНЕЛЬ ДРАФТА -->
         <div class="sidebar-draft">
-    <div class="mode-title">Captains Mode</div>
-    <div id="status-message">ЗАГРУЗКА...</div>
+            <div class="mode-title">Captains Mode</div>
+            <div id="status-message">ЗАГРУЗКА...</div>
             
             <!-- ОСТАВЛЯЕМ ТОЛЬКО ОДИН ЭТОТ БЛОК ЗАГОЛОВКОВ -->
-    <div class="panel-headers">
-        <span class="rad-h">Radiant</span>
-        <span class="dire-h">Dire</span>
-    </div>
-            
             <div class="panel-headers">
-    <span class="rad-h">Radiant</span>
-    <span class="dire-h">Dire</span>
-</div>
+                <span class="rad-h">Radiant</span>
+                <span class="dire-h">Dire</span>
+            </div>
 
-<!-- Трёхколоночный адаптивный контейнер ходов -->
-    <div class="draft-columns-container">
-        <div id="left-slots-column" class="column-slots"></div>
-        <div id="numbers-column" class="column-numbers"></div>
-        <div id="right-slots-column" class="column-slots"></div>
-    </div>
+            <!-- Трёхколоночный адаптивный контейнер ходов -->
+            <div class="draft-columns-container">
+                <div id="left-slots-column" class="column-slots"></div>
+                <div id="numbers-column" class="column-numbers"></div>
+                <div id="right-slots-column" class="column-slots"></div>
+            </div>
 
-<button id="action-btn" class="disabled">ВЫБЕРИТЕ ГЕРОЯ</button>
-</div>
+            <button id="action-btn" class="disabled">ВЫБЕРИТЕ ГЕРОЯ</button>
+        </div>
     </div>
 
     <script src="script.js"></script>
