@@ -166,9 +166,11 @@ document.addEventListener("DOMContentLoaded", () => {
     renderHeroesGrid();
     renderDraftRows();
     updateUI();
-    
     const actionBtn = document.getElementById("action-btn");
     actionBtn.addEventListener("click", commitCurrentTurn);
+    
+    // ВОТ ЭТА СТРОЧКА: заставит бота мгновенно проснуться при открытии сайта!
+    setTimeout(checkBotTurn, 500); 
 });
 
 function renderHeroesGrid() {
