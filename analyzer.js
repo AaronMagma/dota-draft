@@ -143,3 +143,87 @@ const heroesPool = [
     { id: "void_spirit", name: "Void Spirit", attr: "uni", icon: "🌌" },
     { id: "windranger", name: "WR", attr: "uni", icon: "🍃" }
 ];
+
+// analyzer.js — движок аналитики
+
+const heroesPool = [
+  // Пример героя (остальных нужно заполнить вручную)
+  {
+    id: 'axe',
+    name: 'Axe',
+    attr: 'str', 
+    icon: '🪓',
+    role: ['hard'], // Роли: carry/1, mid/2, off/3, hard/4, sup/5, roam/6
+    metaScore: 70,
+    counters: { slark: 18, puck: 15 },
+    synergies: {}
+  }
+];
+
+// Текущие составы команд
+let radiantTeam = [];
+let direTeam = [];
+
+export function getHero(id) {
+  return heroesPool.find(h => h.id === id);
+}
+
+// Проверка на дублирование роли в команде
+export function canAddRole(team, heroId) {
+  const teamArray = team === 'radiant' ? radiantTeam : direTeam;
+  const hero = getHero(heroId);
+  
+  if (!hero || !hero.role.length) return true; // Нет ограничений у этого героя
+  for (const existing of teamArray) {
+    if (existing.role.some(r => hero.role.includes(r))) return false;
+  }
+  return true;
+}
+
+// Расчёт очков за ход
+export function calculateScore(actionType, team, heroId) {
+  let scoreChange = 0;
+  const hero = getHero(heroId);
+
+  if (!hero) return 0;
+
+  switch (actionType) {
+    case 'ban':
+      scoreChange -= Math.floor(hero.metaScore / 10); // Минус очки за бан метового героя
+      break;
+    
+    case 'pick': {
+      // Очки за пик по мете
+      scoreChange += hero.metaScore > 90 ? 10 : hero.metaScore >= 70 ? 5 : 0;
+      
+      // Контр-пик вражеской команды
+      const enemyTeam = team === 'radiant' ? direTeam : radiantTeam;
+      for (const enemy of enemyTeam) {
+        if (hero.counters[enemy.id]) {
+          scoreChange += hero.counters[enemy.id]; // +очки за контру
+        } else if (enemy.counters[hero.id]) {
+          scoreChange -= enemy.counters[hero.id] * 0.7; // -штраф за то, что его законтрили
+        }
+      }
+
+      // Синергия внутри своей команды
+      const ownTeam = team === 'radiant' ? radiantTeam : direTeam;
+      for (const ally of ownTeam) {
+        if (hero.synergies[ally.id]) {
+          scoreChange += hero.synergies[ally.id];
+        }
+      }
+      break;
+    }
+  }
+
+  return scoreChange;
+}
+
+// Обновление состава после хода
+export function updateTeamComposition(team, heroId, isPick) {
+  if (isPick) {
+    const targetTeam = team === 'radiant' ? radiantTeam : direTeam;
+    targetTeam.push(getHero(heroId));
+  }
+}
