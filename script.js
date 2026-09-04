@@ -178,7 +178,7 @@ const targetContainer = containers[hero.attr];
 if (!targetContainer) return;
 const card = document.createElement("div");
 card.className = "hero-card";
-card.id = grid-hero-${hero.id};
+card.id = "grid-hero-" + hero.id;
 card.innerHTML = <div style="display: flex; flex-direction: column; align-items: center; justify-content: space-between; width: 100%; height: 100%; padding-top: 5px; box-sizing: border-box;"> <span style="font-size: 20px; line-height: 1;">${hero.icon}</span> <div style="background: rgba(0, 0, 0, 0.75); width: 100%; text-align: center; padding: 2px 0;"> <span style="font-size: 9px; font-weight: 900; color: #ffffff; letter-spacing: 0.4px; text-transform: uppercase; white-space: nowrap; display: block; overflow: hidden; text-overflow: ellipsis; max-width: 100%; padding: 0 2px; box-sizing: border-box;">${hero.name}</span> </div> </div>;
 card.addEventListener("click", () => selectHero(hero.id));
 targetContainer.appendChild(card);
@@ -198,12 +198,12 @@ numLabel.className = "num-label";
 numLabel.textContent = config.step;
 numCol.appendChild(numLabel);
 const leftSlot = document.createElement("div");
-leftSlot.id = slot-left-${index};
+leftSlot.id = "slot-left-" + index;
 leftSlot.className = "slot-display empty-slot";
 leftSlot.textContent = config.team === "radiant" ? (config.type === "ban" ? "B" : "P") : "";
 leftCol.appendChild(leftSlot);
 const rightSlot = document.createElement("div");
-rightSlot.id = slot-right-${index};
+rightSlot.id = "slot-right-" + index;
 rightSlot.className = "slot-display empty-slot";
 rightSlot.textContent = config.team === "dire" ? (config.type === "ban" ? "B" : "P") : "";
 rightCol.appendChild(rightSlot);
@@ -214,11 +214,11 @@ if (currentStepIndex >= draftSequence.length) return;
 if (bannedHeroes.has(heroId) || pickedHeroes.has(heroId)) return;
 if (draftSequence[currentStepIndex].team === "dire") return;
 if (selectedHeroId) {
-const oldCard = document.getElementById(grid-hero-${selectedHeroId});
+const oldCard = document.getElementById("grid-hero-" + selectedHeroId);
 if (oldCard) oldCard.classList.remove("selected");
 }
 selectedHeroId = heroId;
-const newCard = document.getElementById(grid-hero-${heroId});
+const newCard = document.getElementById("grid-hero-" + heroId);
 if (newCard) newCard.classList.add("selected");
 updateUI();
 }
@@ -231,12 +231,12 @@ bannedHeroes.add(selectedHeroId);
 } else {
 pickedHeroes.add(selectedHeroId);
 }
-const card = document.getElementById(grid-hero-${selectedHeroId});
+const card = document.getElementById("grid-hero-" + selectedHeroId);
 if (card) {
 card.classList.remove("selected");
 card.classList.add("disabled");
 }
-const targetSlotId = currentTurn.team === "radiant" ? slot-left-${currentStepIndex} : slot-right-${currentStepIndex};
+const targetSlotId = currentTurn.team === "radiant" ? "slot-left-" + currentStepIndex : "slot-right-" + currentStepIndex;
 const slot = document.getElementById(targetSlotId);
 if (slot) {
 slot.classList.remove("empty-slot", "active-slot");
@@ -264,7 +264,7 @@ const teamName = turn.team === "radiant" ? "Radiant (Свет)" : "Dire (Тьм�
 const actionName = turn.type === "ban" ? "БАНИТ" : "ВЫБИРАЕТ";
 statusMsg.textContent = ${teamName}\n${actionName};
 statusMsg.style.color = turn.team === "radiant" ? "#22c55e" : "#f87171";
-const activeSlotId = turn.team === "radiant" ? slot-left-${currentStepIndex} : slot-right-${currentStepIndex};
+const activeSlotId = turn.team === "radiant" ? "slot-left-" + currentStepIndex : "slot-right-" + currentStepIndex;
 const activeSlot = document.getElementById(activeSlotId);
 if (activeSlot) {
 activeSlot.classList.add("active-slot");
@@ -292,7 +292,7 @@ if (availableHeroes.length === 0) return;
 const randomIndex = Math.floor(Math.random() * availableHeroes.length);
 const botSelectedHero = availableHeroes[randomIndex];
 selectedHeroId = botSelectedHero.id;
-const card = document.getElementById(grid-hero-${selectedHeroId});
+const card = document.getElementById("grid-hero-" + selectedHeroId);
 if (card) {
 card.classList.add("selected");
 }
@@ -306,12 +306,12 @@ bannedHeroes.add(selectedHeroId);
 } else {
 pickedHeroes.add(selectedHeroId);
 }
-const cardFinal = document.getElementById(grid-hero-${selectedHeroId});
+const cardFinal = document.getElementById("grid-hero-" + selectedHeroId);
 if (cardFinal) {
 cardFinal.classList.remove("selected");
 cardFinal.classList.add("disabled");
 }
-const targetSlotId = turn.team === "radiant" ? slot-left-${currentStepIndex} : slot-right-${currentStepIndex};
+const targetSlotId = turn.team === "radiant" ? "slot-left-" + currentStepIndex : "slot-right-" + currentStepIndex;
 const slot = document.getElementById(targetSlotId);
 if (slot) {
 slot.classList.remove("empty-slot", "active-slot");
