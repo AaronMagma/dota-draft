@@ -362,31 +362,26 @@ function checkBotTurn() {
     const turn = draftSequence[currentStepIndex];
     if (turn.team === "radiant") return; // Если ход игрока — бот ждет
 
-    // 1. Ищем всех доступных героев
     const availableHeroes = heroesPool.filter(h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id));
     if (availableHeroes.length === 0) return;
 
     // Списки приоритетов строго по мете The International 2026
-    const sPlusTier = ["treant_protector"]; // Всегда в бан/пик на 1 стадии
-    const sTier = ["earth_spirit", "invoker", "shadow_fiend"]; // Топ винрейт и востребованность
-    const aTier = ["ember_spirit", "centaur", "hoodwink", "winter_wyvern", "keeper_of_the_light"]; // Сильная мета по позициям
-    const trashTier = ["templar_assassin", "spirit_breaker", "puck"]; // Бот не берет их, если есть выбор
+    const sPlusTier = ["treant_protector"]; 
+    const sTier = ["earth_spirit", "invoker", "shadow_fiend"]; 
+    const aTier = ["ember_spirit", "centaur", "hoodwink", "winter_wyvern", "keeper_of_the_light"]; 
+    const trashTier = ["templar_assassin", "spirit_breaker", "puck"]; 
 
     let botSelectedHero = null;
 
-    // С шансом 85% бот заберет метового героя
     if (Math.random() < 0.85) {
-        // Проверяем S+ Тир (Трент)
         const availableSPlus = availableHeroes.filter(h => sPlusTier.includes(h.id));
         if (availableSPlus.length > 0) {
             botSelectedHero = availableSPlus[Math.floor(Math.random() * availableSPlus.length)];
         } else {
-            // Проверяем S Тир (Земляной, СФ, Инвокер)
             const availableSTier = availableHeroes.filter(h => sTier.includes(h.id));
             if (availableSTier.length > 0) {
                 botSelectedHero = availableSTier[Math.floor(Math.random() * availableSTier.length)];
             } else {
-                // Проверяем A Тир (Центавр, Эмбер, Худвинк, Виверна, Котл)
                 const availableATier = availableHeroes.filter(h => aTier.includes(h.id));
                 if (availableATier.length > 0) {
                     botSelectedHero = availableATier[Math.floor(Math.random() * availableATier.length)];
@@ -395,14 +390,12 @@ function checkBotTurn() {
         }
     }
 
-    // Если мета занята или бот решил сыграть нестандартно — берем случайного (исключая мусорный тир)
     if (!botSelectedHero) {
         const cleanPool = availableHeroes.filter(h => !trashTier.includes(h.id));
         const finalPool = cleanPool.length > 0 ? cleanPool : availableHeroes;
         botSelectedHero = finalPool[Math.floor(Math.random() * finalPool.length)];
     }
 
-    // Фиксируем выбор бота
     selectedHeroId = botSelectedHero.id;
     
     const card = document.getElementById("grid-hero-" + selectedHeroId);
@@ -433,26 +426,31 @@ function checkBotTurn() {
 
         const targetSlotId = turn.team === "radiant" ? "slot-left-" + currentStepIndex : "slot-right-" + currentStepIndex;
         const slot = document.getElementById(targetSlotId);
+        
+        // ВСПЛЫВАЮЩИЙ ДИЗАЙН: Вот сюда вставился код, выводящий имя и иконку героя бота
         if (slot) {
             slot.classList.remove("empty-slot", "active-slot");
             slot.classList.add(turn.type === "ban" ? "filled-ban" : "filled-pick");
-            slot.innerHTML = `<span style="font-size: 14px;">${botSelectedHero.icon}</span>`;
+            slot.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;">
+                    <span style="font-size: 13px;">${botSelectedHero.icon}</span>
+                    <span style="font-size: 9px; font-weight: bold; color: #ffffff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px;">${botSelectedHero.name}</span>
+                </div>
+            `;
         }
 
         currentStepIndex++;
         selectedHeroId = null;
         updateUI();
 
-        // Проверяем следующий ход
         setTimeout(checkBotTurn, 400);
     }, 1200);
 }
 
-// 3. Блокируем клики игрока по сетке, когда наступает ход компьютера (Dire)
 const originalSelectHero = selectHero;
 selectHero = function(heroId) {
     if (currentStepIndex >= draftSequence.length) return;
-    if (draftSequence[currentStepIndex].team === "dire") return; // Ход ИИ — кликать нельзя
+    if (draftSequence[currentStepIndex].team === "dire") return; 
     
     originalSelectHero(heroId);
 };
