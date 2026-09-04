@@ -1,44 +1,56 @@
 // Полный пул героев, разбитый на 4 класса по 6 штук в каждом
 const heroesPool = [
-    // --- STRENGTH (Сила) — 35 героев строго по вашим рядам (без дублей) ---
+    // --- STRENGTH (Сила) — ровно 36 героев строго по вашему списку ---
+    // Ряд 1
     { id: "alchemist", name: "Alchemist", attr: "str", icon: "🧪" },
     { id: "axe", name: "Axe", attr: "str", icon: "🪓" },
     { id: "bristleback", name: "Bristleback", attr: "str", icon: "🦔" },
     { id: "centaur", name: "Centaur", attr: "str", icon: "🛡️" },
     { id: "chaos_knight", name: "Chaos Knight", attr: "str", icon: "🐴" },
+    // Ряд 2
     { id: "clockwerk", name: "Clockwerk", attr: "str", icon: "⚙️" },
     { id: "dawnbreaker", name: "Dawnbreaker", attr: "str", icon: "🔨" },
+    { id: "doom", name: "Doom", attr: "str", icon: "😈" },
     { id: "dragon_knight", name: "Dragon Knight", attr: "str", icon: "🐉" },
     { id: "earth_spirit", name: "Earth Spirit", attr: "str", icon: "🟢" },
+    // Ряд 3
     { id: "earthshaker", name: "Earthshaker", attr: "str", icon: "🪨" },
     { id: "elder_titan", name: "Elder Titan", attr: "str", icon: "🤠" },
     { id: "huskar", name: "Huskar", attr: "str", icon: "🩸" },
     { id: "kunkka", name: "Kunkka", attr: "str", icon: "⚓" },
     { id: "largo", name: "Largo", attr: "str", icon: "🥊" },
+    // Ряд 4
     { id: "legion_commander", name: "Legion", attr: "str", icon: "🚩" },
     { id: "lifestealer", name: "Lifestealer", attr: "str", icon: "🦷" },
+    { id: "lycan", name: "Lycan", attr: "str", icon: "🐺" },
     { id: "mars", name: "Mars", attr: "str", icon: "⭕" },
     { id: "night_stalker", name: "Night Stalker", attr: "str", icon: "🦇" },
+    // Ряд 5
     { id: "ogre_magi", name: "Ogre Magi", attr: "str", icon: "👥" },
     { id: "omniknight", name: "Omniknight", attr: "str", icon: "🛡️" },
     { id: "phoenix", name: "Phoenix", attr: "str", icon: "🦅" },
     { id: "primal_beast", name: "Primal Beast", attr: "str", icon: "🦖" },
     { id: "pudge", name: "Pudge", attr: "str", icon: "🥩" },
+    // Ряд 6
     { id: "slardar", name: "Slardar", attr: "str", icon: "🐟" },
     { id: "spirit_breaker", name: "Spirit Breaker", attr: "str", icon: "🐮" },
     { id: "sven", name: "Sven", attr: "str", icon: "⚔️" },
     { id: "tidehunter", name: "Tidehunter", attr: "str", icon: "🍉" },
+    { id: "timbersaw", name: "Timbersaw", attr: "str", icon: "🌲" },
+    // Ряд 7
     { id: "tiny", name: "Tiny", attr: "str", icon: "🗿" },
     { id: "treant_protector", name: "Treant", attr: "str", icon: "🌳" },
     { id: "tusk", name: "Tusk", attr: "str", icon: "❄️" },
     { id: "underlord", name: "Underlord", attr: "str", icon: "🟢" },
     { id: "undying", name: "Undying", attr: "str", icon: "🧟" },
+    // Ряд 8
     { id: "wraith_king", name: "Wraith King", attr: "str", icon: "👑" },
 
-    // --- AGILITY (Ловкость) — 31 герой строго по вашим рядам (без дублей) ---
+   // --- AGILITY (Ловкость) — ровно 35 героев строго по вашему списку ---
     { id: "anti_mage", name: "Anti-Mage", attr: "agi", icon: "🔮" },
     { id: "bloodseeker", name: "Bloodseeker", attr: "agi", icon: "🩸" },
     { id: "bounty_hunter", name: "Bounty Hunter", attr: "agi", icon: "💰" },
+    { id: "broodmother", name: "Broodmother", attr: "agi", icon: "🕷️" },
     { id: "clinkz", name: "Clinkz", attr: "agi", icon: "🏹" },
     { id: "drow_ranger", name: "Drow", attr: "agi", icon: "❄️" },
     { id: "ember_spirit", name: "Ember", attr: "agi", icon: "🔥" },
@@ -47,9 +59,11 @@ const heroesPool = [
     { id: "hoodwink", name: "Hoodwink", attr: "agi", icon: "🐿️" },
     { id: "juggernaut", name: "Juggernaut", attr: "agi", icon: "👺" },
     { id: "kez", name: "Kez", attr: "agi", icon: "🦤" },
+    { id: "lone_druid", name: "Lone Druid", attr: "agi", icon: "🐻" },
     { id: "luna", name: "Luna", attr: "agi", icon: "🌙" },
     { id: "medusa", name: "Medusa", attr: "agi", icon: "🐍" },
     { id: "meepo", name: "Meepo", attr: "agi", icon: "⛏️" },
+    { id: "mirana", name: "Mirana", attr: "agi", icon: "🐯" },
     { id: "monkey_king", name: "MK", attr: "agi", icon: "🐒" },
     { id: "morphling", name: "Morphling", attr: "agi", icon: "🌊" },
     { id: "naga_siren", name: "Naga", attr: "agi", icon: "🧜" },
@@ -65,13 +79,15 @@ const heroesPool = [
     { id: "terrorblade", name: "TB", attr: "agi", icon: "😈" },
     { id: "troll_warlord", name: "Troll", attr: "agi", icon: "🪓" },
     { id: "ursa", name: "Ursa", attr: "agi", icon: "🐻" },
+    { id: "vengeful_spirit", name: "Vengeful", attr: "agi", icon: "🦅" },
     { id: "viper", name: "Viper", attr: "agi", icon: "🐍" },
     { id: "weaver", name: "Weaver", attr: "agi", icon: "🕷️" },
 
-    // --- INTELLIGENCE (Интеллект) — 33 героя строго по вашим рядам (без дублей) ---
+   // --- INTELLIGENCE (Интеллект) — ровно 34 героя строго по вашему списку ---
     { id: "ancient_apparition", name: "AA", attr: "int", icon: "🥶" },
     { id: "chen", name: "Chen", attr: "int", icon: "🐘" },
     { id: "crystal_maiden", name: "CM", attr: "int", icon: "❄️" },
+    { id: "dark_seer", name: "Dark Seer", attr: "int", icon: "🧠" },
     { id: "dark_willow", name: "Willow", attr: "int", icon: "🧚" },
     { id: "disruptor", name: "Disruptor", attr: "int", icon: "🌩️" },
     { id: "enchantress", name: "Enchant", attr: "int", icon: "🦌" },
@@ -103,7 +119,7 @@ const heroesPool = [
     { id: "witch_doctor", name: "WD", attr: "int", icon: "🧪" },
     { id: "zeus", name: "Zeus", attr: "int", icon: "☁️" },
 
-    // --- UNIVERSAL (Универсалы) — ровно 22 героя строго по вашему скриншоту ---
+    // --- UNIVERSAL (Универсалы) — ровно 22 героя строго по вашему списку ---
     { id: "abaddon", name: "Abaddon", attr: "uni", icon: "🐴" },
     { id: "arc_warden", name: "Arc Warden", attr: "uni", icon: "🌀" },
     { id: "bane", name: "Bane", attr: "uni", icon: "👁️" },
