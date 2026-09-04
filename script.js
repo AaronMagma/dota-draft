@@ -253,6 +253,8 @@ function selectHero(heroId) {
     updateUI();
 }
 
+// Замените нижнюю часть script.js (начиная с commitCurrentTurn) на этот код:
+
 function commitCurrentTurn() {
     if (!selectedHeroId || currentStepIndex >= draftSequence.length) return;
 
@@ -271,7 +273,6 @@ function commitCurrentTurn() {
         card.classList.add("disabled");
     }
 
-    // Находим правильный слот на основе команды
     const targetSlotId = currentTurn.team === "radiant" ? `slot-left-${currentStepIndex}` : `slot-right-${currentStepIndex}`;
     const slot = document.getElementById(targetSlotId);
     if (slot) {
@@ -283,13 +284,15 @@ function commitCurrentTurn() {
     currentStepIndex++;
     selectedHeroId = null;
     updateUI();
+
+    // ПОСЛЕ КАЖДОГО ХОДА ПРОВЕРЯЕМ: ЕСЛИ СЛЕДУЮЩИЙ ХОД ЗА DIRE — ПУСКАЕМ ИИ
+    setTimeout(checkBotTurn, 400); 
 }
 
 function updateUI() {
     const statusMsg = document.getElementById("status-message");
     const actionBtn = document.getElementById("action-btn");
 
-    // Сбрасываем старую подсветку активного хода со всех слотов
     document.querySelectorAll(".slot-display").forEach(s => s.classList.remove("active-slot"));
 
     if (currentStepIndex >= draftSequence.length) {
@@ -307,11 +310,17 @@ function updateUI() {
     statusMsg.textContent = `${teamName} ${actionName}`;
     statusMsg.style.color = turn.team === "radiant" ? "#22c55e" : "#f87171";
 
-    // Подсвечиваем рамкой текущий активный слот, который ждет выбора героя
     const activeSlotId = turn.team === "radiant" ? `slot-left-${currentStepIndex}` : `slot-right-${currentStepIndex}`;
     const activeSlot = document.getElementById(activeSlotId);
     if (activeSlot) {
         activeSlot.classList.add("active-slot");
+    }
+
+    // Если сейчас ходит ИИ (Dire), кнопка для игрока блокируется
+    if (turn.team === "dire") {
+        actionBtn.textContent = "ДУМАЕТ КОМПЬЮТЕР...";
+        actionBtn.className = "disabled";
+        return;
     }
 
     if (selectedHeroId) {
@@ -323,3 +332,48 @@ function updateUI() {
         actionBtn.className = "disabled";
     }
 }
+
+// ЛОГИКА РАБОТЫ ИСКУССТВЕННОГО ИНТЕЛЛЕКТА (БОТА)
+function checkBotTurn() {
+    if (currentStepIndex >= draftSequence.length) return;
+
+    const turn = draftSequence[currentStepIndex];
+    // Если сейчас ход Светлых (Игрока) — ничего не делаем, ждем его клика
+    if (turn.team === "radiant") return; 
+
+    // 1. Ищем всех доступных героев, которые еще не заняты
+    const availableHeroes = heroesPool.filter(h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id));
+    if (availableHeroes.length === 0) return;
+
+    // 2. Бот выбирает случайного случайного героя из оставшихся
+    const randomIndex = Math.floor(Math.random() * availableHeroes.length);
+    const botSelectedHero = availableHeroes[randomIndex];
+
+    // 3. Визуально подсвечиваем выбор бота на сетке (как будто он нажал на карту)
+    selectedHeroId = botSelectedHero.id;
+    const card = document.getElementById(`grid-hero-${selectedHeroId}`);
+    if (card) {
+        card.classList.add("selected");
+    }
+
+    // Изменяем текст на кнопке, чтобы игрок видел, кого хочет забанить/взять ИИ
+    const actionBtn = document.getElementById("action-btn");
+    const actionText = turn.type === "ban" ? "БАН" : "ПИК";
+    actionBtn.textContent = `КОМПЬЮТЕР: ${actionText} ${botSelectedHero.name}`;
+
+    // 4. Даем игроку 1.2 секунды посмотреть на выбор бота, после чего ИИ автоматически фиксирует ход
+    setTimeout(() => {
+        commitCurrentTurn();
+    }, 1200);
+}
+
+// Переопределяем функцию выбора героя игроком, чтобы он не мог кликать в ход бота
+const originalSelectHero = selectHero;
+selectHero = function(heroId) {
+    if (currentStepIndex >= draftSequence.length) return;
+    // Запрещаем игроку выбирать героев на сетке, если сейчас ход Тьмы (Dire)
+    if (draftSequence[currentStepIndex].team === "dire") return; 
+    
+    originalSelectHero(heroId);
+};
+
