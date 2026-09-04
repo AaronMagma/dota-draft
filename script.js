@@ -283,6 +283,8 @@ function commitCurrentTurn() {
     currentStepIndex++;
     selectedHeroId = null;
     updateUI();
+    // 🔥 ВОТ ЭТУ СТРОЧКУ НУЖНО ДОБАВИТЬ В САМЫЙ КОНЕЦ ФУНКЦИИ:
+    setTimeout(checkBotTurn, 400); 
 }
 
 function updateUI() {
