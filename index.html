@@ -13,20 +13,29 @@
         .heroes-section::-webkit-scrollbar { width: 4px; }
         .heroes-section::-webkit-scrollbar-thumb { background: #2d3545; border-radius: 2px; }
 
-        .attribute-box { background: #161920; padding: 10px; border-radius: 4px; border: 1px solid #232935; }
+        .attribute-box { background: #161920; padding: 10px; border-radius: 4px; border: 1px solid #232935; display: flex; flex-direction: column; }
         .attr-title { font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #2d3545; }
         .attr-title.str { color: #ff4d4d; }
         .attr-title.agi { color: #22c55e; }
         .attr-title.int { color: #38bdf8; }
         .attr-title.uni { color: #eab308; }
-        .grid-container { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+        
+        /* Увеличенная сетка — теперь 8 героев в ряд вместо 10 */
+        .grid-container { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; }
 
-        .hero-card { cursor: pointer; border: 1px solid #3a4454; border-radius: 3px; aspect-ratio: 16/11; display: flex; align-items: center; justify-content: center; background-color: #0d0f13; transition: all 0.12s ease; position: relative; overflow: hidden; }
+        /* Увеличенные карточки героев */
+        .hero-card { cursor: pointer; border: 1px solid #3a4454; border-radius: 4px; aspect-ratio: 14/11; display: flex; align-items: center; justify-content: center; background-color: #0d0f13; transition: all 0.12s ease; position: relative; overflow: hidden; }
         .hero-card:hover:not(.disabled) { border-color: #eab308; transform: scale(1.08); z-index: 10; box-shadow: 0 0 8px rgba(234,179,8,0.4); }
         .hero-card.selected { border-color: #22c55e; box-shadow: 0 0 10px #22c55e; z-index: 10; }
         .hero-card.disabled { filter: grayscale(100%) brightness(25%); opacity: 0.3; cursor: not-allowed; border-color: #1f242d; }
 
-        /* СТАДИЯ ДРАФТА (Правая часть — Сжатая и Компактная) */
+        /* Текстовые стили подложки внутри карточек переопределяем прямо из CSS */
+        .hero-card div { display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; height: 100% !important; padding-top: 4px !important; box-sizing: border-box !important; }
+        .hero-card span { font-size: 20px !important; line-height: 1 !important; }
+        .hero-card div div { background: rgba(0, 0, 0, 0.75) !important; width: 100% !important; text-align: center !important; padding: 2px 0 !important; }
+        .hero-card div div span { font-size: 8.5px !important; font-weight: 900 !important; color: #ffffff !important; letter-spacing: 0.4px !important; text-transform: uppercase !important; }
+
+        /* СТАДИЯ ДРАФТА (Правая часть) */
         .sidebar-draft { width: 25%; background: #11141a; padding: 12px; border-radius: 6px; border: 1px solid #1f242d; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; height: 100%; justify-content: space-between; }
         .mode-title { font-size: 11px; font-weight: bold; letter-spacing: 2px; color: #a1a1aa; text-transform: uppercase; margin-bottom: 2px; }
         #status-message { font-size: 12px; font-weight: bold; color: #eab308; text-transform: uppercase; text-align: center; letter-spacing: 1px; margin-bottom: 5px; min-height: 20px; }
@@ -35,23 +44,21 @@
         .panel-headers .rad-h { color: #22c55e; }
         .panel-headers .dire-h { color: #f87171; }
 
-        /* ТРИ ВЕРТИКАЛЬНЫЕ КОЛОНКИ В СТИЛЕ DOTA DRAFT WARS */
+        /* ВЕРТИКАЛЬНЫЕ КОЛОНКИ ДРАФТА */
         .draft-columns-container { display: grid; grid-template-columns: 1fr 30px 1fr; width: 100%; gap: 5px; flex-grow: 1; align-items: stretch; margin-bottom: 10px; }
         .column-slots { display: flex; flex-direction: column; justify-content: space-between; gap: 2px; }
         .column-numbers { display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 2px; font-size: 9px; color: #52525b; font-weight: bold; }
 
-        /* Стили ячеек (высота подбирается автоматически, чтобы занять весь экран!) */
         .slot-display { width: 100%; flex-grow: 1; min-height: 18px; background: #0d0f13; border: 1px solid #1f242d; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 12px; box-sizing: border-box; transition: all 0.2s; position: relative; }
         .slot-display.empty-slot { opacity: 0.15; border-color: #232935; border-style: dashed; }
         .slot-display.active-slot { border-color: #eab308; background: #1d222c; box-shadow: inset 0 0 5px rgba(234,179,8,0.2); }
 
-        /* Специальные индикаторы BAN и PICK прямо поверх слотов */
         .slot-display.filled-ban { filter: grayscale(100%) brightness(40%); background: #221212; border-color: #ef4444; box-shadow: inset 0 0 5px rgba(239, 68, 68, 0.4); }
         .slot-display.filled-pick { background: #122216; border-color: #22c55e; box-shadow: inset 0 0 5px rgba(34, 197, 94, 0.4); }
 
         .num-label { display: flex; align-items: center; justify-content: center; flex-grow: 1; width: 100%; border-bottom: 1px solid rgba(35, 41, 53, 0.3); }
 
-        /* КНОПКА ДЕЙСТВИЯ — ТЕПЕРЬ СЛИТНАЯ В САМОМ НИЗУ ПАНЕЛИ */
+        /* КНОПКА ДЕЙСТВИЯ */
         #action-btn { background-color: #161920; color: #4b5563; border: 1px solid #232935; padding: 12px; width: 100%; font-size: 11px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; box-sizing: border-box; }
         #action-btn.player-turn { background-color: #a91e1e; color: white; border-color: #e11d48; box-shadow: 0 4px 8px rgba(225,29,72,0.3); }
         #action-btn.player-turn:hover { background-color: #be1212; }
@@ -86,13 +93,12 @@
             <div class="mode-title">Captains Mode</div>
             <div id="status-message">ЗАГРУЗКА...</div>
             
-            <!-- ОСТАВЛЯЕМ ТОЛЬКО ОДИН ЭТОТ БЛОК ЗАГОЛОВКОВ -->
             <div class="panel-headers">
                 <span class="rad-h">Radiant</span>
                 <span class="dire-h">Dire</span>
             </div>
 
-            <!-- Трёхколоночный адаптивный контейнер ходов -->
+            <!-- Трёхколоночный контейнер ходов -->
             <div class="draft-columns-container">
                 <div id="left-slots-column" class="column-slots"></div>
                 <div id="numbers-column" class="column-numbers"></div>
