@@ -322,4 +322,79 @@ function updateUI() {
         actionBtn.textContent = turn.type === "ban" ? "ЗАБАНЬТЕ ГЕРОЯ" : "ВЫБЕРИТЕ ГЕРОЯ";
         actionBtn.className = "disabled";
     }
+    // 1. Изменяем запуск загрузки: будим бота через полсекунды после открытия страницы
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(checkBotTurn, 500);
+});
+
+// 2. Логика автоматического выбора для компьютерного бота
+function checkBotTurn() {
+    if (currentStepIndex >= draftSequence.length) return;
+
+    const turn = draftSequence[currentStepIndex];
+    if (turn.team === "radiant") return; // Если ход Светлых (Игрока) — бот ждет
+
+    // Находим доступных героев для ИИ
+    const availableHeroes = heroesPool.filter(h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id));
+    if (availableHeroes.length === 0) return;
+
+    const randomIndex = Math.floor(Math.random() * availableHeroes.length);
+    const botSelectedHero = availableHeroes[randomIndex];
+
+    selectedHeroId = botSelectedHero.id;
+    
+    // Подсвечиваем рамкой карту, которую выбрал бот
+    const card = document.getElementById("grid-hero-" + selectedHeroId);
+    if (card) {
+        card.classList.add("selected");
+    }
+
+    // Пишем на кнопке, кого забирает компьютер
+    const actionBtn = document.getElementById("action-btn");
+    const actionText = turn.type === "ban" ? "БАН" : "ПИК";
+    if (actionBtn) {
+        actionBtn.textContent = "КОМПЬЮТЕР: " + actionText + " " + botSelectedHero.name;
+    }
+
+    // Через 1.2 секунды бот сам нажимает кнопку подтверждения хода
+    setTimeout(() => {
+        if (!selectedHeroId) return;
+
+        if (turn.type === "ban") {
+            bannedHeroes.add(selectedHeroId);
+        } else {
+            pickedHeroes.add(selectedHeroId);
+        }
+
+        const cardFinal = document.getElementById("grid-hero-" + selectedHeroId);
+        if (cardFinal) {
+            cardFinal.classList.remove("selected");
+            cardFinal.classList.add("disabled");
+        }
+
+        const targetSlotId = turn.team === "radiant" ? "slot-left-" + currentStepIndex : "slot-right-" + currentStepIndex;
+        const slot = document.getElementById(targetSlotId);
+        if (slot) {
+            slot.classList.remove("empty-slot", "active-slot");
+            slot.classList.add(turn.type === "ban" ? "filled-ban" : "filled-pick");
+            slot.innerHTML = `<span style="font-size: 14px;">${botSelectedHero.icon}</span>`;
+        }
+
+        currentStepIndex++;
+        selectedHeroId = null;
+        updateUI();
+
+        // Проверяем следующий ход (вдруг опять ходит бот)
+        setTimeout(checkBotTurn, 400);
+    }, 1200);
+}
+
+// 3. Блокируем клики игрока по сетке, когда наступает ход компьютера (Dire)
+const originalSelectHero = selectHero;
+selectHero = function(heroId) {
+    if (currentStepIndex >= draftSequence.length) return;
+    if (draftSequence[currentStepIndex].team === "dire") return; // Ход ИИ — кликать нельзя
+    
+    originalSelectHero(heroId);
+};
 }
