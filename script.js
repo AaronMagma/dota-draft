@@ -179,7 +179,6 @@ if (!targetContainer) return;
 const card = document.createElement("div");
 card.className = "hero-card";
 card.id = grid-hero-${hero.id};
-// УВЕЛИЧЕННЫЙ ВАРИАНТ: Текст теперь белый, жирный (9px) и на контрастной подложке
 card.innerHTML = <div style="display: flex; flex-direction: column; align-items: center; justify-content: space-between; width: 100%; height: 100%; padding-top: 5px; box-sizing: border-box;"> <span style="font-size: 20px; line-height: 1;">${hero.icon}</span> <div style="background: rgba(0, 0, 0, 0.75); width: 100%; text-align: center; padding: 2px 0;"> <span style="font-size: 9px; font-weight: 900; color: #ffffff; letter-spacing: 0.4px; text-transform: uppercase; white-space: nowrap; display: block; overflow: hidden; text-overflow: ellipsis; max-width: 100%; padding: 0 2px; box-sizing: border-box;">${hero.name}</span> </div> </div>;
 card.addEventListener("click", () => selectHero(hero.id));
 targetContainer.appendChild(card);
