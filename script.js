@@ -159,11 +159,10 @@ document.addEventListener("DOMContentLoaded", () => {
     renderHeroesGrid();
     renderDraftRows();
     updateUI();
-    
     const actionBtn = document.getElementById("action-btn");
     actionBtn.addEventListener("click", commitCurrentTurn);
 
-    // 🔥 БОТ ПРОСЫПАЕТСЯ СРАЗУ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+    // ВОТ ЭТА СТРОЧКА: заставит бота мгновенно проснуться при открытии сайта!
     setTimeout(checkBotTurn, 500); 
 });
 function renderHeroesGrid() {
@@ -212,122 +211,154 @@ rightCol.appendChild(rightSlot);
 });
 }
 function selectHero(heroId) {
-if (currentStepIndex >= draftSequence.length) return;
-if (bannedHeroes.has(heroId) || pickedHeroes.has(heroId)) return;
-// 🔥 БЛОКИРОВКА КЛИКОВ: Игрок не может нажимать на сетку, если ходит Dire (ИИ)
-if (draftSequence[currentStepIndex].team === "dire") return;
-if (selectedHeroId) {
-const oldCard = document.getElementById("grid-hero-" + selectedHeroId); // 🔥 Исправлено
-if (oldCard) oldCard.classList.remove("selected");
+    if (currentStepIndex >= draftSequence.length) return;
+    if (bannedHeroes.has(heroId) || pickedHeroes.has(heroId)) return;
+    
+    // БЛОКИРОВКА: Игрок не может выбирать героев кликом, если сейчас ходит Dire (ИИ)
+    if (draftSequence[currentStepIndex].team === "dire") return; 
+
+    if (selectedHeroId) {
+        const oldCard = document.getElementById(`grid-hero-${selectedHeroId}`);
+        if (oldCard) oldCard.classList.remove("selected");
+    }
+
+    selectedHeroId = heroId;
+    const newCard = document.getElementById(`grid-hero-${heroId}`);
+    if (newCard) newCard.classList.add("selected");
+    updateUI();
 }
-selectedHeroId = heroId;
-const newCard = document.getElementById("grid-hero-" + heroId); // 🔥 Исправлено
-if (newCard) newCard.classList.add("selected");
-updateUI();
-}
+
 function commitCurrentTurn() {
-if (!selectedHeroId || currentStepIndex >= draftSequence.length) return;
-const currentTurn = draftSequence[currentStepIndex];
-const hero = heroesPool.find(h => h.id === selectedHeroId);
-if (currentTurn.type === "ban") {
-bannedHeroes.add(selectedHeroId);
-} else {
-pickedHeroes.add(selectedHeroId);
+    if (!selectedHeroId || currentStepIndex >= draftSequence.length) return;
+
+    const currentTurn = draftSequence[currentStepIndex];
+    const hero = heroesPool.find(h => h.id === selectedHeroId);
+
+    if (currentTurn.type === "ban") {
+        bannedHeroes.add(selectedHeroId);
+    } else {
+        pickedHeroes.add(selectedHeroId);
+    }
+
+    const card = document.getElementById(`grid-hero-${selectedHeroId}`);
+    if (card) {
+        card.classList.remove("selected");
+        card.classList.add("disabled");
+    }
+
+    const targetSlotId = currentTurn.team === "radiant" ? `slot-left-${currentStepIndex}` : `slot-right-${currentStepIndex}`;
+    const slot = document.getElementById(targetSlotId);
+    if (slot) {
+        slot.classList.remove("empty-slot", "active-slot");
+        slot.classList.add(currentTurn.type === "ban" ? "filled-ban" : "filled-pick");
+        slot.innerHTML = `<span style="font-size: 14px;">${hero.icon}</span>`;
+    }
+
+    currentStepIndex++;
+    selectedHeroId = null;
+    updateUI();
+
+    // Запускаем проверку следующего хода (не пойдет ли бот)
+    setTimeout(checkBotTurn, 400); 
 }
-const card = document.getElementById("grid-hero-" + selectedHeroId); // 🔥 Исправлено
-if (card) {
-card.classList.remove("selected");
-card.classList.add("disabled");
-}
-const targetSlotId = currentTurn.team === "radiant" ? "slot-left-" + currentStepIndex : "slot-right-" + currentStepIndex; // 🔥 Исправлено
-const slot = document.getElementById(targetSlotId);
-if (slot) {
-slot.classList.remove("empty-slot", "active-slot");
-slot.classList.add(currentTurn.type === "ban" ? "filled-ban" : "filled-pick");
-slot.innerHTML = <span style="font-size: 13px;">${hero.icon}</span>;
-}
-currentStepIndex++;
-selectedHeroId = null;
-updateUI();
-// 🔥 ПЕРЕДАЕМ ХОД РОБОТУ С ПАУЗОЙ
-setTimeout(checkBotTurn, 400);
-}
+
 function updateUI() {
-const statusMsg = document.getElementById("status-message");
-const actionBtn = document.getElementById("action-btn");
-document.querySelectorAll(".slot-display").forEach(s => s.classList.remove("active-slot"));
-if (currentStepIndex >= draftSequence.length) {
-statusMsg.textContent = "ДРАФТ ЗАВЕРШЕН!";
-statusMsg.style.color = "#22c55e";
-actionBtn.textContent = "КОНЕЦ";
-actionBtn.className = "disabled";
-return;
+    const statusMsg = document.getElementById("status-message");
+    const actionBtn = document.getElementById("action-btn");
+
+    document.querySelectorAll(".slot-display").forEach(s => s.classList.remove("active-slot"));
+
+    if (currentStepIndex >= draftSequence.length) {
+        statusMsg.textContent = "ДРАФТ ЗАВЕРШЕН!";
+        statusMsg.style.color = "#22c55e";
+        actionBtn.textContent = "КОНЕЦ";
+        actionBtn.className = "disabled";
+        return;
+    }
+
+    const turn = draftSequence[currentStepIndex];
+    const teamName = turn.team === "radiant" ? "Radiant (Свет)" : "Dire (Тьма)";
+    const actionName = turn.type === "ban" ? "БАНИТ" : "ВЫБИРАЕТ";
+    
+    statusMsg.textContent = `${teamName}\n${actionName}`;
+    statusMsg.style.color = turn.team === "radiant" ? "#22c55e" : "#f87171";
+
+    const activeSlotId = turn.team === "radiant" ? `slot-left-${currentStepIndex}` : `slot-right-${currentStepIndex}`;
+    const activeSlot = document.getElementById(activeSlotId);
+    if (activeSlot) {
+        activeSlot.classList.add("active-slot");
+    }
+
+    // Если сейчас ходит ИИ (Dire), кнопка для игрока намертво блокируется
+    if (turn.team === "dire") {
+        actionBtn.textContent = "ДУМАЕТ КОМПЬЮТЕР...";
+        actionBtn.className = "disabled";
+        return;
+    }
+
+    if (selectedHeroId) {
+        const selectedHero = heroesPool.find(h => h.id === selectedHeroId);
+        actionBtn.textContent = `ПОДТВЕРДИТЬ: ${selectedHero.name}`;
+        actionBtn.className = "player-turn";
+    } else {
+        actionBtn.textContent = turn.type === "ban" ? "ЗАБАНЬТЕ ГЕРОЯ" : "ВЫБЕРИТЕ ГЕРОЯ";
+        actionBtn.className = "disabled";
+    }
 }
-const turn = draftSequence[currentStepIndex];
-const teamName = turn.team === "radiant" ? "Radiant (Свет)" : "Dire (Тьма)";
-const actionName = turn.type === "ban" ? "БАНИТ" : "ВЫБИРАЕТ";
-statusMsg.textContent = turn.team === "radiant" ? "Radiant (Свет)\n" + actionName : "Dire (Тьма)\n" + actionName;
-statusMsg.style.color = turn.team === "radiant" ? "#22c55e" : "#f87171";
-const activeSlotId = turn.team === "radiant" ? "slot-left-" + currentStepIndex : "slot-right-" + currentStepIndex; // 🔥 Исправлено
-const activeSlot = document.getElementById(activeSlotId);
-if (activeSlot) {
-activeSlot.classList.add("active-slot");
-}
-// 🔥 ЕСЛИ СЕЙЧАС ХОДИТ DIRE — КНОПКА ПОДТВЕРЖДЕНИЯ ДЛЯ ИГРОКА ЗАБЛОКИРОВАНА
-if (turn.team === "dire") {
-actionBtn.textContent = "ДУМАЕТ КОМПЬЮТЕР...";
-actionBtn.className = "disabled";
-return;
-}
-if (selectedHeroId) {
-const selectedHero = heroesPool.find(h => h.id === selectedHeroId);
-actionBtn.textContent = "ПОДТВЕРДИТЬ: " + selectedHero.name;
-actionBtn.className = "player-turn";
-} else {
-actionBtn.textContent = turn.type === "ban" ? "ЗАБАНЬТЕ ГЕРОЯ" : "ВЫБЕРИТЕ ГЕРОЯ";
-actionBtn.className = "disabled";
-}
-}
-// 🔥 ПОЛНОЦЕННЫЙ ИИ-АЛГОРИТМ БОТА
+
+// ЛОГИКА АВТОМАТИЧЕСКОГО ХОДА БОТА
 function checkBotTurn() {
-if (currentStepIndex >= draftSequence.length) return;
-const turn = draftSequence[currentStepIndex];
-if (turn.team === "radiant") return; // Ход игрока, бот ждет
-const availableHeroes = heroesPool.filter(h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id));
-if (availableHeroes.length === 0) return;
-const randomIndex = Math.floor(Math.random() * availableHeroes.length);
-const botSelectedHero = availableHeroes[randomIndex];
-selectedHeroId = botSelectedHero.id;
-const card = document.getElementById("grid-hero-" + selectedHeroId); // 🔥 Исправлено
-if (card) {
-card.classList.add("selected");
-}
-const actionBtn = document.getElementById("action-btn");
-const actionText = turn.type === "ban" ? "БАН" : "ПИК";
-actionBtn.textContent = "КОМПЬЮТЕР: " + actionText + " " + botSelectedHero.name;
-setTimeout(() => {
-if (!selectedHeroId) return;
-if (turn.type === "ban") {
-bannedHeroes.add(selectedHeroId);
-} else {
-pickedHeroes.add(selectedHeroId);
-}
-const cardFinal = document.getElementById("grid-hero-" + selectedHeroId); // 🔥 Исправлено
-if (cardFinal) {
-cardFinal.classList.remove("selected");
-cardFinal.classList.add("disabled");
-}
-const targetSlotId = turn.team === "radiant" ? "slot-left-" + currentStepIndex : "slot-right-" + currentStepIndex; // 🔥 Исправлено
-const slot = document.getElementById(targetSlotId);
-if (slot) {
-slot.classList.remove("empty-slot", "active-slot");
-slot.classList.add(turn.type === "ban" ? "filled-ban" : "filled-pick");
-slot.innerHTML = <span style="font-size: 14px;">${botSelectedHero.icon}</span>;
-}
-currentStepIndex++;
-selectedHeroId = null;
-updateUI();
-// Проверяем следующий ход (у Тьмы есть сдвоенные ходы)
-setTimeout(checkBotTurn, 400);
-}, 1200);
+    if (currentStepIndex >= draftSequence.length) return;
+
+    const turn = draftSequence[currentStepIndex];
+    if (turn.team === "radiant") return; // Ход игрока, бот смиренно ждет
+
+    const availableHeroes = heroesPool.filter(h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id));
+    if (availableHeroes.length === 0) return;
+
+    const randomIndex = Math.floor(Math.random() * availableHeroes.length);
+    const botSelectedHero = availableHeroes[randomIndex];
+
+    // Имитируем «подсвечивание» выбора бота на экране
+    selectedHeroId = botSelectedHero.id;
+    const card = document.getElementById(`grid-hero-${selectedHeroId}`);
+    if (card) {
+        card.classList.add("selected");
+    }
+
+    const actionBtn = document.getElementById("action-btn");
+    const actionText = turn.type === "ban" ? "БАН" : "ПИК";
+    actionBtn.textContent = `КОМПЬЮТЕР: ${actionText} ${botSelectedHero.name}`;
+
+    // Пауза 1.2 секунды для реалистичности, затем бот подтверждает свой ход сам
+    setTimeout(() => {
+        if (!selectedHeroId) return; // На случай непредвиденных сбросов
+
+        if (turn.type === "ban") {
+            bannedHeroes.add(selectedHeroId);
+        } else {
+            pickedHeroes.add(selectedHeroId);
+        }
+
+        const cardFinal = document.getElementById(`grid-hero-${selectedHeroId}`);
+        if (cardFinal) {
+            cardFinal.classList.remove("selected");
+            cardFinal.classList.add("disabled");
+        }
+
+        const targetSlotId = turn.team === "radiant" ? `slot-left-${currentStepIndex}` : `slot-right-${currentStepIndex}`;
+        const slot = document.getElementById(targetSlotId);
+        if (slot) {
+            slot.classList.remove("empty-slot", "active-slot");
+            slot.classList.add(turn.type === "ban" ? "filled-ban" : "filled-pick");
+            slot.innerHTML = `<span style="font-size: 14px;">${botSelectedHero.icon}</span>`;
+        }
+
+        currentStepIndex++;
+        selectedHeroId = null;
+        updateUI();
+
+        // Проверяем, не идет ли следующий ход опять за ботом (ведь у Тьмы есть сдвоенные ходы)
+        setTimeout(checkBotTurn, 400);
+    }, 1200);
 }
