@@ -269,12 +269,7 @@ export function selectHero(heroId) {
     updateUI(); // Обновляем интерфейс кнопки действия
 }
 
-/**
- * Подтверждает выбор игрока или компьютера.
- *
- * ВАЖНО! Эта функция осталась из вашего старого кода,
- * она должна работать без изменений.
- */
+
 export function commitCurrentTurn() {
     if (!selectedHeroId || currentStepIndex >= draftSequence.length) return;
 
