@@ -80,7 +80,7 @@
                 <div id="uni-container" class="grid-container"></div>
             </div>
         </div>
-        <button id="team-switcher" style="margin-bottom: 5px;">Сменить команду</button>
+
         <!-- ПАНЕЛЬ ДРАФТА -->
         <div class="sidebar-draft">
             <div class="mode-title">Captains Mode</div>
@@ -103,9 +103,13 @@
         </div>
     </div>
 
-   <!-- Версия v=20260908 для сброса кэша -->
-<script type="module" src="/dota-draft/analyzer.js?v=20260908"></script>
-<script type="module" src="/dota-draft/script.js?v=20260908"></script>
-<script type="module" src="/dota-draft/gameLogic.js?v=20260908"></script>
+    <!-- Подключаем движок аналитики -->
+<script type="module" src="/dota-draft/analyzer.js"></script>
+
+<!-- Подключаем основную логику игры -->
+<script type="module" src="/dota-draft/gameLogic.js"></script>
+
+<!-- ВАШ СТАРЫЙ ФАЙЛ ПОДКЛЮЧАЕМ КАК МОДУЛЬ! -->
+<script type="module" src="/dota-draft/script.js"></script>
 </body>
 </html>
