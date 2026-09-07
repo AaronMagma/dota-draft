@@ -1,144 +1,83 @@
 // analyzer.js — движок аналитики драфта Dota 2
 
 /**
- * Пул всех героев. Для каждого героя указаны его роли в виде цифр позиций: [1] = керри, [4, 5] = саппорты.
+ * Получение актуального пула всех героев с dotabuff.com.
+ *
+ * @returns {Array} Массив объектов героев со свойствами:
+ *   id - строка ID героя (например, "axe")
+ *   name - локализованное имя героя
+ *   role - массив позиций [1-5]
+ *   winrate - средневзвешенный винрейт по всем MMR-диапазонам (%)
  */
-const heroesPool = [
-    // Strength
-    { id: 'alchemist', name: 'Alchemist', role: [1], icon: "🧪" },
-    { id: 'axe', name: 'Axe', role: [3], icon: "🪓" },
-    { id: 'bristleback', name: 'Bristleback', role: [3], icon: "🦔" },
-    { id: 'centaur', name: 'Centaur Warrunner', role: [3, 2], icon: "🛡️" },
-    { id: 'chaos_knight', name: 'Chaos Knight', role: [1, 3], icon: "🐴" },
-    { id: 'clockwerk', name: 'Clockwerk', role: [4, 5], icon: "⚙️" },
-    { id: 'dawnbreaker', name: 'Dawnbreaker', role: [3], icon: "🔨" },
-    { id: 'doom', name: 'Doom', role: [3, 1], icon: "😈" },
-    { id: 'dragon_knight', name: 'Dragon Knight', role: [2, 1], icon: "🐉" },
-    { id: 'earth_spirit', name: 'Earth Spirit', role: [2], icon: "🟢" },
-    { id: 'earthshaker', name: 'Earthshaker', role: [2], icon: "🪨" },
-    { id: 'elder_titan', name: 'Elder Titan', role: [4, 5], icon: "🤠" },
-    { id: 'huskar', name: 'Huskar', role: [2, 3], icon: "🩸" },
-    { id: 'kunkka', name: 'Kunkka', role: [2, 3], icon: "⚓" },
-    { id: 'largo', name: 'Largo', role: [3], icon: "🥊" },
-    { id: 'legion_commander', name: 'Legion Commander', role: [3], icon: "🚩" },
-    { id: 'lifestealer', name: 'Lifestealer', role: [1], icon: "🦷" },
-    { id: 'lycan', name: 'Lycan', role: [2, 3], icon: "🐺" },
-    { id: 'mars', name: 'Mars', role: [3], icon: "⭕" },
-    { id: 'night_stalker', name: 'Night Stalker', role: [3], icon: "🦇" },
-    { id: 'ogre_magi', name: 'Ogre Magi', role: [4, 5], icon: "👥" },
-    { id: 'omniknight', name: 'Omniknight', role: [4, 5], icon: "🛡️" },
-    { id: 'phoenix', name: 'Phoenix', role: [4, 5], icon: "🦅" },
-    { id: 'primal_beast', name: 'Primal Beast', role: [2, 3], icon: "🦖" },
-    { id: 'pudge', name: 'Pudge', role: [1, 2, 3, 4, 5], icon: "🥩" },
-    { id: 'slardar', name: 'Slardar', role: [3, 2], icon: "🐟" },
-    { id: 'spirit_breaker', name: 'Spirit Breaker', role: [3, 4, 5], icon: "🐮" },
-    { id: 'sven', name: 'Sven', role: [1], icon: "⚔️" },
-    { id: 'tidehunter', name: 'Tidehunter', role: [3], icon: "🍉" },
-    { id: 'timbersaw', name: 'Timbersaw', role: [3, 2], icon: "🌲" },
-    { id: 'tiny', name: 'Tiny', role: [1], icon: "🗿" },
-    { id: 'treant_protector', name: 'Treant Protector', role: [4, 5], icon: "🌳" },
-    { id: 'tusk', name: 'Tusk', role: [4, 5], icon: "❄️" },
-    { id: 'underlord', name: 'Underlord', role: [3], icon: "🟢" },
-    { id: 'undying', name: 'Undying', role: [3, 4, 5], icon: "🧟" },
-    { id: 'wraith_king', name: 'Wraith King', role: [1], icon: "👑" },
+export async function fetchHeroesMeta() {
+    const headers = {
+        // Заголовки нужны, чтобы обойти Cloudflare
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+        'Accept-Language': 'ru-RU,ru;q=0.9'
+    };
 
-    // Agility
-    { id: 'anti_mage', name: 'Anti-Mage', role: [1], icon: "🔮" },
-    { id: 'bloodseeker', name: 'Bloodseeker', role: [1], icon: "🩸" },
-    { id: 'bounty_hunter', name: 'Bounty Hunter', role: [4, 5], icon: "💰" },
-    { id: 'broodmother', name: 'Broodmother', role: [2, 1], icon: "🕷️" },
-    { id: 'clinkz', name: 'Clinkz', role: [1], icon: "🏹" },
-    { id: 'drow_ranger', name: 'Drow Ranger', role: [1], icon: "❄️" },
-    { id: 'ember_spirit', name: 'Ember Spirit', role: [2], icon: "🔥" },
-    { id: 'faceless_void', name: 'Faceless Void', role: [1], icon: "⏳" },
-    { id: 'gyrocopter', name: 'Gyrocopter', role: [1], icon: "🚀" },
-    { id: 'hoodwink', name: 'Hoodwink', role: [4, 5], icon: "🐿️" },
-    { id: 'juggernaut', name: 'Juggernaut', role: [1], icon: "👺" },
-    { id: 'kez', name: 'Kez', role: [1, 2], icon: "🦤" },
-    { id: 'lone_druid', name: 'Lone Druid', role: [1], icon: "🐻" },
-    { id: 'luna', name: 'Luna', role: [1], icon: "🌙" },
-    { id: 'medusa', name: 'Medusa', role: [1], icon: "🐍" },
-    { id: 'meepo', name: 'Meepo', role: [1, 2], icon: "⛏️" },
-    { id: 'mirana', name: 'Mirana', role: [4, 5], icon: "🐯" },
-    { id: 'monkey_king', name: 'Monkey King', role: [1, 2], icon: "🐒" },
-    { id: 'morphling', name: 'Morphling', role: [1, 2], icon: "🌊" },
-    { id: 'naga_siren', name: 'Naga Siren', role: [1], icon: "🧜" },
-    { id: 'phantom_assassin', name: 'Phantom Assassin', role: [1], icon: "🗡️" },
-    { id: 'phantom_lancer', name: 'Phantom Lancer', role: [1], icon: "🐒" },
-    { id: 'razor', name: 'Razor', role: [1, 3, 2], icon: "⚡" },
-    { id: 'riki', name: 'Riki', role: [1, 2], icon: "👣" },
-    { id: 'shadow_fiend', name: 'Shadow Fiend', role: [1, 2], icon: "💀" },
-    { id: 'slark', name: 'Slark', role: [1, 2], icon: "🦈" },
-    { id: 'sniper', name: 'Sniper', role: [1, 2], icon: "🎯" },
-    { id: 'spectre', name: 'Spectre', role: [1], icon: "👻" },
-    { id: 'templar_assassin', name: 'Templar Assassin', role: [1], icon: "💜" },
-    { id: 'terrorblade', name: 'Terrorblade', role: [1], icon: "😈" },
-    { id: 'troll_warlord', name: 'Troll Warlord', role: [1], icon: "🪓" },
-    { id: 'ursa', name: 'Ursa', role: [1], icon: "🐻" },
-    { id: 'vengeful_spirit', name: 'Vengeful Spirit', role: [4, 5, 1], icon: "🦅" },
-    { id: 'viper', name: 'Viper', role: [2, 3], icon: "🐍" },
-    { id: 'weaver', name: 'Weaver', role: [1], icon: "🕷️" },
+    try {
+        // Запрашиваем страницу меты за последнюю неделю (Very High + все остальные рейтинги).
+        const response = await fetch('https://ru.dotabuff.com/heroes/meta?date=week', { headers });
+        
+        if (!response.ok) throw new Error(`Failed to fetch heroes meta: ${response.status}`);
 
-    // Intelligence
-    { id: 'ancient_apparition', name: 'Ancient Apparition', role: [4, 5], icon: "🫐" },
-    { id: 'chen', name: 'Chen', role: [4, 5], icon: "🐘" },
-    { id: 'crystal_maiden', name: 'Crystal Maiden', role: [4, 5], icon: "❄️" },
-    { id: 'dark_seer', name: 'Dark Seer', role: [3], icon: "🧠" },
-    { id: 'dark_willow', name: 'Dark Willow', role: [4, 5], icon: "🧚" },
-    { id: 'disruptor', name: 'Disruptor', role: [4, 5], icon: "🌩️" },
-    { id: 'enchantress', name: 'Enchantress', role: [4, 5], icon: "🦌" },
-    { id: 'grimstroke', name: 'Grimstroke', role: [5, 4], icon: "🖌️" },
-    { id: 'invoker', name: 'Invoker', role: [2], icon: "☄️" },
-    { id: 'jakiro', name: 'Jakiro', role: [4, 5], icon: "🐲" },
-    { id: 'keeper_of_the_light', name: 'Keeper of the Light', role: [2, 4, 5], icon: "☀️" },
-    { id: 'leshrac', name: 'Leshrac', role: [2], icon: "🐎" },
-    { id: 'lich', name: 'Lich', role: [4, 5], icon: "💀" },
-    { id: 'lina', name: 'Lina', role: [2], icon: "🔥" },
-    { id: 'lion', name: 'Lion', role: [5, 4], icon: "🦁" },
-    { id: 'muerta', name: 'Muerta', role: [1], icon: "💀" },
-    { id: 'necrophos', name: 'Necrophos', role: [2, 1], icon: "🤢" },
-    { id: 'oracle', name: 'Oracle', role: [4, 5], icon: "🔮" },
-    { id: 'outworld_destroyer', name: 'Outworld Destroyer', role: [2], icon: "🛸" },
-    { id: 'puck', name: 'Puck', role: [2], icon: "🧚" },
-    { id: 'pugna', name: 'Pugna', role: [4, 5], icon: "🟢" },
-    { id: 'queen_of_pain', name: 'Queen of Pain', role: [2], icon: "👑" },
-    { id: 'ringmaster', name: 'Ringmaster', role: [4, 5], icon: "🎪" },
-    { id: 'rubick', name: 'Rubick', role: [2, 4, 5], icon: "💚" },
-    { id: 'shadow_demon', name: 'Shadow Demon', role: [4, 5], icon: "😈" },
-    { id: 'shadow_shaman', name: 'Shadow Shaman', role: [4, 5], icon: "🐍" },
-    { id: 'silencer', name: 'Silencer', role: [4, 5], icon: "🤫" },
-    { id: 'skywrath_mage', name: 'Skywrath Mage', role: [2, 4, 5], icon: "🦅" },
-    { id: 'storm_spirit', name: 'Storm Spirit', role: [2], icon: "⚡" },
-    { id: 'tinker', name: 'Tinker', role: [2], icon: "🤖" },
-    { id: 'warlock', name: 'Warlock', role: [4, 5], icon: "📜" },
-    { id: 'winter_wyvern', name: 'Winter Wyvern', role: [4, 5], icon: "❄️" },
-    { id: 'witch_doctor', name: 'Witch Doctor', role: [4, 5], icon: "🧪" },
-    { id: 'zeus', name: 'Zeus', role: [2, 4, 5], icon: "☁️" },
+        // Парсим HTML как документ
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(await response.text(), 'text/html');
 
-    // Universal
-    { id: 'abaddon', name: 'Abaddon', role: [3, 4, 5, 1], icon: "🐴" },
-    { id: 'arc_warden', name: 'Arc Warden', role: [2], icon: "🌀" },
-    { id: 'bane', name: 'Bane', role: [4, 5], icon: "👁️" },
-    { id: 'batrider', name: 'Batrider', role: [2, 4, 3], icon: "🦇" },
-    { id: 'beastmaster', name: 'Beastmaster', role: [3, 2], icon: "🐗" },
-    { id: 'brewmaster', name: 'Brewmaster', role: [3], icon: "🐼" },
-    { id: 'dazzle', name: 'Dazzle', role: [4, 5], icon: "🔮" },
-    { id: 'death_prophet', name: 'Death Prophet', role: [3, 2], icon: "👻" },
-    { id: 'enigma', name: 'Enigma', role: [3, 5, 4], icon: "🕳️" },
-    { id: 'io', name: 'Io', role: [2, 5, 4], icon: "⚪" },
-    { id: 'magnus', name: 'Magnus', role: [3, 4], icon: "🦏" },
-    { id: 'marci', name: 'Marci', role: [3, 4, 5], icon: "👊" },
-    { id: 'natures_prophet', name: 'Nature\'s Prophet', role: [1, 2, 5, 4], icon: "🌱" },
-    { id: 'nyx_assassin', name: 'Nyx Assassin', role: [4, 5, 2], icon: "🪲" },
-    { id: 'pangolier', name: 'Pangolier', role: [2, 3], icon: "🦔" },
-    { id: 'sand_king', name: 'Sand King', role: [2, 3], icon: "🦂" },
-    { id: 'snapfire', name: 'Snapfire', role: [2, 4, 3, 5], icon: "🦎" },
-    { id: 'techies', name: 'Techies', role: [4, 5], icon: "💣" },
-    { id: 'venomancer', name: 'Venomancer', role: [4, 5], icon: "🐍" },
-    { id: 'visage', name: 'Visage', role: [2, 3], icon: "🪨" },
-    { id: 'void_spirit', name: 'Void Spirit', role: [2], icon: "🌌" },
-    { id: 'windranger', name: 'Windranger', role: [2, 1, 4], icon: "🍃" }
-];
+        // Ищем таблицу с героями
+        const rows = Array.from(doc.querySelectorAll('.table > tbody tr'));
+
+        return rows.map((row) => {
+            const heroCell = row.querySelector('[data-tooltip="Герой"] a');
+            
+            // Извлекаем ID из ссылки /heroes/alchemist -> alchemist
+            const id = heroCell.href.split('/').pop(); 
+
+            // Имя героя
+            const name = heroCell.textContent.trim();
+
+            // Позиции берутся из иконок над именем героя
+            const roles = [];
+            for (let i = 1; i <= 5; i++) {
+                if (heroCell.parentElement.querySelector(`img[data-tooltip="${i}"]`)) {
+                    roles.push(i);
+                }
+            }
+
+            // ⚡️ Считываем ВСЕ колонки с винрейтами (по разным MMR)
+            let totalWinrate = 0;
+            let count = 0;
+
+            // Проходим по первым пяти ячейкам (игнорируем первую общую)
+            for (let colIdx = 1; colIdx <= 9; colIdx += 2) {
+                const cell = row.children[colIdx];
+                if (!cell || !cell.querySelector('span')) continue;
+                
+                // Пример текста ячейки: "46.13%"
+                const winrateText = cell.querySelector('span').textContent;
+                const winrate = parseFloat(winrateText.replace('%', ''));
+
+                totalWinrate += winrate;
+                count++;
+            }
+
+            // Вычисляем средний винрейт по всем диапазонам
+            const avgWinrate = Math.round(totalWinrate / count);
+
+            return { 
+                id,
+                name,
+                role: roles,
+                winrate: avgWinrate // Средневзвешенный винрейт
+            };
+        });
+    } catch (err) {
+        console.error(err.message);
+        return [];
+    }
+}
 
 /**
  * Получение объекта героя по его ID.
@@ -146,9 +85,28 @@ const heroesPool = [
  * @param {string} heroId - Уникальный идентификатор героя.
  * @returns Объект героя или null.
  */
-export function getHero(heroId) {
-  return heroesPool.find((hero) => hero.id === heroId);
+export async function getHero(heroId) {
+  try {
+    const allHeroes = await fetchHeroesMeta();
+    
+    // Возвращает первого найденного героя с этим ID (регистр не важен)
+    return allHeroes.find((hero) => hero.id === heroId.toLowerCase());
+  } catch (err) {
+    console.error('Ошибка при получении героя:', err.message);
+    return null;
+  }
 }
+
+/**
+ * Константы для удобного перевода позиции в число.
+ */
+export const POSITION_MAP = {
+    1: 'Керри',
+    2: 'Мид / Оффлейн',
+    3: 'Оффлейн',
+    4: 'Саппорт 4',
+    5: 'Хард саппорт'
+};
 
 /**
  * Считает очки за баланс состава при распределении ролей.
@@ -162,26 +120,25 @@ export function getHero(heroId) {
  * @param {Array<number>} roleOrder Массив назначенных им позиций (от 1 до 5).
  * @returns Число набранных очков.
  */
-export function calculateRoleScore(teamHeroes, roleOrder) {
-  let score = 0;
+async function calculateRoleScore(teamHeroes, roleOrder) {
+    let score = 0;
 
-  for (let i = 0; i < 5; i++) {
-    const hero = getHero(teamHeroes[i]);
-    if (!hero || !roleOrder[i]) continue;
+    for (let i = 0; i < 5; i++) {
+        const heroObj = await getHero(teamHeroes[i]);
+        
+        // Если герой не найден на Dotabuff (например, новый), пропускаем его
+        if (!heroObj || !roleOrder[i]) continue;
 
-    const assignedPosition = parseInt(roleOrder[i]); // Позиция от 1 до 5
-    const isMainRole = hero.role[0] === assignedPosition; // Основная ли это роль?
+        const assignedPosition = parseInt(roleOrder[i]); // Позиция от 1 до 5
+        const isMainRole = heroObj.role[0] === assignedPosition;
 
-    // Проверяем, может ли герой играть на этой позиции
-    if (hero.role.includes(assignedPosition)) {
-      score += isMainRole ? 5 : 3;
-    } else {
-      // Герой не может стоять на этой позиции -> 0 очков
-      score += 0;
+        // Проверяем, может ли герой играть на этой позиции
+        if (heroObj.role.includes(assignedPosition)) {
+            score += isMainRole ? 5 : 3;
+        }
     }
-  }
 
-  return score;
+    return score;
 }
 
 /**
@@ -200,61 +157,175 @@ export function calculateRoleScore(teamHeroes, roleOrder) {
  * @param {Set<string>} enemyTeam Герои противника.
  * @returns Изменение счёта.
  */
-export function calculateDraftScore(actionType, team, heroId, enemyTeam) {
-  const hero = getHero(heroId);
+export async function calculateDraftScore(actionType, team, heroId, enemyTeam) {
+  const hero = await getHero(heroId); // <-- Добавлено await здесь
   let delta = 0;
 
-  // Мета-герои (настройка под текущую мете!)
-  const META_HEROES = new Set(['centaur', 'clockwerk', 'doom', 'earth_spirit', 'lifestealer', 'tiny', 
-                               'treant_protector', 'underlord', 'undying', 'ember_spirit', 'hoodwink', 
-                               'lone_druid', 'shadow_fiend', 'terrorblade', 'dark_willow', 'keeper_of_the_light', 
-                               'lina', 'winter_wyvern', 'bane', 'natures_prophet', 'pangolier', 'snapfire' 
-    /* Добавь сюда актуальные ID по твоей текущей мете.
-       Например: 'treant_protector', 'ember_spirit', 'mars'
-     */
-  ]);
-
-  // Контрпики (добавляй свои пары здесь)
-  const COUNTERS = {
-    axe: ['slark', 'outworld_destroyer', 'timbersaw', 'shadow_demon', 'pugna', ], // Axe сильно контрит Slark
-    alchemist : ['lifestealer', 'necrophos', 'doom', 'ancient_apparition'],
-    bristleback : ['slark', 'viper', 'legion_commander', 'hoodwink', 'ancient_apparition'],
-    centaur : ['lifestealer', 'timbersaw', 'disruptor', 'underlord', 'treant_protector', 'puck'],
-    chaos_knight : ['naga_siren', 'puck', 'sand_king', 'earthshaker', 'phoenix'],
-    dawnbreaker : ['weaver', 'viper', 'underlord', 'nyx_assassin', 'silencer'],
-    doom : ['wraith_king', 'lone_druid', 'centaur', 'rubick', 'oracle'],
-    dragon_knight : ['huskar', 'slark', 'viper', 'shadow_shaman', 'hoodwink'],
-    earth_spirit : ['slark', 'lone_druid', 'tidehunter', 'clockwerk'],
-    earthshaker : ['spectre', 'templar_assassin', 'night_stalker', 'venomancer', 'clockwerk'],
-    elder_titan : ['templar_assassin', 'puck', 'dark_seer', 'clockwerk', 'lich'],
-    // Добавь другие примеры ниже
-  };
-
   switch (actionType) {
-    case 'pick':
-      // Очки за мета-пика
-      if (META_HEROES.has(heroId)) delta += 10;
+      case 'pick':
+          // Очки за мета-пика
+          // ❗️ МЕТА-ГЕРОИ ТЕПЕРЬ ОПРЕДЕЛЯЮТСЯ ДИНАМИЧЕСКИ ПО ВИНРЕЙТУ!
+          // Герой считается мета, если его общий винрейт >= 54%
+          if (hero && hero.winrate >= 54) delta += 10;
 
-      // Контрпики
-      for (const enemy of enemyTeam.values()) {
-        const enemyObj = getHero(enemy);
-        if (!enemyObj || !COUNTERS[heroId]) continue;
+          // Контрпики
+          for (const enemy of enemyTeam.values()) {
+              const enemyObj = await getHero(enemy); // <-- Добавлено await здесь
+              if (!enemyObj || !COUNTERS[heroId]) continue;
 
-        // Мы кого-то законтрили
-        if (COUNTERS[heroId]?.includes(enemy.id)) {
-          delta += 15; // Твой бонус за контр-пик
-        }
+              // Мы кого-то законтрили
+              if (COUNTERS[heroId]?.includes(enemy.id)) {
+                  delta += 15; // Твой бонус за контр-пик
+              }
 
-        // Нас законтрил враг
-        if (COUNTERS[enemy.id]?.includes(hero.id)) {
-          delta -= Math.floor(15 * 0.7); // Штраф ~ -10
-        }
-      }
-      break;
+              // Нас законтрил враг
+              if (COUNTERS[enemy.id]?.includes(hero.id)) {
+                  delta -= Math.floor(15 * 0.7); // Штраф ~ -10
+              }
+          }
+          break;
 
-    // ❗ ВАЖНО: Бан любого героя НЕ влияет на очки!
-    // case 'ban': ... удалено
+      // ❗ ВАЖНО: Бан любого героя НЕ влияет на очки!
+      // case 'ban': ... удалено
   }
 
   return delta;
 }
+
+/**
+ * Таблица контрпиков.
+ * Добавляй свои пары здесь.
+ */
+export const COUNTERS = {
+    // --- STRENGTH ---
+    alchemist: ['ancient_apparition', 'viper', 'silencer'],
+    axe: ['slark', 'timbersaw', 'pugna', 'brewmaster', 'spectre'],
+    bristleback: ['viper', 'ancient_apparition', 'silencer', 'skywrath_mage', 'grimstroke'],
+    centaur_warrunner: ['ember_spirit', 'storm_spirit', 'queen_of_pain', 'void_spirit', 'lina'],
+    chaos_knight: ['spectre', 'naga_siren', 'phantom_lancer', 'morphling', 'arc_warden'],
+    clockwerk: ['mirana', 'bounty_hunter'], // заглушка против инвизников
+    dawnbreaker: ['weaver', 'viper', 'nyx_assassin', 'silencer'],
+    doom: ['wraith_king', 'medusa', 'terrorblade', 'luna', 'abaddon'],
+    dragon_knight: ['viper', 'huskar', 'bounty_hunter', 'weaver', 'troll_warlord'],
+    earth_spirit: ['slark', 'riki', 'clinkz', 'troll_warlord', 'windranger'],
+    earthshaker: ['spectre', 'templar_assassin', 'faceless_void', 'antimage', 'drow_ranger'],
+    elder_titan: ['puck', 'templar_assassin', 'dark_seer', 'clockwerk'],
+    huskar: ['ancient_apparition', 'outworld_destroyer', 'lich', 'shadow_shaman', 'bane'],
+    kunkka: ['ancient_apparition', 'rubick', 'keeper_of_the_light', 'death_prophet'],
+    legion_commander: ['phantom_lancer', 'naga_siren', 'broodmother', 'chaos_knight', 'lone_druid'],
+    lifestealer: ['axe', 'earthshaker', 'abyssal_underlord', 'doom', 'spirit_breaker'],
+    lycan: ['ancient_apparition', 'vengeful_spirit', 'keeper_of_the_light', 'dazzle'],
+    mars: ['gyrocopter', 'drow_ranger', 'sniper', 'windranger'],
+    night_stalker: ['lone_druid', 'meepo', 'beastmaster', 'chen', 'furion'],
+    ogre_magi: ['ancient_apparition', 'skywrath_mage', 'zuus', 'rubick'],
+    omniknight: ['invoker', 'ancient_apparition', 'viper', 'grimstroke'],
+    phoenix: ['ancient_apparition', 'ember_spirit', 'zuus', 'skywrath_mage'],
+    primal_beast: ['grimstroke', 'oracle', 'ancient_apparition', 'undying'],
+    pudge: ['drow_ranger', 'sniper', 'windranger', 'hoodwink', 'gyrocopter'],
+    slardar: ['templar_assassin', 'morphling', 'arc_warden', 'troll_warlord', 'razor'],
+    spirit_breaker: ['puck', 'storm_spirit', 'ember_spirit', 'queen_of_pain', 'tusk'],
+    sven: ['slardar', 'ancient_apparition', 'disruptor', 'death_prophet'],
+    tidehunter: ['gyrocopter', 'luna', 'drow_ranger', 'sniper', 'windranger'],
+    timbersaw: ['ancient_apparition', 'bloodseeker', 'axe', 'primal_beast'],
+    tiny: ['ursa', 'bloodseeker', 'legion_commander', 'slardar', 'bristleback'],
+    treant_protector: ['nyx_assassin', 'bounty_hunter', 'spirit_breaker', 'batrider'],
+    tusk: ['monkey_king', 'spectre', 'faceless_void', 'medusa', 'terrorblade'],
+    underlord: ['enchantress', 'broodmother', 'natures_prophet', 'furion'],
+    undying: ['rubick', 'pugna', 'ancient_apparition', 'keeper_of_the_light'],
+    wraith_king: ['pugna', 'ancient_apparition', 'grimstroke', 'oracle'],
+
+    // AGILITY
+    antimage: ['templar_assassin', 'nyx_assassin', 'dazzle', 'oracle', 'rubick'],
+    bloodseeker: ['axe', 'primal_beast', 'centaur_warrunner', 'mars', 'kunkka'],
+    bounty_hunter: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke', 'phoenix'],
+    broodmother: ['ancient_apparition', 'earthshaker', 'nevermore', 'invoker', 'tiny'],
+    clinkz: ['ancient_apparition', 'undying', 'necrophos', 'witch_doctor', 'warlock'],
+    drow_ranger: ['bounty_hunter', 'spirit_breaker', 'axe', 'tidehunter', 'centaur_warrunner'],
+    ember_spirit: ['ancient_apparition', 'skywrath_mage', 'zuus', 'rubick', 'disruptor'],
+    faceless_void: ['spectre', 'earthshaker', 'magnus', 'slardar', 'dragon_knight'],
+    gyrocopter: ['ancient_apparition', 'grimstroke', 'oracle', 'winter_wyvern'],
+    hoodwink: ['ancient_apparition', 'rubick', 'keeper_of_the_light', 'death_prophet'],
+    juggernaut: ['ancient_apparition', 'disruptor', 'death_prophet', 'warlock', 'enigma'],
+    kez: ['ancient_apparition', 'keeper_of_the_light', 'silencer', 'rubick'],
+    lone_druid: ['chen', 'enigma', 'earthshaker', 'magnus', 'beastmaster'],
+    luna: ['vengeful_spirit', 'dazzle', 'oracle', 'abaddon', 'winter_wyvern'],
+    medusa: ['viper', 'ancient_apparition', 'skywrath_mage', 'silencer', 'zeus'],
+    meepo: ['earthshaker', 'enigma', 'magnus', 'void_spirit', 'ember_spirit'],
+    mirana: ['keeper_of_the_light', 'night_stalker', 'bounty_hunter', 'viper'],
+    monkey_king: ['earthshaker', 'enigma', 'magnus', 'tidehunter', 'centaur_warrunner'],
+    morphling: ['ember_spirit', 'queen_of_pain', 'skywrath_mage', 'lina', 'ancient_apparition'],
+    naga_siren: ['earthshaker', 'tidehunter', 'magnus', 'enigma', 'dark_seer'],
+    phantom_assassin: ['axe', 'beastmaster', 'legion_commander', 'abyssal_underlord', 'spirit_breaker'],
+    phantom_lancer: ['ancient_apparition', 'earthshaker', 'magnus', 'kunkka', 'enigma'],
+    razor: ['chen', 'enigma', 'earthshaker', 'magnus', 'jakiro'],
+    riki: ['ancient_apparition', 'keeper_of_the_light', 'skywrath_mage', 'rubick', 'grimstroke'],
+    shadow_fiend: [], // заглушка под ранний прессинг/ганк
+    slark: ['bounty_hunter', 'bloodseeker', 'slardar', 'spirit_breaker', 'axe'],
+    sniper: ['spirit_breaker', 'bounty_hunter', 'pudge', 'axe', 'centaur_warrunner'],
+    spectre: ['ancient_apparition', 'earthshaker', 'doom', 'axe', 'magnus'],
+    templar_assassin: ['invoker', 'ancient_apparition', 'earthshaker', 'nevermore', 'lina'],
+    terrorblade: ['ancient_apparition', 'grimstroke', 'vengeful_spirit', 'earthshaker', 'axe'],
+    troll_warlord: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke', 'phoenix'],
+    ursa: ['winter_wyvern', 'beastmaster', 'phoenix', 'keeper_of_the_light', 'dazzle'],
+    vengeful_spirit: ['invoker', 'ancient_apparition', 'viper', 'grimstroke'],
+    viper: ['ancient_apparition', 'zuus', 'rubick', 'keeper_of_the_light'],
+    weaver: ['bane', 'bloodseeker', 'skywrath_mage', 'ancient_apparition', 'silencer'],
+
+    // INTELLIGENCE
+    ancient_apparition: ['tiny', 'spirit_breaker', 'pudge', 'axe', 'centaur_warrunner'],
+    chen: ['night_stalker', 'bounty_hunter', 'riki', 'naga_siren'],
+    crystal_maiden: ['bounty_hunter', 'nyx_assassin', 'centaur_warrunner', 'spirit_breaker', 'axe'],
+    dark_seer: ['puck', 'rubick', 'keeper_of_the_light', 'death_prophet'],
+    dark_willow: ['juggernaut', 'faceless_void', 'sven', 'wraith_king'],
+    disruptor: ['storm_spirit', 'ember_spirit', 'queen_of_pain', 'puck', 'riki'],
+    enchantress: ['heroes_with_burst', 'outworld_destroyer', 'lion', 'skywrath_mage', 'lina'],
+    grimstroke: ['juggernaut', 'faceless_void', 'sven', 'wraith_king', 'troll_warlord'],
+    invoker: ['legion_commander', 'axe', 'centaur_warrunner', 'bristleback', 'ursa'],
+    jakiro: ['ancient_apparition', 'rubick', 'keeper_of_the_light', 'death_prophet'],
+    keeper_of_the_light: ['night_stalker', 'bounty_hunter', 'riki', 'naga_siren', 'clinkz'],
+    leshrac: ['nyx_assassin', 'silencer', 'disruptor', 'rubick', 'oracle'],
+    lich: ['ancient_apparition', 'rubick', 'keeper_of_the_light', 'death_prophet'],
+    lina: ['lion', 'legion_commander', 'axe', 'faceless_void', 'centaur_warrunner'],
+    lion: ['juggernaut', 'omniknight', 'legion_commander', 'faceless_void', 'troll_warlord'],
+    muerta: ['ancient_apparition', 'zuus', 'rubick', 'keeper_of_the_light'],
+    necrophos: ['silencer', 'axe', 'doom', 'spirit_breaker', 'legion_commander'],
+    oracle: ['juggernaut', 'legion_commander', 'axe', 'faceless_void', 'troll_warlord'],
+    outworld_destroyer: ['enigma', 'earthshaker', 'beastmaster', 'nyx_assassin'],
+    puck: ['stealth_heroes', 'silencer', 'disruptor', 'doom', 'axe'],
+    pugna: ['underlord', 'huskar', 'dragon_knight', 'wraith_king', 'life_stealer'],
+    queen_of_pain: ['silencer', 'doom', 'axe', 'legion_commander', 'faceless_void'],
+    ringmaster: ['ancient_apparition', 'zuus', 'rubick', 'keeper_of_the_light'],
+    rubick: ['heroes_without_good_spells', 'slark', 'troll_warlord', 'ursa', 'spectre'],
+    silencer: ['storm_spirit', 'queen_of_pain', 'lina', 'skywrath_mage', 'death_prophet'],
+    skywrath_mage: ['ancient_apparition', 'zuus', 'rubick', 'keeper_of_the_light'],
+    storm_spirit: ['silencer', 'disruptor', 'ancient_apparition', 'ember_spirit', 'lina'],
+    tinker: ['antimage', 'ancient_apparition', 'viper', 'silencer'],
+    warlock: ['abaddon', 'winter_wyvern', 'omniknight', 'treant_protector', 'dazzle'],
+    winter_wyvern: ['chaos_knight', 'phantom_lancer', 'terrorblade', 'spectre', 'medusa'],
+    witch_doctor: ['abaddon', 'winter_wyvern', 'omniknight', 'treant_protector', 'dazzle'],
+    zeus: ['anti-mage', 'ancient_apparition', 'storm_spirit', 'ember_spirit', 'skywrath_mage'],
+
+    // UNIVERSAL
+    abaddon: ['ancient_apparition', 'viper', 'grimstroke', 'oracle'],
+    arc_warden: ['pugna', 'ancient_apparition', 'grimstroke', 'oracle'],
+    bane: ['juggernaut', 'omniknight', 'legion_commander', 'faceless_void'],
+    batrider: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
+    beastmaster: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
+    brewmaster: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
+    dazzle: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
+    death_prophet: ['silencer', 'axe', 'legion_commander', 'faceless_void'],
+    enigma: ['ancient_apparition', 'rubick', 'keeper_of_the_light', 'death_prophet'],
+    io: ['rubick', 'keeper_of_the_light', 'death_prophet', 'ancient_apparition'],
+    magnus: ['puck', 'silencer', 'disruptor', 'doom'],
+    marci: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
+    natures_prophet: ['ancient_apparition', 'rubick', 'keeper_of_the_light', 'death_prophet'],
+    nyx_assassin: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
+    pangolier: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
+    sand_king: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
+    snapfire: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
+    techies: ['chen', 'enigma', 'earthshaker', 'magnus'],
+    venomancer: ['ancient_apparition', 'rubick', 'keeper_of_the_light', 'death_prophet'],
+    visage: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
+    void_spirit: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
+    windranger: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke']
+};
