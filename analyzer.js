@@ -76,7 +76,7 @@ export async function fetchHeroesMeta() {
                 name,
                 role: roles,
                 winrate: avgWinrate, // Средневзвешенный винрейт
-                pickrate // Общая частота пика
+                pickrate              // Общая частота пика
             };
         });
     } catch (err) {
@@ -96,7 +96,7 @@ export async function getHero(heroId) {
     const allHeroes = await fetchHeroesMeta();
     
     // Возвращает первого найденного героя с этим ID (регистр не важен)
-    return allHeroes.find((hero) => hero.id === heroId.toLowerCase());
+    return allHeroes.find((hero) => hero.id === hero.id.toLowerCase());
   } catch (err) {
     console.error('Ошибка при получении героя:', err.message);
     return null;
@@ -179,23 +179,155 @@ export async function calculateDraftScore(actionType, team, heroId, enemyTeam) {
 }
 
 /**
- * Функция для автоматического подбора оптимального бана.
- * Предлагает героя с самой высокой суммой критериев "мета".
+ * Основная функция управления драфтом ИИ.
  *
- * @param {Set<string>} enemyTeam Герои противника.
- * @returns Объект героя или null.
+ * Эта логика управляет выбором следующего героя ботом.
+ * Бот анализирует текущее состояние драфта и выбирает героя,
+ * который лучше всего закрывает пробелы в собственном составе
+ * и даёт максимальный прирост очков против врага.
+ *
+ * @param {Object} draftState - Текущий статус драфта.
+ * @returns Объект с информацией о герое для следующего пика.
  */
-export async function suggestBan(enemyTeam) {
-  const allHeroes = await fetchHeroesMeta();
-  
-  // Исключаем уже выбранных врагов, чтобы не советовать тех же героев дважды
-  const availableHeroes = allHeroes.filter(h => !enemyTeam.has(h.id));
+export async function aiDraft(draftState) {
+  const {
+    teamHeroes,      // Массив ID выбранных героев вашей команды (бота)
+    enemyHeroes,     // Массив ID вражеских героев
+    roleOrder        // Массив позиций от 1 до 5; null/undefined значит "пустая позиция"
+  } = draftState;
 
-  // Сортируем оставшихся героев по сумме критериев "мета" (чем больше, тем лучше)
-  return availableHeroes.sort((a, b) =>
-      ((b.winrate || 0) - META_SETTINGS.WINRATE_THRESHOLD) +
-      ((b.pickrate || 0) - META_SETTINGS.PICKRATE_THRESHOLD)
-  ).shift(); // shift возвращает первый элемент массива (самого популярного/мощного)
+  // Шаг 0: Получаем актуальные данные о всех героях
+  const allHeroes = await fetchHeroesMeta();
+
+  // Шаг 1: Анализируем состав команды
+  // Найдём первую полностью пустую позицию
+  let neededPosition = findFirstEmptySlot(roleOrder);
+  
+  // Если все слоты заняты, ищем самые слабые линии
+  if (!neededPosition && !isTeamFull(roleOrder)) {
+    neededPosition = findWeakestRole(allHeroes, teamHeroes, roleOrder);
+  }
+
+  // Если команда полная, просто берём самого сильного героя без учёта ролей
+  if (!neededPosition) return await findStrongestHero(allHeroes, teamHeroes, enemyHeroes);
+
+  // Шаг 2: Фильтруем список кандидатов
+  // Оставляем только тех, кто может встать на нужную роль
+  const candidates = allHeroes.filter(
+    hero => !teamHeroes.includes(hero.id) && hero.role.includes(neededPosition)
+  );
+
+  // Шаг 3: Оцениваем каждого кандидата
+  const scoredCandidates = [];
+  for (const candidate of candidates) {
+    // Создаём новый порядок ролей, где герой занимает найденное место
+    const newRoles = [...roleOrder];
+    newRoles[neededPosition - 1] = neededPosition;
+    
+    // Считаем изменение баланса состава при добавлении этого героя
+    const balanceDelta = await calculateRoleScore([...teamHeroes, candidate.id], newRoles) -
+                         await calculateRoleScore(teamHeroes, roleOrder);
+
+    // Считаем силу пика против врага
+    const pickStrength = await calculateDraftScore('pick', 'dire', candidate.id, new Set(enemyHeroes));
+
+    scoredCandidates.push({
+      id: candidate.id,
+      name: candidate.name,
+      position: neededPosition,
+      score: balanceDelta + pickStrength
+    });
+  }
+
+  // Шаг 4: Возвращаем лучшего кандидата
+  scoredCandidates.sort((a, b) => b.score - a.score); // По убыванию итогового балла
+  return scoredCandidates.length > 0 ? scoredCandidates[0] : null;
+}
+
+// Вспомогательные функции
+
+/**
+ * Находит номер первой пустой позиции в команде.
+ * @returns Число от 1 до 5 или null, если все заполнены.
+ */
+function findFirstEmptySlot(roleOrder) {
+  for (let i = 1; i <= 5; i++) {
+    if (!roleOrder[i-1]) return i;
+  }
+  return null;
+}
+
+/**
+ * Проверяет, все ли пять слотов заняты хотя бы одним героем.
+ */
+function isTeamFull(roleOrder) {
+  return roleOrder.every(slot => slot !== undefined && slot !== null);
+}
+
+/**
+ * Находит самую слабую линию в текущем составе.
+ * Идея: мы считаем текущий балл баланса для каждой линии отдельно.
+ * Берём ту линию, которая даёт наименьший вклад в общий баланс.
+ * Это позволяет закрывать пробелы даже когда все слоты формально заняты.
+ */
+async function findWeakestRole(allHeroes, teamHeroes, roleOrder) {
+  const currentBalance = await calculateRoleScore(teamHeroes, roleOrder);
+
+  // Будем считать баллы за каждую линию отдельно
+  const lineScores = Array.from({length: 5}, (_, i) => ({
+    role: i + 1,
+    heroesOnLine: getHeroesOnRole(i + 1, teamHeroes),
+    score: 0
+  }));
+
+  // Для каждой линии вычислим её вклад в общий баланс
+  for (const line of lineScores) {
+    const tempRoles = [...roleOrder]; // Копия текущего порядка
+    // Представим, что у нас нет ни одного героя на этой линии
+    tempRoles.forEach((_, idx) => {
+      if (line.heroesOnLine.includes(teamHeroes[idx])) tempRoles[idx] = null;
+    });
+
+    // Разница между общим баллом и баллом без текущей линии —
+    // это и есть ценность этой линии
+    line.score = await calculateRoleScore(teamHeroes, tempRoles);
+  }
+
+  // Сортируем линии по их ценности (чем меньше балл, тем линия слабее)
+  lineScores.sort((a, b) => a.score - b.score);
+
+  // Возвращаем позицию самой слабой линии
+  return lineScores[0].role;
+}
+
+/**
+ * Находит всех героев в команде, которые могут стоять на заданной роли.
+ */
+function getHeroesOnRole(targetRole, teamHeroes) {
+  return Promise.all(teamHeroes.map(asyncGetHero))
+    .then(heroes =>
+      heroes.filter(h =>
+        h?.role.includes(targetRole)
+      ).map(h => h.id)
+    )
+    .catch(() => []);
+}
+
+/**
+ * Вспомогательная функция для поиска самого сильного героя среди оставшихся.
+ * Используется, если все позиции уже заполнены.
+ */
+async function findStrongestHero(allHeroes, teamHeroes, enemyHeroes) {
+  const availableHeroes = allHeroes.filter(h => !teamHeroes.includes(h.id));
+  
+  return availableHeroes.map(async hero => ({
+    id: hero.id,
+    name: hero.name,
+    score: await calculateDraftScore('pick', 'dire', hero.id, new Set(enemyHeroes))
+  }))
+  .then(candidates =>
+    candidates.sort((a, b) => b.score - a.score)[0]
+  );
 }
 
 /**
