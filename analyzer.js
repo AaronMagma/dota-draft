@@ -260,7 +260,7 @@ export const COUNTERS = {
     marci: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
     natures_prophet: ['ancient_apparition', 'rubick', 'keeper_of_the_light', 'death_prophet'],
     nyx_assassin: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
-    pangolier: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
+    pangolier: ['clockwerk', 'techies', 'bloodseeker', 'grimstroke'],
     sand_king: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
     snapfire: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
     techies: ['chen', 'enigma', 'earthshaker', 'magnus'],
