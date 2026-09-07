@@ -50,7 +50,7 @@ export const heroesPool = [
     { id: "gyrocopter", name: "Gyro", attr: "agi", icon: "🚀" },
     { id: "hoodwink", name: "Hoodwink", attr: "agi", icon: "🐿️" },
     { id: "juggernaut", name: "Juggernaut", attr: "agi", icon: "👺" },
-    { id: "keen_optic", name: "Kez", attr: "agi", icon: "🦤" }, // Я исправил опечатку Kez -> keen_optic
+    { id: "keen_optic", name: "Keen Optic", attr: "agi", icon: "🦤" }, // Исправил опечатку Kez -> keen_optic
     { id: "lone_druid", name: "Lone Druid", attr: "agi", icon: "🐻" },
     { id: "luna", name: "Luna", attr: "agi", icon: "🌙" },
     { id: "medusa", name: "Medusa", attr: "agi", icon: "🐍" },
@@ -159,7 +159,7 @@ export const draftSequence = [
     { step: 19, team: "dire", type: "ban" },
     { step: 20, team: "radiant", type: "ban" },
     { step: 21, team: "dire", type: "ban" },
-    { step: 22, team: "radiant",  type: "ban" },
+    { step: 22, team: "radiant", type: "ban" },
     { step: 23, team: "dire", type: "pick" },
     { step: 24, team: "radiant", type: "pick" }
 ];
@@ -172,7 +172,6 @@ export const bannedHeroes = new Set();
 export const pickedHeroes = new Set();
 export let selectedHeroId = null; // Выбранный героем игроком
 
-
 /**
  * Генерирует сетку всех доступных героев слева.
  */
@@ -184,7 +183,7 @@ export function renderHeroesGrid() {
         int: document.getElementById("int-container"),
         uni: document.getElementById("uni-container")
     };
-    
+
     Object.values(containers).forEach(c => c && (c.innerHTML = ""));
 
     heroesPool.forEach(hero => {
@@ -229,8 +228,9 @@ export function renderDraftRows() {
         const leftSlot = document.createElement("div");
         leftSlot.id = `slot-left-${index}`;
         leftSlot.className = "slot-display empty-slot";
-        leftSlot.textContent = config.team === "radiant"
-            ? (config.type === "ban" ? "B" : "P") 
+        leftSlot.textContent =
+          config.team === "radiant"
+            ? (config.type === "ban" ? "B" : "P")
             : "";
         leftCol.appendChild(leftSlot);
 
@@ -238,8 +238,9 @@ export function renderDraftRows() {
         const rightSlot = document.createElement("div");
         rightSlot.id = `slot-right-${index}`;
         rightSlot.className = "slot-display empty-slot";
-        rightSlot.textContent = config.team === "dire"
-            ? (config.type === "ban" ? "B" : "P") 
+        rightSlot.textContent =
+          config.team === "dire"
+            ? (config.type === "ban" ? "B" : "P")
             : "";
         rightCol.appendChild(rightSlot);
     });
@@ -249,8 +250,12 @@ export function renderDraftRows() {
  * Выделяет карточку героя при клике.
  */
 export function selectHero(heroId) {
-    if (currentStepIndex >= draftSequence.length) return;
-    if (bannedHeroes.has(heroId) || pickedHeroes.has(heroId)) return;
+    if (
+      currentStepIndex >= draftSequence.length ||
+      bannedHeroes.has(heroId) ||
+      pickedHeroes.has(heroId)
+    )
+      return;
 
     if (selectedHeroId) {
         const oldCard = document.getElementById(`grid-hero-${selectedHeroId}`);
@@ -288,19 +293,26 @@ export function commitCurrentTurn() {
     card.classList.add("disabled");
 
     // Находим правильный слот на основе команды
-    const slotId = turnConfig.team === "radiant"
+    const slotId =
+      turnConfig.team === "radiant"
         ? `slot-left-${currentStepIndex}`
         : `slot-right-${currentStepIndex}`;
     
     const slot = document.getElementById(slotId)!;
     slot.classList.remove("empty-slot", "active-slot");
     slot.classList.add(
-        turnConfig.type === "ban" ? "filled-ban" : "filled-pick"
+      turnConfig.type === "ban" ? "filled-ban" : "filled-pick"
     );
 
     // Вставляем иконку и имя героя прямо в слот
     slot.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;">
+        <div style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            width: 100%;
+        ">
             <span style="font-size: 13px;">${heroObj.icon}</span>
             <span style="font-size: 9px; font-weight: bold; color: #ffffff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px;">${heroObj.name}</span>
         </div>
@@ -320,12 +332,14 @@ export function updateUI() {
 
     // Сбрасываем старую подсветку активного хода со всех слотов
     [...document.querySelectorAll(".slot-display")].forEach(s =>
-        s.classList.remove("active-slot")
+      s.classList.remove("active-slot")
     );
 
     // Проверяем завершение драфта по визуальному состоянию
-    const allSlots = [...document.querySelectorAll('.slot-display')];
-    const filledSlots = allSlots.filter(slot => slot.classList.contains('filled-ban') || slot.classList.contains('filled-pick'));
+    const allSlots = [...document.querySelectorAll(".slot-display")];
+    const filledSlots = allSlots.filter(
+      slot => slot.classList.contains("filled-ban") || slot.classList.contains("filled-pick")
+    );
 
     if (filledSlots.length === draftSequence.length) {
         statusMsg.textContent = "ДРАФТ ЗАВЕРШЁН!";
@@ -337,21 +351,21 @@ export function updateUI() {
 
     const turn = draftSequence[currentStepIndex];
     const isPlayerTurn =
-        (turn.team === "radiant" && playerIsRadiant) ||
-        (turn.team === "dire" && !playerIsRadiant);
+      (turn.team === "radiant" && playerIsRadiant) ||
+      (turn.team === "dire" && !playerIsRadiant);
 
     const teamName = turn.team === "radiant"
-        ? "Radiant (Свет)"
-        : "Dire (Тьма)";
+      ? "Radiant (Свет)"
+      : "Dire (Тьма)";
     const actionName = turn.type === "ban" ? "БАНИТ" : "ВЫБИРАЕТ";
-    
+
     statusMsg.textContent = `${teamName} ${actionName}`;
     statusMsg.style.color = turn.team === "radiant" ? "#22c55e" : "#f87171";
 
     // Подсвечиваем рамкой текущий активный слот
     const activeSlotId = turn.team === "radiant"
-        ? `slot-left-${currentStepIndex}`
-        : `slot-right-${currentStepIndex}`;
+      ? `slot-left-${currentStepIndex}`
+      : `slot-right-${currentStepIndex}`;
     
     const activeSlot = document.getElementById(activeSlotId);
     activeSlot?.classList.add("active-slot");
@@ -362,20 +376,21 @@ export function updateUI() {
         actionBtn.className = "player-turn";
     } else {
         actionBtn.textContent = isPlayerTurn
-            ? (turn.type === "ban" ? "ЗАБАНЬТЕ ГЕРОЯ" : "ВЫБЕРИТЕ ГЕРОЯ")
-            : "КОМПЬЮТЕР ДУМАЕТ..."; // Добавил подсказку
+          ? (turn.type === "ban" ? "ЗАБАНЬТЕ ГЕРОЯ" : "ВЫБЕРИТЕ ГЕРОЯ")
+          : "КОМПЬЮТЕР ДУМАЕТ..."; // Добавил подсказку
         actionBtn.className = "disabled";
     }
 }
-// ВАЖНО: Добавьте этот код в самый низ файла script.js!
-document.addEventListener('DOMContentLoaded', () => {
-  renderHeroesGrid();
-  renderDraftRows();
-  updateUI();
-  
-  const actionBtn = document.getElementById('action-btn');
-  if (actionBtn) {
-      // Это ваш старый обработчик кнопки "Подтвердить"
-      actionBtn.addEventListener('click', commitCurrentTurn);
-  }
+
+// ⚡️ ВАЖНО: Этот блок должен быть в самом низу файла!
+document.addEventListener("DOMContentLoaded", () => {
+    renderHeroesGrid();
+    renderDraftRows();
+    updateUI();
+
+    const actionBtn = document.getElementById("action-btn");
+    if (actionBtn) {
+        // Подключаем обработчик клика только если кнопка существует
+        actionBtn.addEventListener("click", commitCurrentTurn);
+    }
 });
