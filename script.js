@@ -288,7 +288,7 @@ function commitCurrentTurn() {
     if (slot) {
         slot.classList.remove("empty-slot", "active-slot");
         slot.classList.add(
-          turnConfig.type === "ban" ? "filled-ban" : "filled-pick"
+          `${turn.type === \"ban\" ? \"filled-ban\" : \"filled-pick\"}`
         );
 
         // ⚡️ ВСПЛЫВАЮЩИЙ ДИЗАЙН: Вот сюда вставился код, выводящий имя и иконку героя прямо в слот
@@ -436,7 +436,7 @@ async function checkBotTurn(stepIndex = currentStepIndex) {
             cardFinal.classList.add(\"disabled\"); // Экранирование
         }
 
-        const targetSlotId = turn.team === \"radiant\" ? \"slot-left-\" + stepIndex : \"slot-right-\" + stepIndex;
+        const targetSlotId = `${turn.team === \"radiant\" ? \"slot-left-\" + stepIndex : \"slot-right-\" + stepIndex}`;
         const slot = document.getElementById(targetSlotId);
         
         // ⚡️ ВАШ СТАРЫЙ СИНТАКСИС ЭКРАНИРОВАНИЯ!
