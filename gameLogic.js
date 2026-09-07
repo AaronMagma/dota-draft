@@ -93,8 +93,8 @@ function banHero(heroId) {
     if (card) card.classList.add('disabled');
 
     const targetSlotId = draftSequence[currentStepIndex].team === 'radiant'
-        ? `slot-left-${currentStepIndex}`
-        : `slot-right-${currentStep`;
+        : `slot-left-${currentStepIndex}`
+        : `slot-right-${currentStep}`;
 
     const slot = document.getElementById(targetSlotId);
     if (slot) {
