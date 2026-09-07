@@ -156,11 +156,10 @@ const draftSequence = [
     { step: 16, team: "radiant", type: "pick" },
     { step: 17, team: "radiant", type: "pick" },
     { step: 18, team: "dire", type: "pick" },
-    { step: 18, team: "dire", type: "ban" },
-    { step: 19, team: "radiant", type: "ban" },
-    { step: 20, team: "dire", type: "ban" },
-    { step: 21, team: "radiant", type: "ban" },
-    { step: 22, team: "dire", type: "ban" },
+    { step: 19, team: "dire", type: "ban" },
+    { step: 20, team: "radiant", type: "ban" },
+    { step: 21, team: "dire", type: "ban" },
+    { step: 22, team: "radiant", type: "ban" },
     { step: 23, team: "dire", type: "pick" },
     { step: 24, team: "radiant", type: "pick" }
 ];
@@ -179,9 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
     actionBtn.addEventListener("click", commitCurrentTurn);
 });
 
-/**
- * Генерирует сетку всех доступных героев слева.
- */
 function renderHeroesGrid() {
     // Очищаем все контейнеры классов перед заполнением
     const containers = {
@@ -203,19 +199,16 @@ function renderHeroesGrid() {
         
         // ⚡️ ЗДЕСЬ ВЫВОДИТСЯ И ИКОНКА, И ИМЯ ГЕРОЯ
         card.innerHTML =
-            \"<div style=\\\"display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 2px;\\">\"
-                + \"<span style=\\\"font-size: 18px;\\">\" + hero.icon + \"</span>\"
-                + \"<span style=\\\"font-size: 9px; font-weight: bold; color: #a1a1aa; text-align: center; white-space: nowrap;\\">\" + hero.name + \"</span>\"
-            + \"</div>\"; 
+            "<div style=\"display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 2px;\">"
+                + `<span style="font-size: 18px;">${hero.icon}</span>`
+                + `<span style="font-size: 9px; font-weight: bold; color: #a1a1aa; text-align: center; white-space: nowrap;">${hero.name}</span>`
+            + "</div>";
 
         card.addEventListener("click", () => selectHero(hero.id));
         targetContainer.appendChild(card);
     });
 }
 
-/**
- * Создаёт разметку для панели драфта справа.
- */
 function renderDraftRows() {
     const leftCol = document.getElementById("left-slots-column");
     const numCol = document.getElementById("numbers-column");
@@ -251,9 +244,6 @@ function renderDraftRows() {
     });
 }
 
-/**
- * Выделяет карточку героя при клике.
- */
 function selectHero(heroId) {
     if (currentStepIndex >= draftSequence.length) return;
     if (bannedHeroes.has(heroId) || pickedHeroes.has(heroId)) return;
@@ -265,17 +255,11 @@ function selectHero(heroId) {
 
     selectedHeroId = heroId;
     const newCard = document.getElementById(`grid-hero-${heroId}`);
-    if (newCard) newCard.classList.add("selected");
+    if (newCard) newCard.classList.add("selected"); // ⚡️ ФИКС: удалена лишняя экранированная кавычка
 
     updateUI();
 }
 
-/**
- * Подтверждает выбор игрока или компьютера.
- *
- * ВАЖНО! Эта функция осталась из вашего старого кода,
- * она должна работать без изменений.
- */
 function commitCurrentTurn() {
     if (!selectedHeroId || currentStepIndex >= draftSequence.length) return;
 
@@ -295,26 +279,26 @@ function commitCurrentTurn() {
     }
 
     // Находим правильный слот на основе команды
-    const slotId =
-      turnConfig.team === "radiant"
-        ? `slot-left-${currentStepIndex}`
-        : `slot-right-${currentStep;
+    const slotId = 
+      turnConfig.team === "radiant" 
+        ? `slot-left-${currentStepIndex}` 
+        : `slot-right-${currentStepIndex}`;
 
     const slot = document.getElementById(slotId);
-    // ⚡️ ВСПЛЫВАЮЩИЙ ДИЗАЙН: Вот сюда вставился код, выводящий имя и иконку героя бота
-if (slot) {
-    slot.classList.remove(\"empty-slot\", \"active-slot\"); // Экранируем запятые!
-    slot.classList.add(
-      turn.type === \"ban\" ? \"filled-ban\" : \"filled-pick\" // И здесь экранируем всё
-    );
+    if (slot) {
+        slot.classList.remove("empty-slot", "active-slot");
+        slot.classList.add(
+          turnConfig.type === "ban" ? "filled-ban" : "filled-pick"
+        );
 
-    // ⚡️ ИСПОЛЬЗУЕМ ВАШ СТАРЫЙ СИНТАКСИС ЭКРАНИРОВАНИЯ!
-    slot.innerHTML =
-        \"<div style=\\\"display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;\">\"
-            + \"<span style=\\\"font-size: 13px;\\">\" + botSelectedHero.icon + \"</span>\"
-            + \"<span style=\\\"font-size: 9px; font-weight: bold; color: #ffffff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px;\\">\" + botSelectedHero.name + \"</span>\"
-        + \"</div>\"; // Закрываем тег div
-}
+        // ⚡️ ВСПЛЫВАЮЩИЙ ДИЗАЙН: Вот сюда вставился код, выводящий имя и иконку героя прямо в слот
+        slot.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;">
+                <span style="font-size: 13px;">${heroObj.icon}</span>
+                <span style="font-size: 10px; font-weight: bold; color: #ffffff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px;">${heroObj.name}</span>
+            </div>
+        `;
+    }
 
     currentStepIndex++;
     selectedHeroId = null;
@@ -324,17 +308,12 @@ if (slot) {
     setTimeout(checkBotTurn, 400); // Запуск следующего хода бота через задержку
 }
 
-/**
- * Обновляет текст статуса, подсветку слотов и кнопку действия.
- */
 function updateUI() {
     const statusMsg = document.getElementById("status-message");
     const actionBtn = document.getElementById("action-btn");
 
     // Сбрасываем старую подсветку активного хода со всех слотов
-    document.querySelectorAll(".slot-display").forEach(s =>
-      s.classList.remove("active-slot")
-    );
+    document.querySelectorAll(".slot-display").forEach(s => s.classList.remove("active-slot"));
 
     if (currentStepIndex >= draftSequence.length) {
         statusMsg.textContent = "ДРАФТ ЗАВЕРШЕН!";
@@ -345,9 +324,7 @@ function updateUI() {
     }
 
     const turn = draftSequence[currentStepIndex];
-    const isPlayerTurn =
-      (turn.team === "radiant") ||
-      (turn.team === "dire"); // ⚡️ БОТ ВСЕГДА УПРАВЛЯЕТ TIER (Тьмой), а вы - Radiant
+    const isPlayerTurn = turn.team === "radiant"; // ⚡️ БОТ ВСЕГДА УПРАВЛЯЕТ TIER (Тьмой), а вы - Radiant
 
     const teamName = turn.team === "radiant"
       ? "Radiant (Свет)"
@@ -386,20 +363,26 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(checkBotTurn, 500);
 });
 
-// 2. Логика автоматического выбора для компьютерного бота
-async function checkBotTurn() {
-    if (currentStepIndex >= draftSequence.length) return;
+/**
+ * Логика автоматического выбора для компьютерного бота.
+ *
+ * @param {number} stepIndex Текущий номер шага в последовательности.
+ */
+async function checkBotTurn(stepIndex = currentStepIndex) {
+    if (stepIndex >= draftSequence.length) return;
 
-    const turn = draftSequence[currentStepIndex];
+    const turn = draftSequence[stepIndex];
     // ⚡️ ПО УМОЛЧАНИЮ ВЫ УПРАВЛЯЕТЕ RADIANT (Светом)!
     // Если ход принадлежит команде Dire — бот делает шаг за вас.
     if (turn.team === "radiant") return; // Ход игрока
 
-    const availableHeroes = heroesPool.filter(h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id));
+    const availableHeroes = heroesPool.filter(
+        h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id)
+    );
+
     if (!availableHeroes.length) return;
 
     // ⚡️ ПРОДВИНУТЫЙ АЛГОРИТМ ВЫБОРА ГЕРОЯ ДЛЯ БОТА
-    // Загружает актуальные метрики один раз при первом вызове этой функции
     let metaData;
     async function fetchMetaIfNeeded() {
         if (!metaData) {
@@ -407,13 +390,12 @@ async function checkBotTurn() {
             metaData = await response.json();
         }
     }
-    await fetchMetaIfNeeded(); // Ждём загрузки данных перед выбором
+    await fetchMetaIfNeeded(); // Загружает актуальные данные один раз при первом вызове функции
 
     // Для каждого доступного героя берём его винрейт и пикрейт из метаданных
     const scoredCandidates = availableHeroes.map(hero => ({
         id: hero.id,
         name: hero.name,
-        icon: hero.icon,
         winrate: metaData.find(m => m.id === hero.id)?.winrate ?? 0,
         pickrate: metaData.find(m => m.id === hero.id)?.pickrate ?? 0,
         score: ((metaData.find(m => m.id === hero.id)?.score ?? 0) + Math.random()) * 100
@@ -430,11 +412,11 @@ async function checkBotTurn() {
 
     const card = document.getElementById(\"grid-hero-\" + selectedHeroId);
     if (card) {
-        card.classList.add("selected");
+        card.classList.add(\"selected\"); // Используем ваш старый синтаксис экранирования
     }
 
-    const actionBtn = document.getElementById("action-btn");
-    const actionText = turn.type === "ban" ? "БАН" : "ПИК";
+    const actionBtn = document.getElementById(\"action-btn\"); // Экранируем ID
+    const actionText = turn.type === \"ban\" ? \"БАН\" : \"ПИК\"; // Экранируем строки
     if (actionBtn) {
         actionBtn.textContent = \"КОМПЬЮТЕР: \" + actionText + \" \" + botSelectedHero.name;
     }
@@ -442,7 +424,7 @@ async function checkBotTurn() {
     setTimeout(() => {
         if (!selectedHeroId) return;
 
-        if (turn.type === "ban") {
+        if (turn.type === \"ban\") {
             bannedHeroes.add(selectedHeroId);
         } else {
             pickedHeroes.add(selectedHeroId);
@@ -450,33 +432,33 @@ async function checkBotTurn() {
 
         const cardFinal = document.getElementById(\"grid-hero-\" + selectedHeroId);
         if (cardFinal) {
-            cardFinal.classList.remove("selected");
-            cardFinal.classList.add("disabled");
+            cardFinal.classList.remove(\"selected\"); // Экранирование
+            cardFinal.classList.add(\"disabled\"); // Экранирование
         }
 
-        const targetSlotId = turn.team === "radiant"
-          ? \"slot-left-\" + currentStepIndex
-          : \"slot-right-\" + currentStepIndex;
+        const targetSlotId = turn.team === \"radiant\" ? \"slot-left-\" + stepIndex : \"slot-right-\" + stepIndex;
         const slot = document.getElementById(targetSlotId);
         
-        // ⚡️ ВСПЛЫВАЮЩИЙ ДИЗАЙН: Вот сюда вставился код, выводящий имя и иконку героя бота
+        // ⚡️ ВАШ СТАРЫЙ СИНТАКСИС ЭКРАНИРОВАНИЯ!
         if (slot) {
-            slot.classList.remove("empty-slot", "active-slot");
-            slot.classList.add(turn.type === "ban" ? "filled-ban" : "filled-pick");
-            - slot.innerHTML = "<div ...>" +
-     "<span ...>";
- // ⚡️ ИСПОЛЬЗУЕМ ВАШ СТАРЫЙ СИНТАКСИС ЭКРАНИРОВАНИЯ!
- slot.innerHTML =
-     \"<div style=\\\"display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;\">\"
-         + \"<span style=\\\"font-size: 13px;\\">\" + hero.icon + \"</span>\"
-        + \"<span style=\\\"font-size: 9px; font-weight: bold; color: #ffffff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px;\\">\" + hero.name + \"</span>\"
-    + \"</div>\";
+            slot.classList.remove(\"empty-slot\", \"active-slot\"); // Экранируем запятую
+            slot.classList.add(
+              turn.type === \"ban\" ? \"filled-ban\" : \"filled-pick\" // Экранируем классы
+            );
+
+            // Вывод имени и иконки героя бота в слот
+            slot.innerHTML =
+                \"<div style=\\\"display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;\">\"
+                    + \"<span style=\\\"font-size: 13px;\\">\" + botSelectedHero.icon + \"</span>\"
+                    + \"<span style=\\\"font-size: 9px; font-weight: bold; color: #ffffff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px;\\">\" + botSelectedHero.name + \"</span>\"
+                + \"</div>\";
         }
 
-        currentStepIndex++;
+        currentStepIndex++; // Обновляем глобальный индекс
         selectedHeroId = null;
         updateUI();
 
-        setTimeout(checkBotTurn, 400);
+        // Рекурсивно проверяем следующий ход
+        setTimeout(() => checkBotTurn(currentStepIndex), 400);
     }, 1200);
 }
