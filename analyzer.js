@@ -8,6 +8,7 @@
  *   name - локализованное имя героя
  *   role - массив позиций [1-5]
  *   winrate - средневзвешенный винрейт по всем MMR-диапазонам (%)
+ *   pickrate - общая частота пика (%)
  */
 export async function fetchHeroesMeta() {
     const headers = {
@@ -66,11 +67,16 @@ export async function fetchHeroesMeta() {
             // Вычисляем средний винрейт по всем диапазонам
             const avgWinrate = Math.round(totalWinrate / count);
 
+            // ⚡️ Добавим поле с общей частотой пика (первая колонка Pick%)
+            const pickrateText = row.children[0].querySelector('span').textContent;
+            const pickrate = parseFloat(pickrateText.replace('%', ''));
+
             return { 
                 id,
                 name,
                 role: roles,
-                winrate: avgWinrate // Средневзвешенный винрейт
+                winrate: avgWinrate, // Средневзвешенный винрейт
+                pickrate // Общая частота пика
             };
         });
     } catch (err) {
@@ -109,37 +115,11 @@ export const POSITION_MAP = {
 };
 
 /**
- * Считает очки за баланс состава при распределении ролей.
- *
- * Баллы начисляются так:
- * +5 если герой стоит на своей основной позиции (первой в списке)
- * +3 если он стоит на любой из подходящих ему позиций
- * 0 баллов если роль не подходит вообще.
- *
- * @param {Array<string>} teamHeroes Список ID выбранных героев.
- * @param {Array<number>} roleOrder Массив назначенных им позиций (от 1 до 5).
- * @returns Число набранных очков.
+ * Настройки порогов для определения метовых героев.
+ * Ты можешь менять их под текущие тренды!
  */
-async function calculateRoleScore(teamHeroes, roleOrder) {
-    let score = 0;
-
-    for (let i = 0; i < 5; i++) {
-        const heroObj = await getHero(teamHeroes[i]);
-        
-        // Если герой не найден на Dotabuff (например, новый), пропускаем его
-        if (!heroObj || !roleOrder[i]) continue;
-
-        const assignedPosition = parseInt(roleOrder[i]); // Позиция от 1 до 5
-        const isMainRole = heroObj.role[0] === assignedPosition;
-
-        // Проверяем, может ли герой играть на этой позиции
-        if (heroObj.role.includes(assignedPosition)) {
-            score += isMainRole ? 5 : 3;
-        }
-    }
-
-    return score;
-}
+const META_WINRATE_THRESHOLD = 53; // Винрейт от 53%
+const META_PICKRATE_THRESHOLD = 8; // Частота пика от 8%
 
 /**
  * Считывает очки за пик конкретного героя во время драфта.
@@ -158,19 +138,23 @@ async function calculateRoleScore(teamHeroes, roleOrder) {
  * @returns Изменение счёта.
  */
 export async function calculateDraftScore(actionType, team, heroId, enemyTeam) {
-  const hero = await getHero(heroId); // <-- Добавлено await здесь
+  const hero = await getHero(heroId); // <-- Await здесь обязателен
   let delta = 0;
 
   switch (actionType) {
       case 'pick':
-          // Очки за мета-пика
-          // ❗️ МЕТА-ГЕРОИ ТЕПЕРЬ ОПРЕДЕЛЯЮТСЯ ДИНАМИЧЕСКИ ПО ВИНРЕЙТУ!
-          // Герой считается мета, если его общий винрейт >= 54%
-          if (hero && hero.winrate >= 54) delta += 10;
+          // Герой считается мета, если он популярен ИЛИ имеет высокий винрейт
+          if (
+              hero && 
+              ((hero.winrate || 0) >= META_WINRATE_THRESHOLD ||
+               (hero.pickrate || 0) >= META_PICKRATE_THRESHOLD)
+          ) {
+              delta += 10; // Твой бонус за пик метового героя
+          }
 
           // Контрпики
           for (const enemy of enemyTeam.values()) {
-              const enemyObj = await getHero(enemy); // <-- Добавлено await здесь
+              const enemyObj = await getHero(enemy); // <-- Await здесь тоже нужен
               if (!enemyObj || !COUNTERS[heroId]) continue;
 
               // Мы кого-то законтрили
@@ -300,32 +284,4 @@ export const COUNTERS = {
     skywrath_mage: ['ancient_apparition', 'zuus', 'rubick', 'keeper_of_the_light'],
     storm_spirit: ['silencer', 'disruptor', 'ancient_apparition', 'ember_spirit', 'lina'],
     tinker: ['antimage', 'ancient_apparition', 'viper', 'silencer'],
-    warlock: ['abaddon', 'winter_wyvern', 'omniknight', 'treant_protector', 'dazzle'],
-    winter_wyvern: ['chaos_knight', 'phantom_lancer', 'terrorblade', 'spectre', 'medusa'],
-    witch_doctor: ['abaddon', 'winter_wyvern', 'omniknight', 'treant_protector', 'dazzle'],
-    zeus: ['anti-mage', 'ancient_apparition', 'storm_spirit', 'ember_spirit', 'skywrath_mage'],
-
-    // UNIVERSAL
-    abaddon: ['ancient_apparition', 'viper', 'grimstroke', 'oracle'],
-    arc_warden: ['pugna', 'ancient_apparition', 'grimstroke', 'oracle'],
-    bane: ['juggernaut', 'omniknight', 'legion_commander', 'faceless_void'],
-    batrider: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
-    beastmaster: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
-    brewmaster: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
-    dazzle: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
-    death_prophet: ['silencer', 'axe', 'legion_commander', 'faceless_void'],
-    enigma: ['ancient_apparition', 'rubick', 'keeper_of_the_light', 'death_prophet'],
-    io: ['rubick', 'keeper_of_the_light', 'death_prophet', 'ancient_apparition'],
-    magnus: ['puck', 'silencer', 'disruptor', 'doom'],
-    marci: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
-    natures_prophet: ['ancient_apparition', 'rubick', 'keeper_of_the_light', 'death_prophet'],
-    nyx_assassin: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
-    pangolier: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
-    sand_king: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
-    snapfire: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
-    techies: ['chen', 'enigma', 'earthshaker', 'magnus'],
-    venomancer: ['ancient_apparition', 'rubick', 'keeper_of_the_light', 'death_prophet'],
-    visage: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
-    void_spirit: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
-    windranger: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke']
-};
+    warlock: ['ab
