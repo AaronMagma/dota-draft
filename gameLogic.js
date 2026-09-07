@@ -4,12 +4,10 @@ import {
     fetchHeroesMeta,
     calculateDraftScore,
     POSITION_MAP,
+    getHero as getAnalyticHero, // Используем вашу функцию поиска + нашу аналитику
 } from './analyzer.js';
 
-/**
- * Импортируем ваши глобальные переменные и функции из script.js.
- * Они доступны благодаря type="module" в index.html.
- */
+// Импортируем ваши глобальные переменные и функции из script.js
 import {
     heroesPool, // Ваш список героев с эмодзи
     draftSequence,
@@ -19,11 +17,10 @@ import {
     selectedHeroId,
     selectHero,
     commitCurrentTurn,
-    updateUI,
-} from './script.js';
+    updateUI
+} from './script.js'; // ВАЖНО: Подключаем ваш старый скрипт как модуль!
 
 let playerIsRadiant = true; // По умолчанию игрок управляет Radiant
-// Если поставить false, игрок будет управлять Dire
 
 /**
  * Проверяет, закончен ли драфт по визуальному состоянию слотов.
@@ -50,7 +47,7 @@ async function botAdvancedPick(stepIndex, metaHeroes) {
         h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id)
     );
 
-    // Отфильтрованный пул только по вашему списку из 127 героев
+    // Отфильтрованный пул только по вашим 127 героям
     const filteredHeroes = availableHeroes.filter(h =>
         heroesPool.some(poolHero => poolHero.id === h.id.toLowerCase())
     );
@@ -82,9 +79,40 @@ async function botAdvancedPick(stepIndex, metaHeroes) {
 
     // Через секунду подтверждаем ход (эмуляция задержки человека)
     setTimeout(() => {
-        commitCurrentTurn();
+        commitCurrentTurn(); // Вызываем вашу существующую функцию подтверждения хода
         checkBotTurn(metaHeroes); // Рекурсивно проверяем следующий шаг
     }, 1500);
+}
+
+/**
+ * Вспомогательная функция для бана без подтверждения через кнопку.
+ */
+function banHero(heroId) {
+    bannedHeroes.add(heroId);
+    const card = document.getElementById(`grid-hero-${heroId}`);
+    if (card) card.classList.add('disabled');
+
+    const targetSlotId = draftSequence[currentStepIndex].team === 'radiant'
+        ? `slot-left-${currentStepIndex}`
+        : `slot-right-${currentStep`;
+
+    const slot = document.getElementById(targetSlotId);
+    if (slot) {
+        slot.classList.remove('empty-slot', 'active-slot');
+        slot.classList.add('filled-ban');
+        
+        // Вставляем иконку и имя героя прямо в слот
+        const heroObj = heroesPool.find(h => h.id === heroId);
+        slot.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;">
+                <span style="font-size: 13px;">${heroObj.icon}</span>
+                <span style="font-size: 9px; font-weight: bold; color: #ffffff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px;">${heroObj.name}</span>
+            </div>
+        `;
+    }
+
+    currentStepIndex++;
+    updateUI();
 }
 
 /**
@@ -108,11 +136,11 @@ export async function checkBotTurn(metaHeroes) {
     // Ход компьютера
     if (turnConfig.type === 'ban') {
         // Просто выбираем случайного доступного героя для бана
-        const availableHeroes = heroesPool.filter(hero =>
-            !bannedHeroes.has(hero.id) && !pickedHeroes.has(hero.id)
+        const availableHeroes = heroesPool.filter(
+            hero => !bannedHeroes.has(hero.id) && !pickedHeroes.has(hero.id)
         );
         const randomBan = availableHeroes[
-            Math.floor(Math.random() * availableHeroes.length)
+            Math.floor(Math.random() * availableFriends.length)
         ];
 
         banHero(randomBan.id);
@@ -122,38 +150,7 @@ export async function checkBotTurn(metaHeroes) {
     }
 }
 
-/**
- * Вспомогательная функция для бана без подтверждения через кнопку.
- */
-function banHero(heroId) {
-    bannedHeroes.add(heroId);
-    const card = document.getElementById(`grid-hero-${heroId}`);
-    if (card) card.classList.add('disabled');
-
-    const targetSlotId = draftSequence[currentStepIndex].team === 'radiant'
-        ? `slot-left-${currentStepIndex}`
-        : `slot-right-${currentStepIndex}`;
-    
-    const slot = document.getElementById(targetSlotId);
-    if (slot) {
-        slot.classList.remove('empty-slot', 'active-slot');
-        slot.classList.add('filled-ban');
-        
-        // Вставляем иконку и имя героя прямо в слот
-        const heroObj = heroesPool.find(h => h.id === heroId);
-        slot.innerHTML = `
-            <div style="display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;">
-                <span style="font-size: 13px;">${heroObj.icon}</span>
-                <span style="font-size: 9px; font-weight: bold; color: #ffffff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px;">${heroObj.name}</span>
-            </div>
-        `;
-    }
-
-    currentStepIndex++;
-    updateUI();
-}
-
-// ⚡️ ВАЖНО: Эта функция запускает весь процесс
+// ⚡️ ВАЖНО: Запуск всего процесса
 window.addEventListener('DOMContentLoaded', async () => {
     // Предварительно кэшируем всю мету при загрузке страницы
     const META_HEROES = await fetchHeroesMeta();
