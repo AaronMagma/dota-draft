@@ -293,7 +293,7 @@ export function commitCurrentTurn() {
         ? `slot-left-${currentStepIndex}`
         : `slot-right-${currentStepIndex}`;
     
-    const slot = document.getElementById(slotId)!;
+    const slot = document.getElementById(targetSlotId) ?? {};
     slot.classList.remove("empty-slot", "active-slot");
     slot.classList.add(
       turnConfig.type === "ban" ? "filled-ban" : "filled-pick"
