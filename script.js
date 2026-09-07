@@ -10,7 +10,7 @@ function togglePlayerTeam() {
 }
 // Полный пул героев, разбитый на 4 класса по 6 штук в каждом
 const heroesPool = [
-    // --- STRENGTH (Сила) — ровно 36 героев строго по вашему списку ---
+    // --- STRENGTH (Сила) — ровно 36 или больше героев строго по вашему списку ---
     // Ряд 1
     { id: "alchemist", name: "Alchemist", attr: "str", icon: "🧪" },
     { id: "axe", name: "Axe", attr: "str", icon: "🪓" },
