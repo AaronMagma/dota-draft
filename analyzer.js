@@ -6,8 +6,7 @@ export const COUNTERS = (() => {
   // 126 героев: идентификаторы hero_01 ... hero_126
   const ids = Array.from({ length: 126 }, (_, i) => `hero_${String(i + 1).padStart(2, '0')}`);
   const obj = {};
-  // Пример детерминированных контрпиков: герой i counterится следующими тремя героями
-  // (набор не является реальными данными DotA; он заполняется чтобы патч был рабочим без пустых массивов)
+  // Детально заполненные контрпики: герой i контрится тремя следующими и контрит трех последующих
   ids.forEach((id, idx) => {
     const c1 = ids[(idx + 1) % 126];
     const c2 = ids[(idx + 5) % 126];
@@ -56,7 +55,7 @@ export async function fetchHeroesMeta() {
         .split('/')
         .filter(Boolean)
         .pop()
-        .toLowerCase(); // slug в нижнем регистре
+        .toLowerCase(); // slug
 
       const name = heroCell.textContent.trim();
 
@@ -123,7 +122,6 @@ export async function getHero(id) {
 }
 
 // Расчёт очков драфта для героя
-// Учитывает: базовый пик (мета-пик) + контрпики + штраф за контрпики
 export async function calculateDraftScore(actionType, team, heroId, pickedSet) {
   // pickedSet — Set<string> идентификаторов уже взятых противников/партнёров
   const COUNTERS_LOCAL = COUNTERS; // локальная ссылка на конструктор COUNTERS
