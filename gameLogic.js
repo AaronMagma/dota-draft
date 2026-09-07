@@ -3,11 +3,12 @@
 import {
     fetchHeroesMeta,
     calculateDraftScore,
-    POSITION_MAP,
-    getHero as getAnalyticHero, // Используем вашу функцию поиска + нашу аналитику
 } from './analyzer.js';
 
-// Импортируем ваши глобальные переменные и функции из script.js
+/**
+ * Импортируем ваши глобальные переменные и функции из script.js.
+ * Они доступны благодаря type="module" в index.html.
+ */
 import {
     heroesPool, // Ваш список героев с эмодзи
     draftSequence,
@@ -17,7 +18,7 @@ import {
     selectedHeroId,
     selectHero,
     commitCurrentTurn,
-    updateUI
+    updateUI,
 } from './script.js'; // ВАЖНО: Подключаем ваш старый скрипт как модуль!
 
 let playerIsRadiant = true; // По умолчанию игрок управляет Radiant
@@ -27,14 +28,15 @@ let playerIsRadiant = true; // По умолчанию игрок управля
  */
 function isDraftFinished() {
     const allSlots = [...document.querySelectorAll('.slot-display')];
-    const filledSlots = allSlots.filter(slot => slot.classList.contains('filled-ban') || slot.classList.contains('filled-pick'));
+    const filledSlots = allSlots.filter(slot =>
+        slot.classList.contains('filled-ban') || slot.classList.contains('filled-pick')
+    );
 
     return filledSlots.length === draftSequence.length;
 }
 
 /**
  * Продвинутый алгоритм выбора героя для бота.
- * Работает на основе данных о мета-игре: винрейта, пикрейта и контрпиков.
  *
  * @param {number} stepIndex - Текущий номер шага в последовательности.
  * @param {Array<Object>} metaHeroes - Данные о всех героях с Dotabuff.
@@ -42,21 +44,25 @@ function isDraftFinished() {
 async function botAdvancedPick(stepIndex, metaHeroes) {
     const turnConfig = draftSequence[stepIndex];
 
+    console.log(`AI выбирает героя на шаге ${turnConfig.step}: команда ${turnConfig.team}, тип действия "${turnConfig.type}"`);
+
     // Список всех доступных героев (не забаненных и не выбранных)
-    const availableHeroes = metaHeroes.filter(
+    let availableHeroes = metaHeroes.filter(
         h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id)
     );
 
-    // Отфильтрованный пул только по вашим 127 героям
-    const filteredHeroes = availableHeroes.filter(h =>
+    // Отфильтрованный пул только по вашему списку из 127 героев
+    availableHeroes = availableHeroes.filter(h =>
         heroesPool.some(poolHero => poolHero.id === h.id.toLowerCase())
     );
 
-    // Если никто не подходит, выбираем рандома из полного списка
-    const candidates = filteredHeroes.length ? filteredHeroes : availableHeroes;
+    if (!availableHeroes.length) {
+        console.error('Ошибка AI: нет доступных героев!');
+        return;
+    }
 
     // Сортируем кандидатов по силе их пиков
-    const scoredCandidates = await Promise.all(candidates.map(async hero => ({
+    const scoredCandidates = await Promise.all(availableHeroes.map(async hero => ({
         ...hero,
         score: await calculateDraftScore(
             'pick',
@@ -69,17 +75,14 @@ async function botAdvancedPick(stepIndex, metaHeroes) {
     // Находим лучшего кандидата
     const bestCandidate = scoredCandidates.sort((a, b) => b.score - a.score)[0];
 
-    if (!bestCandidate) {
-        console.error('AI не смог найти подходящего героя!');
-        return;
-    }
+    console.log(`AI выбрал: ${bestCandidate.name} (${bestCandidate.id}) | Score: ${bestCandidate.score}`);
 
     // Делаем выбор
     selectHero(bestCandidate.id);
 
     // Через секунду подтверждаем ход (эмуляция задержки человека)
     setTimeout(() => {
-        commitCurrentTurn(); // Вызываем вашу существующую функцию подтверждения хода
+        commitCurrentTurn();
         checkBotTurn(metaHeroes); // Рекурсивно проверяем следующий шаг
     }, 1500);
 }
@@ -92,19 +95,26 @@ function banHero(heroId) {
     const card = document.getElementById(`grid-hero-${heroId}`);
     if (card) card.classList.add('disabled');
 
-    const targetSlotId = draftSequence[currentStepIndex].team === 'radiant'
-        : `slot-left-${currentStepIndex}`
-        : `slot-right-${currentStep}`;
-
+    const targetSlotId =
+      draftSequence[currentStepIndex].team === "radiant"
+        ? `slot-left-${currentStepIndex}`
+        : `slot-right-${currentStepIndex}`;
+    
     const slot = document.getElementById(targetSlotId);
     if (slot) {
-        slot.classList.remove('empty-slot', 'active-slot');
-        slot.classList.add('filled-ban');
+        slot.classList.remove("empty-slot", "active-slot");
+        slot.classList.add("filled-ban");
         
         // Вставляем иконку и имя героя прямо в слот
         const heroObj = heroesPool.find(h => h.id === heroId);
         slot.innerHTML = `
-            <div style="display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;">
+            <div style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                width: 100%;
+            ">
                 <span style="font-size: 13px;">${heroObj.icon}</span>
                 <span style="font-size: 9px; font-weight: bold; color: #ffffff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px;">${heroObj.name}</span>
             </div>
@@ -136,13 +146,20 @@ export async function checkBotTurn(metaHeroes) {
     // Ход компьютера
     if (turnConfig.type === 'ban') {
         // Просто выбираем случайного доступного героя для бана
-        const availableHeroes = heroesPool.filter(
-            hero => !bannedHeroes.has(hero.id) && !pickedHeroes.has(hero.id)
+        const availableHeroes = heroesPool.filter(hero =>
+            !bannedHeroes.has(hero.id) && !pickedHeroes.has(hero.id)
         );
+
+        if (!availableHeroes.length) {
+            console.error('Ошибка AI при бане: нет доступных героев!');
+            return;
+        }
+
         const randomBan = availableHeroes[
-            Math.floor(Math.random() * availableFriends.length)
+            Math.floor(Math.random() * availableHeroes.length)
         ];
 
+        console.log(`AI банит: ${randomBan.name} (${randomBan.id})`);
         banHero(randomBan.id);
     } else {
         // Для пика используем продвинутый алгоритм
@@ -152,9 +169,13 @@ export async function checkBotTurn(metaHeroes) {
 
 // ⚡️ ВАЖНО: Запуск всего процесса
 window.addEventListener('DOMContentLoaded', async () => {
-    // Предварительно кэшируем всю мету при загрузке страницы
-    const META_HEROES = await fetchHeroesMeta();
+    try {
+        // Предварительно кэшируем всю мету при загрузке страницы
+        const META_HEROES = await fetchHeroesMeta();
 
-    // Начинаем проверять текущий шаг
-    checkBotTurn(META_HEROES);
+        // Начинаем проверять текущий шаг
+        checkBotTurn(META_HEROES);
+    } catch (err) {
+        console.error('Не удалось получить данные о мета-игре:', err.message);
+    }
 });
