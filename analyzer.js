@@ -1,7 +1,7 @@
 // analyzer.js — движок аналитики драфта Dota 2
 
 /**
- * Получение актуального пула всех героев с dotabuff.com.
+ * Получение актуальных данных о героях с dotabuff.com.
  *
  * @returns {Array} Массив объектов героев со свойствами:
  *   id - строка ID героя (например, "axe")
@@ -118,8 +118,10 @@ export const POSITION_MAP = {
  * Настройки порогов для определения метовых героев.
  * Ты можешь менять их под текущие тренды!
  */
-const META_WINRATE_THRESHOLD = 53; // Винрейт от 53%
-const META_PICKRATE_THRESHOLD = 8; // Частота пика от 8%
+export const META_SETTINGS = {
+  WINRATE_THRESHOLD: 50, // Герой считается мета, если его винрейт >= этого числа
+  PICKRATE_THRESHOLD: 6, // Или его частота пика >= этого числа
+};
 
 /**
  * Считывает очки за пик конкретного героя во время драфта.
@@ -146,8 +148,8 @@ export async function calculateDraftScore(actionType, team, heroId, enemyTeam) {
           // Герой считается мета, если он популярен ИЛИ имеет высокий винрейт
           if (
               hero && 
-              ((hero.winrate || 0) >= META_WINRATE_THRESHOLD ||
-               (hero.pickrate || 0) >= META_PICKRATE_THRESHOLD)
+              ((hero.winrate || 0) >= META_SETTINGS.WINRATE_THRESHOLD ||
+               (hero.pickrate || 0) >= META_SETTINGS.PICKRATE_THRESHOLD)
           ) {
               delta += 10; // Твой бонус за пик метового героя
           }
@@ -174,6 +176,26 @@ export async function calculateDraftScore(actionType, team, heroId, enemyTeam) {
   }
 
   return delta;
+}
+
+/**
+ * Функция для автоматического подбора оптимального бана.
+ * Предлагает героя с самой высокой суммой критериев "мета".
+ *
+ * @param {Set<string>} enemyTeam Герои противника.
+ * @returns Объект героя или null.
+ */
+export async function suggestBan(enemyTeam) {
+  const allHeroes = await fetchHeroesMeta();
+  
+  // Исключаем уже выбранных врагов, чтобы не советовать тех же героев дважды
+  const availableHeroes = allHeroes.filter(h => !enemyTeam.has(h.id));
+
+  // Сортируем оставшихся героев по сумме критериев "мета" (чем больше, тем лучше)
+  return availableHeroes.sort((a, b) =>
+      ((b.winrate || 0) - META_SETTINGS.WINRATE_THRESHOLD) +
+      ((b.pickrate || 0) - META_SETTINGS.PICKRATE_THRESHOLD)
+  ).shift(); // shift возвращает первый элемент массива (самого популярного/мощного)
 }
 
 /**
@@ -222,7 +244,7 @@ export const COUNTERS = {
     antimage: ['templar_assassin', 'nyx_assassin', 'dazzle', 'oracle', 'rubick'],
     bloodseeker: ['axe', 'primal_beast', 'centaur_warrunner', 'mars', 'kunkka'],
     bounty_hunter: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke', 'phoenix'],
-    broodmother: ['ancient_apparition', 'earthshaker', 'nevermore', 'invoker', 'tiny'],
+    broodmother: ['ancient_apparition', 'earthshaker', 'nevermore', 'invoker', 'tiny'], // nevermore - shadow fiend
     clinkz: ['ancient_apparition', 'undying', 'necrophos', 'witch_doctor', 'warlock'],
     drow_ranger: ['bounty_hunter', 'spirit_breaker', 'axe', 'tidehunter', 'centaur_warrunner'],
     ember_spirit: ['ancient_apparition', 'skywrath_mage', 'zuus', 'rubick', 'disruptor'],
@@ -284,4 +306,32 @@ export const COUNTERS = {
     skywrath_mage: ['ancient_apparition', 'zuus', 'rubick', 'keeper_of_the_light'],
     storm_spirit: ['silencer', 'disruptor', 'ancient_apparition', 'ember_spirit', 'lina'],
     tinker: ['antimage', 'ancient_apparition', 'viper', 'silencer'],
-    warlock: ['ab
+    warlock: ['abaddon', 'winter_wyvern', 'omniknight', 'treant_protector', 'dazzle'],
+    winter_wyvern: ['chaos_knight', 'phantom_lancer', 'terrorblade', 'spectre', 'medusa'],
+    witch_doctor: ['abaddon', 'winter_wyvern', 'omniknight', 'treant_protector', 'dazzle'],
+    zeus: ['anti-mage', 'ancient_apparition', 'storm_spirit', 'ember_spirit', 'skywrath_mage'],
+
+    // UNIVERSAL
+    abaddon: ['ancient_apparition', 'viper', 'grimstroke', 'oracle'],
+    arc_warden: ['pugna', 'ancient_apparition', 'grimstroke', 'oracle'],
+    bane: ['juggernaut', 'omniknight', 'legion_commander', 'faceless_void'],
+    batrider: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
+    beastmaster: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
+    brewmaster: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
+    dazzle: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
+    death_prophet: ['silencer', 'axe', 'legion_commander', 'faceless_void'],
+    enigma: ['ancient_apparition', 'rubick', 'keeper_of_the_light', 'death_prophet'],
+    io: ['rubick', 'keeper_of_the_light', 'death_prophet', 'ancient_apparition'],
+    magnus: ['puck', 'silencer', 'disruptor', 'doom'],
+    marci: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
+    natures_prophet: ['ancient_apparition', 'rubick', 'keeper_of_the_light', 'death_prophet'],
+    nyx_assassin: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
+    pangolier: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
+    sand_king: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
+    snapfire: ['ancient_apparition', 'viper', 'keeper_of_the_light', 'death_prophet'],
+    techies: ['chen', 'enigma', 'earthshaker', 'magnus'],
+    venomancer: ['ancient_apparition', 'rubick', 'keeper_of_the_light', 'death_prophet'],
+    visage: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
+    void_spirit: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke'],
+    windranger: ['keeper_of_the_light', 'techies', 'dark_willow', 'grimstroke']
+};
