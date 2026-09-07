@@ -363,39 +363,29 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // 2. Логика автоматического выбора для компьютерного бота
-function checkBotTurn() {
-    if (currentStepIndex >= draftSequence.length) return;
+// ⚡️ ВАЖНО: Импортируем продвинутый AI из gameLogic.js
+import { botAdvancedPick } from './gameLogic.js';
+
+/**
+ * Логика автоматического выбора для компьютерного бота.
+ */
+export async function checkBotTurn(metaHeroes) {
+    if (!metaHeroes || currentStepIndex >= draftSequence.length) return;
 
     const turn = draftSequence[currentStepIndex];
-    if (turn.team === "radiant") return; // Если ход игрока — бот ждет
 
-    const availableHeroes = heroesPool.filter(h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id));
-    if (availableHeroes.length === 0) return;
-
-    // Списки приоритетов строго по мете The International 2026
-    const sPlusTier = ["treant_protector"]; 
-    const sTier = ["earth_spirit", "invoker", "shadow_fiend"]; 
-    const aTier = ["ember_spirit", "centaur", "hoodwink", "winter_wyvern", "keeper_of_the_light"]; 
-    const trashTier = ["templar_assassin", "spirit_breaker", "puck"]; 
-
-    let botSelectedHero = null;
-
-    if (Math.random() < 0.85) {
-        const availableSPlus = availableHeroes.filter(h => sPlusTier.includes(h.id));
-        if (availableSPlus.length > 0) {
-            botSelectedHero = availableSPlus[Math.floor(Math.random() * availableSPlus.length)];
-        } else {
-            const availableSTier = availableHeroes.filter(h => sTier.includes(h.id));
-            if (availableSTier.length > 0) {
-                botSelectedHero = availableSTier[Math.floor(Math.random() * availableSTier.length)];
-            } else {
-                const availableATier = availableHeroes.filter(h => aTier.includes(h.id));
-                if (availableATier.length > 0) {
-                    botSelectedHero = availableATier[Math.floor(Math.random() * availableATier.length)];
-                }
-            }
-        }
+    // Ход игрока
+    if (
+        (turn.team === 'radiant' && playerIsRadiant) ||
+        (turn.team === 'dire' && !playerIsRadiant)
+    ) {
+        // Ничего не делаем, ждём клика пользователя
+        return;
     }
+
+    // Ход компьютера
+    await botAdvancedPick(currentStepIndex, metaHeroes);
+}
 
     if (!botSelectedHero) {
         const cleanPool = availableHeroes.filter(h => !trashTier.includes(h.id));
