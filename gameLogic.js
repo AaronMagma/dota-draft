@@ -1,100 +1,88 @@
-// gameLogic.js — Логика симулятора Dota 2 Draft Simulator
-
+// gameLogic.js
 import { 
   fetchHeroesMeta,
-  calculateDraftScore,
-  POSITION_MAP,
-  getHero as getAnalyticHero // Используем вашу функцию поиска + нашу аналитику
+  calculateDraftScore
 } from './analyzer.js';
 
-// Импортируем ваши функции из script.js
 import {
-  heroesPool, // Ваш список героев с эмодзи
+  heroesPool,
   draftSequence,
   bannedHeroes,
   pickedHeroes,
-  selectedHeroId,
   selectHero,
-  commitCurrentTurn,
-  updateUI
-} from './script.js'; // ВАЖНО: Подключите свой старый скрипт как модуль!
+  commitCurrentTurn
+} from './script.js';
 
-// ⚡️ ВАЖНО: Эта функция запускает весь процесс
+let metaHeroesCache = [];
+let currentStepIndex = 0;
+
+// Пример простой логики переключения хода
+let playerIsRadiant = true;
+
 window.addEventListener('DOMContentLoaded', async () => {
-  // Ждём загрузки вашего UI и сетки героев
-  renderHeroesGrid(); // Вызов из script.js
-  renderDraftRows(); // Вызов из script.js
+  // Предзагрузим мету (если доступно)
+  metaHeroesCache = await fetchHeroesMeta();
 
-  // Предварительно кэшируем всю мету при загрузке страницы
-  const META_HEROES = await fetchHeroesMeta();
+  // Рендерим сетку и драфт-слоты (если реализуете UI)
+  if (typeof renderHeroesGrid === 'function') renderHeroesGrid();
+  if (typeof renderDraftRows === 'function') renderDraftRows();
 
-  // Теперь начинаем автоматический драфт
-  checkBotTurn(META_HEROES);
+  // Запуск бота
+  checkBotTurn(metaHeroesCache);
 });
 
 async function checkBotTurn(metaHeroes) {
   if (currentStepIndex >= draftSequence.length) return;
 
-  const turnConfig = draftSequence[currentStepIndex];
+  const turn = draftSequence[currentStepIndex];
 
-  // Ход игрока
-  if (
-    (turnConfig.team === 'radiant' && playerIsRadiant) ||
-    (turnConfig.team === 'dire' && !playerIsRadiant)
-  ) {
-    // Ничего не делаем, ждём клика пользователя
+  // Определяем, чей ход
+  const isBotTurn = (turn.team === 'radiant' && !playerIsRadiant) ||
+                    (turn.team === 'dire' && playerIsRadiant);
+
+  if (!isBotTurn) {
+    // Сейчас ход игрока — ждём ввода через UI
     return;
   }
 
-  // Ход компьютера
-  let botSelectedHero;
+  let botSelectedHero = null;
 
-  if (turnConfig.type === 'ban') {
-    // Просто выбираем случайного доступного героя для бана
+  if (turn.type === 'ban') {
     const availableHeroes = heroesPool.filter(
-      hero => !bannedHeroes.has(hero.id) && !pickedHeroes.has(hero.id)
+      h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id)
     );
-    botSelectedHero = availableHeroes[
-      Math.floor(Math.random() * availableHeroes.length)
-    ];
+    if (availableHeroes.length > 0) {
+      botSelectedHero = availableHeroes[Math.floor(Math.random() * availableHeroes.length)];
+    }
   } else {
-    // Продвинутый алгоритм выбора героя для пиков
-    const availableHeroes = metaHeroes.filter(
+    const availableHeroes = heroesPool.filter(
       h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id)
     );
 
-    // Отфильтрованный пул только по вашему списку
-    const filteredHeroes = availableHeroes.filter(h =>
-      heroesPool.some(poolHero => poolHero.id === h.id)
+    const filteredHeroes = metaHeroes.filter(h =>
+      availableHeroes.some(poolHero => poolHero.id === h.id)
     );
 
-    // Сортируем кандидатов по силе их пиков
-    const scoredCandidates = filteredHeroes.map(async hero => ({
-      ...hero,
-      score: await calculateDraftScore(
-        'pick',
-        turnConfig.team,
-        hero.id,
-        new Set([...pickedHeroes])
-      )
-    }));
+    const scoredCandidates = await Promise.all(
+      filteredHeroes.map(async hero => ({
+        ...hero,
+        score: await calculateDraftScore('pick', turn.team, hero.id, new Set([...pickedHeroes]))
+      }))
+    );
 
-    // Ждём завершения асинхронного мапинга
-    const resolvedScores = await Promise.all(scoredCandidates);
-
-    // Находим лучшего кандидата
-    const bestCandidate = resolvedScores.sort((a, b) => b.score - a.score)[0];
-    botSelectedHero = bestCandidate;
+    const bestCandidate = scoredCandidates.sort((a, b) => b.score - a.score)[0];
+    if (bestCandidate) botSelectedHero = bestCandidate;
+    else if (availableHeroes.length > 0) botSelectedHero = availableHeroes[0];
   }
 
-  // Делаем выбор
-  selectHero(botSelectedHero.id);
+  if (botSelectedHero) {
+    selectHero(botSelectedHero.id);
+  }
 
-  // Через секунду подтверждаем ход (эмуляция задержки человека)
-  setTimeout(commitCurrentTurn, 1500);
+  setTimeout(commitCurrentTurn, 1200);
 
-  // Рекурсивно проверяем следующий шаг
+  // Рекурсивный вызов на следующий ход
   setTimeout(() => checkBotTurn(metaHeroes), 1800);
 }
 
-let playerIsRadiant = true; // Измените на false, если хотите играть за Тьму
+export { }
