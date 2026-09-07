@@ -1,155 +1,115 @@
-// gameLogic.js — Логика симулятора драфта Dota 2
+// gameLogic.js — Логика симулятора с поддержкой динамического AI
 
 import {
-  aiDraft,
-  POSITION_MAP // Для отображения ролей на интерфейсе
+  fetchHeroesMeta,
+  getHero as getAnalyticHero,
+  calculateDraftScore,
+  POSITION_MAP
 } from './analyzer.js';
 
+// Импортируем ваши глобальные переменные и функции из script.js
+// Они доступны благодаря type="module" в index.html
+const {
+  draftSequence,
+  currentStepIndex,
+  bannedHeroes,
+  pickedHeroes,
+  selectedHeroId,
+  selectHero,
+  commitCurrentTurn,
+  updateUI
+} = window;
+
+// ⚡️ ВАЖНО: Эта функция запускает весь процесс
+window.addEventListener('DOMContentLoaded', async () => {
+  // Ждём загрузки вашего UI и сетки героев
+  document.getElementById('status-message').textContent = '';
+
+  // Предварительно кэшируем всю мету при загрузке страницы
+  const META_HEROES = await fetchHeroesMeta();
+
+  // Начинаем автоматический драфт
+  while (!isDraftFinished(currentStepIndex)) {
+    await nextTurn(currentStepIndex, META_HEROES);
+    setTimeout(() => {}, 700); // Пауза между ходами
+  }
+});
+
 /**
- * Начальное состояние драфта.
+ * Основной цикл хода.
+ * Определяет, чей сейчас ход, и вызывает нужную функцию.
  */
-const initialState = {
-  radiantHeroes: [],
-  direHeroes: [],
-  radiantBans: [], // Можно добавить позже
-  direBans: [],
-  radiantRoles: [null, null, null, null, null],
-  direRoles: [null, null, null, null, null],
-  currentTurn: 'radiant' /* Кто ходит первым */
-};
+async function nextTurn(stepIndex, metaHeroes) {
+  const turnConfig = draftSequence[stepIndex];
+
+  if (turnConfig.team === 'dire') {
+    // Ход компьютера: вызываем продвинутого AI
+    await botAdvancedPick(stepIndex, metaHeroes);
+  } else {
+    // Ход игрока: ничего не делаем, ждём клика по герою
+    // Ваш текущий обработчик кнопки работает корректно
+  }
+}
 
 /**
  * Проверяет, закончен ли драфт.
  */
-function isDraftFinished(state) {
-  return state.radiantHeroes.length === 5 && state.direHeroes.length === 5;
+function isDraftFinished(stepIndex) {
+  return stepIndex >= draftSequence.length;
 }
 
 /**
- * Основной цикл бота.
- *
- * @param {Object} draftState - Текущий статус драфта.
- * @returns Объект с информацией о герое для следующего пика.
+ * Продвинутый алгоритм выбора героя для бота.
+ * Работает на основе динамических данных о мете.
  */
-async function nextTurn(currentState) {
-  const { currentTurn, ...rest } = currentState;
+async function botAdvancedPick(stepIndex, metaHeroes) {
+  const turnConfig = draftSequence[stepIndex];
 
-  // Определяем команду, которой сейчас ходить
-  const myTeam = currentTurn === 'radiant'
-    ? rest.radiantHeroes : rest.direHeroes;
-  const theirTeam = currentTurn === 'radiant'
-    ? rest.direHeroes : rest.radiantHeroes;
+  // Список всех доступных героев (не забаненных и не выбранных)
+  const availableHeroes = metaHeroes.filter(
+    h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id)
+  );
 
-  // Передаём состояние в AI
-  const draftState = {
-    teamHeroes: myTeam,
-    enemyHeroes: theirTeam,
-    roleOrder: currentTurn === 'radiant'
-      ? rest.radiantRoles : rest.direRoles
-  };
+  // Отфильтрованный пул только по вашим 127 героям
+  const filteredHeroes = availableHeroes.filter(h =>
+    heroesPool.some(poolHero => poolHero.id === h.id)
+  );
 
-  // AI делает выбор
-  const botPick = await aiDraft(draftState);
+  // Если никто не подходит, выбираем рандома из полного списка
+  const candidates = filteredHeroes.length ? filteredHeroes : availableHeroes;
 
-  if (!botPick) {
-    console.error('AI не смог сделать ход!');
-    return; // Или можно предложить случайного героя
-  }
+  // Сортируем кандидатов по силе их пиков
+  // Бот выбирает того, кто даст максимальный прирост очков
+  const scoredCandidates = candidates.map(async hero => ({
+    ...hero,
+    score: await calculateDraftScore(
+      'pick',
+      turnConfig.team,
+      hero.id,
+      new Set([...pickedHeroes])
+    )
+  }));
 
-  // Обновляем состояние
-  const updatedState = {
-    ...currentState,
-    // Ставим героя в свою команду
-    [currentTurn]: [
-      ...(currentTurn === 'radiant' ? rest.radiantHeroes : rest.direHeroes),
-      botPick.id
-    ],
-    // Назначаем ему позицию
-    [(currentTurn === 'radiant' ? 'radiantRoles' : 'direRoles')][botPick.position - 1] =
-      botPick.position,
-    // Меняем ход
-    currentTurn: currentTurn === 'radiant' ? 'dire' : 'radiant'
-  };
+  // Ждём завершения асинхронного мапинга
+  const resolvedScores = await Promise.all(scoredCandidates);
 
-  // Выводим информацию о ходе в консоль и на страницу
-  updateStatusMessage(updatedState); // Новая функция отрисовки статуса
-  
-  render(updatedState); // Вызов твоей функции отрисовки интерфейса
+  // Находим лучшего кандидата
+  const bestCandidate = resolvedScores.sort((a, b) => b.score - a.score)[0];
+
+  // Делаем выбор
+  selectHero(bestCandidate.id);
+
+  // Через секунду подтверждаем ход (эмуляция задержки человека)
+  setTimeout(commitCurrentTurn, 1000);
 }
 
-// ⚡️ НОВАЯ ФУНКЦИЯ ДЛЯ ТВОЕГО ИНТЕРФЕЙСА
-/**
- * Отображает текущее действие в строке состояния.
- * @param {Object} state Текущий статус драфта.
- */
-export async function updateStatusMessage(state) {
-  const { currentTurn, radiantHeroes, direHeroes } = state;
-  const radCount = radiantHeroes.length;
-  const direCount = direHeroes.length;
-
-  // Вычисляем номер текущего хода
-  const turnNumber = Math.max(radCount + 1, direCount + 1);
-
-  // Формируем текст сообщения
-  let msg = `${turnNumber}-й ход (${currentTurn.toUpperCase()}):`;
-
-  // Если бот только что сделал ход, добавляем инфо о герое
-  const lastPicked = currentTurn === 'radiant'
-    ? radiantHeroes[radCount - 1]
-    : direHeroes[direCount - 1];
-
-  if (lastPicked) {
-    // Используем твою функцию getHero() из script.js!
-    const heroObj = await getHero(lastPicked);
-    
-    // Берём первую роль по умолчанию
-    const roleText = POSITION_MAP[heroObj.role[0]] || '?';
-    document.getElementById('status-message').innerHTML = `
-      <strong>${msg}</strong><br>
-      ПИКНУТ: <b>${heroObj.name}</b> (${roleText})
-    `;
-  } else {
-    document.getElementById('status-message').textContent = msg;
-  }
-}
-
-// Запускаем игру при загрузке страницы
-window.addEventListener('load', async () => {
-  let state = initialState;
-
-  // Очищаем сообщение загрузки
-  document.getElementById('status-message').textContent = '';
-
-  // Начинаем автоматический драфт
-  while (!isDraftFinished(state)) {
-    await nextTurn(state);
-    state = await new Promise(resolve =>
-      setTimeout(() => resolve(state), 700) // Пауза между ходами
-    );
-  }
-
-  // По окончании драфта выводим итоговое сообщение
-  document.getElementById('action-btn').classList.remove('disabled');
-  document.getElementById('action-btn').innerHTML = `
-    <span style=\"color:#eab308;\">ДРАФТ ЗАВЕРШЁН!</span><br>
-    Radiant: ${state.radiantHeroes.join(', ')}.<br>
-    Dire: ${state.direHeroes.join(', ')}.
-  `;
-});
-// Вставь этот блок в конец файла gameLogic.js,
-// если у тебя нет своей функции render()
-
-/**
- * Простой пример рендера состояния для тестирования.
- */
+// Простой пример рендера состояния для тестирования
+// Вставьте этот блок в конец файла, если хотите видеть текстовые ID вместо ваших карточек
+/*
 function render(state) {
-  // Очищаем списки пиков
-  document.getElementById('left-slots-column').innerHTML = '';
-  document.getElementById('right-slots-column').innerHTML = '';
-  
-  const radSlots = state.radiantHeroes.map((id, idx) => `<div class="slot-display filled-pick">${id} (${state.radiantRoles[idx]})</div>`).join('');
-  const direSlots = state.direHeroes.map((id, idx) => `<div class="slot-display filled-pick">${id} (${state.direRoles[idx]})</div>`).join('');
-
-  document.getElementById('left-slots-column').insertAdjacentHTML('beforeend', radSlots);
-  document.getElementById('right-slots-column').insertAdjacentHTML('beforeend', direSlots);
+  document.getElementById('left-slots-column').innerHTML =
+    state.radiantHeroes.join(', ');
+  document.getElementById('right-slots-column').innerHTML =
+    state.direHeroes.join(', ');
 }
+*/
