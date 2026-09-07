@@ -367,3 +367,15 @@ export function updateUI() {
         actionBtn.className = "disabled";
     }
 }
+// ВАЖНО: Добавьте этот код в самый низ файла script.js!
+document.addEventListener('DOMContentLoaded', () => {
+  renderHeroesGrid();
+  renderDraftRows();
+  updateUI();
+  
+  const actionBtn = document.getElementById('action-btn');
+  if (actionBtn) {
+      // Это ваш старый обработчик кнопки "Подтвердить"
+      actionBtn.addEventListener('click', commitCurrentTurn);
+  }
+});
