@@ -21,30 +21,10 @@ export const heroesPool = Array.from({ length: 126 }, (_, i) => {
 
 // Пример последовательности драфта (минимальный набор)
 export const draftSequence = [
-  { step: 1, team: 'radiant', type: 'ban' },
+  { step: 1, team: 'dire', type: 'ban' },
   { step: 2, team: 'radiant', type: 'ban' },
-  { step: 3, team: 'dire', type: 'ban' },
-  { step: 4, team: 'dire', type: 'ban' }
-  { step: 5, team: 'radiant', type: 'ban' }
-  { step: 6, team: 'dire', type: 'ban' },
-  { step: 7, team: 'dire', type: 'ban' },
-  { step: 8, team: 'radiant', type: 'pick' },
-  { step: 9, team: 'dire', type: 'pick' }
-  { step: 10, team: 'radiant', type: 'ban' }
-  { step: 11, team: 'radiant', type: 'ban' },
-  { step: 12, team: 'radiant', type: 'ban' },
-  { step: 13, team: 'dire', type: 'pick' },
-  { step: 14, team: 'radiant', type: 'pick' }
-  { step: 15, team: 'radiant', type: 'pick' }
-  { step: 16, team: 'dire', type: 'pick' },
-  { step: 17, team: 'dire', type: 'pick' },
-  { step: 18, team: 'radiant', type: 'pick' },
-  { step: 19, team: 'radiant', type: 'ban' }
-  { step: 20, team: 'dire', type: 'ban' }
-  { step: 21, team: 'radiant', type: 'ban' },
-  { step: 22, team: 'dire', type: 'ban' },
-  { step: 23, team: 'radiant', type: 'pick' },
-  { step: 24, team: 'dire', type: 'pick' }
+  { step: 3, team: 'dire', type: 'pick' },
+  { step: 4, team: 'radiant', type: 'pick' }
 ];
 
 // Контроль полей драфта
@@ -59,14 +39,18 @@ export function renderHeroesGrid() {
   for (const h of heroesPool) {
     const card = document.createElement('div');
     card.className = 'hero-card';
-    // Используем спрайт-иконку (пока простая загрузка PNG; позже можно заменить на часть спрайта)
-    const img = document.createElement('img');
-    img.alt = h.name;
-    img.src = h.image;
-    card.appendChild(img);
-    const t = document.createElement('div');
-    t.textContent = h.name;
-    card.appendChild(t);
+    // Простая карточка: бейдж с id и имя
+    const badge = document.createElement('div');
+    badge.textContent = h.id.toUpperCase();
+    badge.style.fontSize = '12px';
+    badge.style.fontWeight = '700';
+    badge.style.marginBottom = '6px';
+    card.appendChild(badge);
+
+    const name = document.createElement('div');
+    name.textContent = h.name;
+    card.appendChild(name);
+
     grid.appendChild(card);
   }
 }
