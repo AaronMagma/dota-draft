@@ -3,33 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Captain Mode - Draft Simulator</title>
+  <title>Captain's Mode - Draft Simulator</title>
   <style>
     body { font-family: Arial, sans-serif; background: #0b1020; color: #fff; margin: 0; padding: 20px; }
-    .container { max-width: 1100px; margin: 0 auto; }
-    #heroes-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 12px; }
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    #heroes-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
     .hero-card { border: 1px solid #333; border-radius: 6px; padding: 6px; text-align: center; background: #15172a; }
     .hero-card img { width: 64px; height: 64px; object-fit: contain; display: block; margin: 0 auto 6px; }
     .slot { width: 120px; height: 54px; border: 1px solid #333; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; background: #1e1f2e; margin-right: 8px; }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="header">
     <h1>Captain's Mode — Draft Simulator</h1>
-    <div id="status-message" aria-live="polite"></div>
-
-    <section id="heroes-grid" aria-label="Герои доступные для драфта">
-      <!-- карточки героев будут подгружаться динамически -->
-    </section>
-
-    <section id="draft-area" style="margin-top: 16px;">
-      <div id="slots" style="display:flex; align-items:center; gap:8px;">
-        <div class="slot" title="Radiant Pick 1"></div>
-        <div class="slot" title="Dire Pick 1"></div>
-        <!-- можно добавить больше слотов по необходимости -->
-      </div>
-    </section>
   </div>
+
+  <section id="heroes-grid" aria-label="Герои доступные для драфта">
+    <!-- карточки героев будут подгружаться динамически -->
+  </section>
+
+  <section id="draft-area" style="margin-top: 16px;">
+    <div id="slots" style="display:flex; align-items:center; gap:8px;">
+      <div class="slot" title="Radiant Pick 1">Radiant 1</div>
+      <div class="slot" title="Dire Pick 1">Dire 1</div>
+    </div>
+  </section>
 
   <script type="module" src="./gameLogic.js"></script>
 </body>
