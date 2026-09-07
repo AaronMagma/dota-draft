@@ -274,7 +274,7 @@ export function commitCurrentTurn() {
     if (!selectedHeroId || currentStepIndex >= draftSequence.length) return;
 
     const turnConfig = draftSequence[currentStepIndex];
-    const heroObj = heroesPool.find(h => h.id === selectedHeroId)!;
+    const heroObj = heroesPool.find(h => h.id === selectedHeroId) ?? {};
 
     if (turnConfig.type === "ban") {
         bannedHeroes.add(selectedHeroId);
