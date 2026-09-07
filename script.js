@@ -1,3 +1,13 @@
+function togglePlayerTeam() {
+    playerIsRadiant = !playerIsRadiant;
+    
+    const statusMsg = document.getElementById('status-message');
+    if (playerIsRadiant) {
+        statusMsg.textContent = "Вы играете за Свет (Radiant)";
+    } else {
+        statusMsg.textContent = "Вы играете за Тьму (Dire)";
+    }
+}
 // Полный пул героев, разбитый на 4 класса по 6 штук в каждом
 const heroesPool = [
     // --- STRENGTH (Сила) — ровно 36 героев строго по вашему списку ---
