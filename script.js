@@ -317,14 +317,21 @@ function updateUI() {
     // Сбрасываем старую подсветку активного хода со всех слотов
     document.querySelectorAll(".slot-display").forEach(s => s.classList.remove("active-slot"));
 
-    if (currentStepIndex >= draftSequence.length) {
-        statusMsg.textContent = "ДРАФТ ЗАВЕРШЕН!";
-        statusMsg.style.color = "#22c55e";
-        actionBtn.textContent = "КОНЕЦ";
-        actionBtn.className = "disabled";
-        return;
-    }
+   // Проверяем заполненность всех слотов вручную
+const allSlots = [...document.querySelectorAll('.slot-display')];
+const filledSlots = allSlots.filter(slot => slot.classList.contains('filled-ban') || slot.classList.contains('filled-pick'));
 
+if (filledSlots.length === draftSequence.length) {
+    // Все слоты заполнены — драфт действительно завершен!
+    statusMsg.textContent = "ДРАФТ ЗАВЕРШЁН!";
+} else {
+    // Иначе показываем текущее состояние хода
+    const turn = draftSequence[currentStepIndex];
+    const teamName = turn.team === "radiant" ? "Radiant (Свет)" : "Dire (Тьма)";
+    const actionName = turn.type === "ban" ? "БАНИТ" : "ВЫБИРАЕТ";
+    
+    statusMsg.textContent = `${teamName} ${actionName}`;
+}
     const turn = draftSequence[currentStepIndex];
     const teamName = turn.team === "radiant" ? "Radiant (Свет)" : "Dire (Тьма)";
     const actionName = turn.type === "ban" ? "БАНИТ" : "ВЫБИРАЕТ";
