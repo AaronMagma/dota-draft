@@ -354,7 +354,7 @@ async function checkBotTurn() {
     if (currentStepIndex >= draftSequence.length) return;
 
     const turn = draftSequence[currentStepIndex];
-    if (turn.team === "radiant") return; // Если ход игрока — бот ждет
+    if (turn.team === "dire") return; // Теперь бот управляет Тьмой, а вы — Светом
 
     // ⚡️ НОВЫЙ КОД ДИНАМИЧЕСКОГО ВЫБОРА НА ОСНОВЕ META DATA
     const availableHeroes = heroesPool.filter(
