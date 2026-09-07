@@ -195,6 +195,8 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const actionBtn = document.getElementById("action-btn");
     actionBtn.addEventListener("click", commitCurrentTurn);
+    // Новый обработчик 
+    document.getElementById('team-switcher').addEventListener('click', togglePlayerTeam);
 });
 
 function renderHeroesGrid() {
