@@ -26,7 +26,7 @@ const heroesPool = [
     { id: "phoenix", name: "Phoenix", attr: "str", icon: "🦅" },
     { id: "primal_beast", name: "Primal Beast", attr: "str", icon: "🦖" },
     { id: "pudge", name: "Pudge", attr: "str", icon: "🍞️" },
-    { id: "slardar", name: "Slardar", attr: "str", icon: "🐟" },
+    { id: "slardar", name: "Slarder", attr: "str", icon: "🐟" }, // Исправлена опечатка Slardar -> Slarder
     { id: "spirit_breaker", name: "Spirit Breaker", attr: "str", icon: "🐮" },
     { id: "sven", name: "Sven", attr: "str", icon: "⚔️" },
     { id: "tidehunter", name: "Tidehunter", attr: "str", icon: "🍉" },
@@ -50,7 +50,7 @@ const heroesPool = [
     { id: "gyrocopter", name: "Gyro", attr: "agi", icon: "🚀" },
     { id: "hoodwink", name: "Hoodwink", attr: "agi", icon: "🐿️" },
     { id: "juggernaut", name: "Juggernaut", attr: "agi", icon: "👺" },
-    { id: "keen_optic", name: "Keen Optic", attr: "agi", icon: "🦤" }, // Исправил опечатку Kez -> keen_optic
+    { id: "keen_optic", name: "Keen Optic", attr: "agi", icon: "🦤" }, // Исправлена опечатка Kez -> keen_optic
     { id: "lone_druid", name: "Lone Druid", attr: "agi", icon: "🐻" },
     { id: "luna", name: "Luna", attr: "agi", icon: "🌙" },
     { id: "medusa", name: "Medusa", attr: "agi", icon: "🐍" },
@@ -255,7 +255,7 @@ function selectHero(heroId) {
 
     selectedHeroId = heroId;
     const newCard = document.getElementById(`grid-hero-${heroId}`);
-    if (newCard) newCard.classList.add("selected"); // ⚡️ ФИКС: удалена лишняя экранированная кавычка
+    if (newCard) newCard.classList.add("selected"); 
 
     updateUI();
 }
@@ -288,7 +288,7 @@ function commitCurrentTurn() {
     if (slot) {
         slot.classList.remove("empty-slot", "active-slot");
         slot.classList.add(
-          `${turn.type === \"ban\" ? \"filled-ban\" : \"filled-pick\"}`
+          `${turnConfig.type === \"ban\" ? \"filled-ban\" : \"filled-pick\"}`
         );
 
         // ⚡️ ВСПЛЫВАЮЩИЙ ДИЗАЙН: Вот сюда вставился код, выводящий имя и иконку героя прямо в слот
@@ -304,7 +304,6 @@ function commitCurrentTurn() {
     selectedHeroId = null;
     updateUI();
 
-    // ⚡️ ВОТ ЭТУ СТРОЧКУ НУЖНО ДОБАВИТЬ В САМЫЙ КОНЕЦ ФУНКЦИИ:
     setTimeout(checkBotTurn, 400); // Запуск следующего хода бота через задержку
 }
 
@@ -356,9 +355,7 @@ function updateUI() {
     }
 }
 
-// ⚡️ А ТЕПЕРЬ ДОБАВЛЯЕМ ЖИВОГО БОТА В САМЫЙ КОНЕЦ ФАЙЛА ---
-
-// 1. Изменяем запуск загрузки: будим бота через полсекунды после открытия страницы
+// ⚡️ А ТЕПЕРЬ ДОБАВЛЯЕМ ЖИВОГО БОТА В САМЫЙ КОНЕЦ ФАЙЛА ---\n\n// 1. Изменяем запуск загрузки: будим бота через полсекунды после открытия страницы
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(checkBotTurn, 500);
 });
@@ -366,7 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
 /**
  * Логика автоматического выбора для компьютерного бота.
  *
- * @param {number} stepIndex Текущий номер шага в последовательности.
+ * @param {number} [stepIndex=currentStepIndex] Текущий номер шага в последовательности.
  */
 async function checkBotTurn(stepIndex = currentStepIndex) {
     if (stepIndex >= draftSequence.length) return;
@@ -382,7 +379,6 @@ async function checkBotTurn(stepIndex = currentStepIndex) {
 
     if (!availableHeroes.length) return;
 
-    // ⚡️ ПРОДВИНУТЫЙ АЛГОРИТМ ВЫБОРА ГЕРОЯ ДЛЯ БОТА
     let metaData;
     async function fetchMetaIfNeeded() {
         if (!metaData) {
@@ -410,9 +406,10 @@ async function checkBotTurn(stepIndex = currentStepIndex) {
 
     selectedHeroId = botSelectedHero.id;
 
+    // Экранирование по вашему стилю
     const card = document.getElementById(\"grid-hero-\" + selectedHeroId);
     if (card) {
-        card.classList.add(\"selected\"); // Используем ваш старый синтаксис экранирования
+        card.classList.add(\"selected\");
     }
 
     const actionBtn = document.getElementById(\"action-btn\"); // Экранируем ID
@@ -436,21 +433,19 @@ async function checkBotTurn(stepIndex = currentStepIndex) {
             cardFinal.classList.add(\"disabled\"); // Экранирование
         }
 
-        const targetSlotId = `${turn.team === \"radiant\" ? \"slot-left-\" + stepIndex : \"slot-right-\" + stepIndex}`;
+        const targetSlotId = turn.team === \"radiant\" ? \"slot-left-\" + stepIndex : \"slot-right-\" + stepIndex;
         const slot = document.getElementById(targetSlotId);
         
-        // ⚡️ ВАШ СТАРЫЙ СИНТАКСИС ЭКРАНИРОВАНИЯ!
+        // ВАШ СТАРЫЙ СИНТАКСИС ЭКРАНИРОВАНИЯ!
         if (slot) {
             slot.classList.remove(\"empty-slot\", \"active-slot\"); // Экранируем запятую
-            slot.classList.add(
-              turn.type === \"ban\" ? \"filled-ban\" : \"filled-pick\" // Экранируем классы
-            );
+            slot.classList.add(`${turn.type === \\\"ban\\\" ? \\\"filled-ban\\\" : \\\"filled-pick\\\"}`); // Экранируем классы
 
             // Вывод имени и иконки героя бота в слот
             slot.innerHTML =
                 \"<div style=\\\"display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;\">\"
-                    + \"<span style=\\\"font-size: 13px;\\">\" + botSelectedHero.icon + \"</span>\"
-                    + \"<span style=\\\"font-size: 9px; font-weight: bold; color: #ffffff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px;\\">\" + botSelectedHero.name + \"</span>\"
+                    + \"<span style=\\\"font-size: 13px;\\\">\" + botSelectedHero.icon + \"</span>\"
+                    + \"<span style=\\\"font-size: 9px; font-weight: bold; color: #ffffff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px;\\\">\" + botSelectedHero.name + \"</span>\"
                 + \"</div>\";
         }
 
