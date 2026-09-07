@@ -136,3 +136,20 @@ window.addEventListener('load', async () => {
     Dire: ${state.direHeroes.join(', ')}.
   `;
 });
+// Вставь этот блок в конец файла gameLogic.js,
+// если у тебя нет своей функции render()
+
+/**
+ * Простой пример рендера состояния для тестирования.
+ */
+function render(state) {
+  // Очищаем списки пиков
+  document.getElementById('left-slots-column').innerHTML = '';
+  document.getElementById('right-slots-column').innerHTML = '';
+  
+  const radSlots = state.radiantHeroes.map((id, idx) => `<div class="slot-display filled-pick">${id} (${state.radiantRoles[idx]})</div>`).join('');
+  const direSlots = state.direHeroes.map((id, idx) => `<div class="slot-display filled-pick">${id} (${state.direRoles[idx]})</div>`).join('');
+
+  document.getElementById('left-slots-column').insertAdjacentHTML('beforeend', radSlots);
+  document.getElementById('right-slots-column').insertAdjacentHTML('beforeend', direSlots);
+}
