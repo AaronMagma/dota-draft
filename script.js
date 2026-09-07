@@ -301,19 +301,20 @@ function commitCurrentTurn() {
         : `slot-right-${currentStep;
 
     const slot = document.getElementById(slotId);
-    if (slot) {
-        slot.classList.remove("empty-slot", "active-slot");
-        slot.classList.add(
-          turnConfig.type === "ban" ? "filled-ban" : "filled-pick"
-        );
+    // ⚡️ ВСПЛЫВАЮЩИЙ ДИЗАЙН: Вот сюда вставился код, выводящий имя и иконку героя бота
+if (slot) {
+    slot.classList.remove(\"empty-slot\", \"active-slot\"); // Экранируем запятые!
+    slot.classList.add(
+      turn.type === \"ban\" ? \"filled-ban\" : \"filled-pick\" // И здесь экранируем всё
+    );
 
-        // ⚡️ ВСПЛЫВАЮЩИЙ ДИЗАЙН: Вот сюда вставился код, выводящий имя и иконку героя прямо в слот
-        slot.innerHTML =
-            \"<div style=\\\"display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;\">\"
-                + \"<span style=\\\"font-size: 13px;\\">\" + heroObj.icon + \"</span>\"
-                + \"<span style=\\\"font-size: 9px; font-weight: bold; color: #ffffff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px;\\">\" + heroObj.name + \"</span>\"
-            + \"</div>\";
-    }
+    // ⚡️ ИСПОЛЬЗУЕМ ВАШ СТАРЫЙ СИНТАКСИС ЭКРАНИРОВАНИЯ!
+    slot.innerHTML =
+        \"<div style=\\\"display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;\">\"
+            + \"<span style=\\\"font-size: 13px;\\">\" + botSelectedHero.icon + \"</span>\"
+            + \"<span style=\\\"font-size: 9px; font-weight: bold; color: #ffffff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px;\\">\" + botSelectedHero.name + \"</span>\"
+        + \"</div>\"; // Закрываем тег div
+}
 
     currentStepIndex++;
     selectedHeroId = null;
@@ -462,11 +463,14 @@ async function checkBotTurn() {
         if (slot) {
             slot.classList.remove("empty-slot", "active-slot");
             slot.classList.add(turn.type === "ban" ? "filled-ban" : "filled-pick");
-            slot.innerHTML =
-                \"<div style=\\\"display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;\">\"
-                    + \"<span style=\\\"font-size: 13px;\\">\" + botSelectedHero.icon + \"</span>\"
-                    + \"<span style=\\\"font-size: 9px; font-weight: bold; color: #ffffff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px;\\">\" + botSelectedHero.name + \"</span>\"
-                + \"</div>\";
+            - slot.innerHTML = "<div ...>" +
+     "<span ...>";
+ // ⚡️ ИСПОЛЬЗУЕМ ВАШ СТАРЫЙ СИНТАКСИС ЭКРАНИРОВАНИЯ!
+ slot.innerHTML =
+     \"<div style=\\\"display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;\">\"
+         + \"<span style=\\\"font-size: 13px;\\">\" + hero.icon + \"</span>\"
+        + \"<span style=\\\"font-size: 9px; font-weight: bold; color: #ffffff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55px;\\">\" + hero.name + \"</span>\"
+    + \"</div>\";
         }
 
         currentStepIndex++;
