@@ -1,94 +1,59 @@
-<!doctype html> <html lang="ru"> <head> <meta charset="UTF-8"/> <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <title>Captain's Mode — Draft Simulator</title> <style> :root{ --bg: #0b1020; --panel: #141a33; --text: #ffffff; --muted: #9aa4b2; } html, body { height: 100%; } body { margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, Arial, sans-serif; } .wrapper { padding: 22px 28px; display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; height: 100vh; box-sizing: border-box; } /* Заголовок слева — почти как в макете */ .title { font-size: 40px; font-weight: 800; margin: 0 0 16px 0; letter-spacing: .5px; }
-/* Левая часть: 4 панели в 2x2 сетке */
-.board {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 16px;
-}
-.panel {
-  background: #0e122a;
-  border: 1px solid #2a2a2a;
-  border-radius: 8px;
-  padding: 12px;
-  min-height: 260px;
-}
-.panel-header {
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-}
-.panel-grid {
-  display: grid;
-  grid-template-columns: repeat(8, 48px);
-  grid-gap: 6px;
-}
-.hero-tile {
-  width: 48px;
-  height: 48px;
-  border-radius: 6px;
-  border: 1px solid #333;
-  background: linear-gradient(135deg, #2b2b2b, #1a1a1a);
-  cursor: pointer;
-  transition: transform .1s;
-}
-.hero-tile:hover { transform: scale(1.05); }
-
-/* Правая панель — Captains Mode */
+<!doctype html> <html lang="ru"> <head> <meta charset="UTF-8"/> <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <title>Captain's Mode — Draft Simulator</title> <style> :root{ --bg: #0b1020; --panel: #141a33; --text: #ffffff; --muted: #9aa4b2; --tile: #1b1f38; } html, body { height: 100%; } body { margin: 0; background: #0b1020; color: var(--text); font-family: system-ui, -apple-system, Arial, sans-serif; } .wrapper { padding: 20px 28px; display: grid; grid-template-columns: 1fr 360px; grid-gap: 24px; align-items: start; min-height: 100vh; } .title { font-size: 40px; font-weight: 900; margin: 6px 0 18px; letter-spacing: .4px; } #board { display: grid; grid-template-columns: repeat(2, 1fr); grid-gap: 16px; } .panel { background: #0f1430; border: 1px solid #2a2a4a; border-radius: 10px; padding: 12px; } .panel-header { font-weight: 800; font-size: 14px; letter-spacing: 1px; color: #8fb3ff; margin-bottom: 8px; text-transform: uppercase; } .panel-grid { display: grid; grid-template-columns: repeat(8, 48px); grid-gap: 6px; } .hero-tile { width: 48px; height: 48px; border-radius: 6px; border: 1px solid #333; background: #1b1f38; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; font-size: 18px; user-select: none; } .hero-tile[data-selected="true"] { outline: 2px solid #ffd166; outline-offset: 2px; } .hero-name { font-size: 12px; text-align: center; margin-top: 6px; color: #d6d6ff; white-space: nowrap; }
+/* Правая панель Captains Mode */
 .side {
-  background: #0e122a;
-  border: 1px solid #2a2a2a;
-  border-radius: 8px;
+  background: #0f1430;
+  border: 1px solid #2a2a4a;
+  border-radius: 10px;
   padding: 16px;
   height: fit-content;
 }
 .side h2 {
-  margin: 0 0 8px 0;
+  margin: 0 0 12px;
   font-size: 20px;
   letter-spacing: 1px;
+  text-align: left;
 }
 .turn {
   font-size: 14px;
-  color: #aaa;
-  margin: 6px 0 12px 0;
-}
-.turn-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-.team {
-  padding: 8px 12px;
-  background: #1b214c;
-  border-radius: 6px;
-  font-weight: 700;
-  font-size: 12px;
+  color: #a6a6a6;
+  margin: 6px 0 12px;
 }
 .timer {
-  padding: 8px 12px;
-  background: #1b214c;
+  display: inline-block;
+  padding: 6px 10px;
   border-radius: 6px;
-  font-weight: 700;
+  background: #1e1f2e;
   font-family: monospace;
+  font-weight: 700;
 }
-.ban-area {
+.team-row {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+.team-pill {
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #1b214c;
+  font-weight: 700;
+  color: #fff;
+}
+#banSlots {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 6px;
-  margin-top: 12px;
+  margin: 8px 0 12px;
 }
-.slot {
+.ban-slot {
   height: 28px;
+  border-radius: 6px;
   background: #11152b;
   border: 1px solid #333;
-  border-radius: 6px;
 }
 .ban-btn {
   width: 100%;
   padding: 12px;
-  margin-top: 12px;
+  margin-top: 6px;
   border-radius: 6px;
   border: 0;
   background: #2b2f58;
@@ -96,31 +61,25 @@
   font-weight: 700;
   cursor: pointer;
 }
-
-@media (max-width: 1024px){
-  .wrapper { grid-template-columns: 1fr; height: auto; }
-  .side { order: -1; }
+@media (max-width: 980px){
+  .wrapper { grid-template-columns: 1fr; }
+  #board { grid-template-columns: 1fr 1fr; }
 }
-</style> </head> <body> <div class="wrapper"> <div> <h1 class="title">Captain's Mode — Draft Simulator</h1>
-  <!-- Левая часть: 4 панели -->
-  <div id="board" class="board" aria-label="Герои по ролям"></div>
-</div>
-
-<!-- Правая панель -->
+</style> </head> <body> <div class="wrapper"> <div> <div class="title">Captain's Mode — Draft Simulator</div> <div id="board" aria-label="Герои по ролям"></div> </div>
 <aside class="side" aria-label="Панель драфта">
   <h2>CAPTAINS MODE</h2>
-  <div class="turn" style="display:flex; justify-content:space-between; align-items:center;">
-    <span>YOUR TURN TO BAN HERO</span>
+  <div class="turn">
+    YOUR TURN TO BAN HERO
     <span class="timer" id="timer">1:26</span>
   </div>
 
-  <div class="turn-row" style="margin-top:6px;">
-    <div class="team" style="flex:1; text-align:center;">RADIANT</div>
-    <div class="team" style="flex:1; text-align:center;">DIRE</div>
+  <div class="team-row" aria-label="Команды">
+    <div class="team-pill" style="background:#2a2a58;">RADIANT</div>
+    <div class="team-pill" style="background:#2a2a58; opacity:.6;">DIRE</div>
   </div>
 
-  <div class="ban-area" id="banSlots" aria-label="Бан-поля"></div>
+  <div id="banSlots" aria-label="Бан - слоты"></div>
 
-  <button class="ban-btn" id="banHeroBtn" disabled>BAN HERO</button>
+  <button id="banHeroBtn" class="ban-btn" disabled>BAN HERO</button>
 </aside>
 </div> <script type="module" src="./gameLogic.js"></script> </body> </html>
