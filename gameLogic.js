@@ -1,88 +1,47 @@
-// gameLogic.js
-import { 
-  fetchHeroesMeta,
-  calculateDraftScore
-} from './analyzer.js';
+// gameLogic.js // Логика драфта под ваш макет: выбор банов, таймер, кнопка BAN HERO
+import { renderBoard } from './script.js'; import { COUNTERS, normalizeHeroName } from './analyzer.js';
 
-import {
-  heroesPool,
-  draftSequence,
-  bannedHeroes,
-  pickedHeroes,
-  selectHero,
-  commitCurrentTurn
-} from './script.js';
+let selectedForBan = null; let banSlotsState = []; // будет хранить выбранные баны (макс 5) let currentTeamTurn = 'Radiant'; let timerValue = 86; // 1:26
 
-let metaHeroesCache = [];
-let currentStepIndex = 0;
+window.addEventListener('DOMContentLoaded', () => { const boardContainer = document.getElementById('board'); renderBoard(boardContainer);
 
-// Пример простой логики переключения хода
-let playerIsRadiant = true;
+// выбор героя для бана boardContainer.addEventListener('click', (e) => { const tile = e.target.closest('.hero-tile'); if (!tile) return; selectedForBan = tile.dataset.heroId; // подсветка выбранного boardContainer.querySelectorAll('.hero-tile').forEach(t => t.removeAttribute('data-selected')); tile.setAttribute('data-selected', 'true'); });
 
-window.addEventListener('DOMContentLoaded', async () => {
-  // Предзагрузим мету (если доступно)
-  metaHeroesCache = await fetchHeroesMeta();
+// кнопка BAN HERO const banBtn = document.getElementById('banHeroBtn'); banBtn.addEventListener('click', () => { if (!selectedForBan) return;
 
-  // Рендерим сетку и драфт-слоты (если реализуете UI)
-  if (typeof renderHeroesGrid === 'function') renderHeroesGrid();
-  if (typeof renderDraftRows === 'function') renderDraftRows();
+// находим первый пустой слот
+const slots = document.getElementById('banSlots');
+const emptySlot = Array.from(slots.children).find(s => !s.dataset.hero);
+const heroId = normalizeHeroName(selectedForBan) || selectedForBan;
 
-  // Запуск бота
-  checkBotTurn(metaHeroesCache);
-});
-
-async function checkBotTurn(metaHeroes) {
-  if (currentStepIndex >= draftSequence.length) return;
-
-  const turn = draftSequence[currentStepIndex];
-
-  // Определяем, чей ход
-  const isBotTurn = (turn.team === 'radiant' && !playerIsRadiant) ||
-                    (turn.team === 'dire' && playerIsRadiant);
-
-  if (!isBotTurn) {
-    // Сейчас ход игрока — ждём ввода через UI
-    return;
-  }
-
-  let botSelectedHero = null;
-
-  if (turn.type === 'ban') {
-    const availableHeroes = heroesPool.filter(
-      h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id)
-    );
-    if (availableHeroes.length > 0) {
-      botSelectedHero = availableHeroes[Math.floor(Math.random() * availableHeroes.length)];
-    }
-  } else {
-    const availableHeroes = heroesPool.filter(
-      h => !bannedHeroes.has(h.id) && !pickedHeroes.has(h.id)
-    );
-
-    const filteredHeroes = metaHeroes.filter(h =>
-      availableHeroes.some(poolHero => poolHero.id === h.id)
-    );
-
-    const scoredCandidates = await Promise.all(
-      filteredHeroes.map(async hero => ({
-        ...hero,
-        score: await calculateDraftScore('pick', turn.team, hero.id, new Set([...pickedHeroes]))
-      }))
-    );
-
-    const bestCandidate = scoredCandidates.sort((a, b) => b.score - a.score)[0];
-    if (bestCandidate) botSelectedHero = bestCandidate;
-    else if (availableHeroes.length > 0) botSelectedHero = availableHeroes[0];
-  }
-
-  if (botSelectedHero) {
-    selectHero(botSelectedHero.id);
-  }
-
-  setTimeout(commitCurrentTurn, 1200);
-
-  // Рекурсивный вызов на следующий ход
-  setTimeout(() => checkBotTurn(metaHeroes), 1800);
+if (emptySlot) {
+  emptySlot.dataset.hero = heroId;
+  emptySlot.innerHTML = `<span>${selectedForBan}</span>`;
+  banSlotsState.push(heroId);
 }
 
-export { }
+// пометим бан как выполненный и отключим выбор на время
+const tiles = boardContainer.querySelectorAll('.hero-tile');
+tiles.forEach(t => {
+  if (t.dataset.heroId === selectedForBan) {
+    t.style.opacity = '0.25';
+    t.style.pointerEvents = 'none';
+  }
+});
+
+banBtn.disabled = true;
+selectedForBan = null;
+});
+
+// простой таймер (1:26) const timerEl = document.getElementById('timer'); timerEl.textContent = '1:26'; setInterval(() => { timerValue = Math.max(0, timerValue - 1); const m = Math.floor(timerValue / 60); const s = timerValue % 60; timerEl.textContent = ${m}:${s.toString().padStart(2, '0')};
+
+// простая смена хода
+if (timerValue === 0) {
+  // смена стороны через простой триггер
+  currentTeamTurn = currentTeamTurn === 'Radiant' ? 'Dire' : 'Radiant';
+  // можно обновить UI здесь, если добавите элементы для команды
+  timerValue = 86; // перезапуск таймера
+}
+}, 1000); });
+
+export { renderBoard };
